@@ -156,3 +156,15 @@ export const usePickingLogs = (orderId?: string) => useQuery({
   queryKey: ['picking-logs', orderId],
   queryFn: () => api.get(orderId ? `/picking-log/order/${orderId}` : '/picking-log').then(r => r.data),
 });
+
+export const useSyncBsaleStock = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (clearExisting = true) =>
+      api.post('/bsale/sync-stock', { clearExisting }).then(r => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['stock'] });
+      qc.invalidateQueries({ queryKey: ['stockSummary'] });
+    },
+  });
+};

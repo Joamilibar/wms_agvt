@@ -1,13 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import axios, { AxiosInstance } from 'axios';
+import { StockLot, StockLotDocument } from '../stock/schemas/stock-lot.schema.js';
 
 @Injectable()
 export class BsaleService {
   private readonly logger = new Logger(BsaleService.name);
   private client: AxiosInstance | null = null;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectModel(StockLot.name) private stockLotModel: Model<StockLotDocument>,
+  ) {
     const token = this.configService.get<string>('bsale.token');
     const baseUrl = this.configService.get<string>('bsale.baseUrl');
 
@@ -193,4 +199,127 @@ export class BsaleService {
     const { data } = await this.client.post('/documents.json', payload);
     return data;
   }
+
+  // ── BSale → MongoDB Stock Sync (Day Zero Approach) ──────────────────────
+  async syncStockFromBsale(clearExisting = true): Promise<{
+    consumed: number;
+    created: number;
+    skipped: number;
+    errors: string[];
+  }> {
+    if (!this.client) throw new Error('BSale no configurado');
+
+    const errors: string[] = [];
+    let created = 0;
+    let skipped = 0;
+
+    // 1. Optionally wipe existing data
+    if (clearExisting) {
+      const deleted = await this.stockLotModel.deleteMany({}).exec();
+      this.logger.log(`Cleared ${deleted.deletedCount} existing StockLots (Day Zero Reset)`);
+    }
+
+    // 2. Resolve office → warehouse name mapping
+    const { data: officesData } = await this.client.get('/offices.json');
+    const officeMap: Record<string, string> = {};
+    for (const o of officesData.items || []) {
+      officeMap[o.id.toString()] = o.name;
+    }
+
+    // 3. Pre-fetch all variants to resolve SKU and Names efficiently
+    const variantMap: Record<string, { sku: string; name: string; cost: number }> = {};
+    let vOffset = 0, vLimit = 250, vTotal = Infinity;
+    this.logger.log('Fetching BSale variants catalog...');
+    while (vOffset < vTotal) {
+      try {
+        const { data } = await this.client.get(`/variants.json?limit=${vLimit}&offset=${vOffset}&expand=[product]`);
+        vTotal = data.count || 0;
+        for (const v of data.items || []) {
+          const varId = v.id.toString();
+          const pName = v.product?.name || '';
+          const vDesc = v.description || '';
+          variantMap[varId] = {
+            sku: v.code || v.barCode || varId,
+            name: (pName && vDesc && pName !== vDesc) ? `${pName} - ${vDesc}` : pName || vDesc || `Variante ${varId}`,
+            cost: v.standardCost || 0,
+          };
+        }
+        vOffset += vLimit;
+      } catch (e: any) {
+        errors.push(`Failed to fetch variants batch at offset ${vOffset}: ${e.message}`);
+        break; // If variants fail entirely, we might degrade gracefully but we need them
+      }
+    }
+
+    // 4. Fetch all current stocks
+    let sOffset = 0, sLimit = 250, sTotal = Infinity;
+    const now = new Date(); // DAY ZERO TIMESTAMP
+    this.logger.log('Fetching and creating current stock lots...');
+
+    while (sOffset < sTotal) {
+      try {
+        const { data } = await this.client.get(`/stocks.json?limit=${sLimit}&offset=${sOffset}`);
+        sTotal = data.count || 0;
+
+        for (const stock of data.items || []) {
+          const qty = stock.quantityAvailable;
+          if (!qty || qty <= 0) {
+            skipped++;
+            continue;
+          }
+
+          const officeId = stock.office?.id?.toString();
+          const variantHref = stock.variant?.href || '';
+          const variantId = variantHref.split('/').pop()?.split('.')[0];
+
+          if (!officeId || !variantId) {
+            skipped++;
+            continue;
+          }
+
+          const warehouse = officeMap[officeId] || `Sucursal ${officeId}`;
+          const vData = variantMap[variantId] || { sku: variantId, name: `Variante ${variantId}`, cost: 0 };
+          const lotKey = `BSL-INI-${variantId}-${officeId}`;
+
+          try {
+            await this.stockLotModel.create({
+              sku: vData.sku,
+              name: vData.name,
+              lot: lotKey,
+              entryDate: now, // Day Zero
+              qty: qty,
+              initialQty: qty,
+              unitCost: vData.cost, // Uses standardCost if available
+              warehouse,
+              location: '',
+              rack: '',
+              col: '',
+              row: '',
+              pallet: '',
+              supplier: null,
+              bsaleProductId: variantId,
+              isActive: true,
+              createdBy: null,
+            });
+            created++;
+          } catch (e: any) {
+            if (e.code === 11000) {
+              errors.push(`Duplicate lot for ${vData.sku} in ${warehouse}`);
+            } else {
+              errors.push(`Create failed for lot ${lotKey}: ${e.message}`);
+            }
+            skipped++;
+          }
+        }
+        sOffset += sLimit;
+      } catch (e: any) {
+        errors.push(`Failed to fetch stocks batch at offset ${sOffset}: ${e.message}`);
+        break;
+      }
+    }
+
+    this.logger.log(`Sync complete. Created: ${created}, Skipped (Zero-stock or dup): ${skipped}, Errors: ${errors.length}`);
+    return { consumed: vTotal /* variants analyzed conceptually */, created, skipped, errors };
+  }
 }
+

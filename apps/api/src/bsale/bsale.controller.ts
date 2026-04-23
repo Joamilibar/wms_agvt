@@ -59,4 +59,10 @@ export class BsaleController {
     if (!officeid || !variantids) return {};
     return this.bsaleService.getStocksForVariants(officeid, variantids.split(',').filter(Boolean));
   }
+
+  @Post('sync-stock')
+  @ApiOperation({ summary: 'Sync BSale stock consumptions into MongoDB StockLots' })
+  async syncStock(@Body() body: { clearExisting?: boolean }) {
+    return this.bsaleService.syncStockFromBsale(body?.clearExisting !== false);
+  }
 }

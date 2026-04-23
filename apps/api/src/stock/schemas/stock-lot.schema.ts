@@ -26,7 +26,7 @@ export class StockLot {
   @Prop({ required: true, min: 0 })
   initialQty!: number;
 
-  @Prop({ required: true, default: '' })
+  @Prop({ default: '' })
   location!: string;
 
   @Prop({ default: '' })

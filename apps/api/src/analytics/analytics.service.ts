@@ -164,6 +164,20 @@ export class AnalyticsService {
       else if (days <= 120) risk = 'alto';
       else risk = 'critico';
 
+      // Build a human-readable location from sub-fields
+      const locationParts = [
+        lot.rack  ? `Rack ${lot.rack}`  : '',
+        lot.col   ? `Col ${lot.col}`    : '',
+        lot.row   ? `Fila ${lot.row}`   : '',
+        lot.pallet? `Pallet ${lot.pallet}` : '',
+      ].filter(Boolean);
+
+      const locationLabel = lot.location
+        ? lot.location
+        : locationParts.length > 0
+          ? locationParts.join(' / ')
+          : 'Sin ubicación asignada';
+
       return {
         lotId: lot._id.toString(),
         sku: lot.sku,
@@ -175,7 +189,11 @@ export class AnalyticsService {
         unitCost: lot.unitCost,
         value,
         warehouse: lot.warehouse,
-        location: lot.location,
+        location: locationLabel,
+        rack: lot.rack,
+        col: lot.col,
+        row: lot.row,
+        pallet: lot.pallet,
         bucket,
         risk,
       };

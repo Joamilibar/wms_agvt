@@ -1,18 +1,16 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router';
 import { useAuthStore } from '../../stores/auth.store';
-import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineChartBar, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
+import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineChartBar, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX, HiOutlineBeaker } from 'react-icons/hi';
 
 const navItems = [
-  { to: '/', icon: HiOutlineHome, label: 'Dashboard' },
-  { to: '/inventario', icon: HiOutlineCube, label: 'Inventario' },
-  { to: '/picking', icon: HiOutlineClipboardList, label: 'Picking' },
+  { to: '/',            icon: HiOutlineHome,          label: 'Dashboard' },
+  { to: '/inventario',  icon: HiOutlineCube,          label: 'Inventario' },
+  { to: '/picking',     icon: HiOutlineClipboardList, label: 'Picking' },
   { to: '/picking-log', icon: HiOutlineClipboardList, label: 'Bitácora Picking' },
-  { to: '/guias', icon: HiOutlineTruck, label: 'Guías' },
-  { to: '/abc', icon: HiOutlineChartBar, label: 'Análisis ABC' },
-  { to: '/cobertura', icon: HiOutlineChartBar, label: 'Cobertura' },
-  { to: '/aging', icon: HiOutlineChartBar, label: 'Aging' },
-  { to: '/bsale', icon: HiOutlineCog, label: 'BSale' },
+  { to: '/guias',       icon: HiOutlineTruck,         label: 'Guías' },
+  { to: '/analisis',    icon: HiOutlineBeaker,        label: 'Análisis Inventario' },
+  { to: '/bsale',       icon: HiOutlineCog,           label: 'BSale' },
 ];
 
 export default function Layout() {

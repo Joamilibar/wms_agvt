@@ -12,6 +12,7 @@ import ABCAnalysis from './pages/ABCAnalysis';
 import Coverage from './pages/Coverage';
 import Aging from './pages/Aging';
 import BSaleConfig from './pages/BSaleConfig';
+import AnalisisInventario from './pages/AnalisisInventario';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="/cobertura" element={<Coverage />} />
             <Route path="/aging" element={<Aging />} />
             <Route path="/bsale" element={<BSaleConfig />} />
+            <Route path="/analisis" element={<AnalisisInventario />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
