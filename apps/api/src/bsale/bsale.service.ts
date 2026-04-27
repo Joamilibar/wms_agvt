@@ -232,7 +232,8 @@ export class BsaleService {
     this.logger.log('Fetching BSale variants catalog...');
     while (vOffset < vTotal) {
       try {
-        const { data } = await this.client.get(`/variants.json?limit=${vLimit}&offset=${vOffset}&expand=[product]`);
+        const res: any = await this.client!.get(`/variants.json?limit=${vLimit}&offset=${vOffset}&expand=[product]`);
+        const data: any = res.data;
         vTotal = data.count || 0;
         for (const v of data.items || []) {
           const varId = v.id.toString();
@@ -258,7 +259,8 @@ export class BsaleService {
 
     while (sOffset < sTotal) {
       try {
-        const { data } = await this.client.get(`/stocks.json?limit=${sLimit}&offset=${sOffset}`);
+        const res: any = await this.client!.get(`/stocks.json?limit=${sLimit}&offset=${sOffset}`);
+        const data: any = res.data;
         sTotal = data.count || 0;
 
         for (const stock of data.items || []) {

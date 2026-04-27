@@ -56,7 +56,7 @@ export const useStartOrder = () => {
 export const useProcessFIFO = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, items }: { id: string; items: { sku: string; qty: number }[] }) => 
+    mutationFn: ({ id, items }: { id: string; items: { sku: string; qty: number }[] }) =>
       api.post(`/orders/${id}/process-fifo`, { items }).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['orders'] });
