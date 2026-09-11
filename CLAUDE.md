@@ -22,6 +22,12 @@ cd apps/web && npm ci && npm run dev
 
 Swagger en `http://localhost:3000/api/docs`. El prefijo global de la API es `/api`.
 
+Con la base vacía `SeedService` crea **siempre** el primer admin (`SEED_ADMIN_*`) —
+`register` es anónimo y solo crea `operator`, así que no hay otra forma de tener
+uno. Los datos demo (lotes, órdenes, guías, dos operadores) solo se siembran fuera
+de producción, salvo `SEED_DEMO_DATA=true`. En producción el arranque **falla** si
+falta `SEED_ADMIN_PASSWORD` o si trae el default de desarrollo.
+
 **Mongo tiene que ser un replica set.** `OrdersService.processFIFO` abre una
 transacción, y MongoDB solo las permite sobre un replica set. El compose levanta
 uno de un solo nodo con keyfile; `mongo-init` ejecuta `rs.initiate()` una vez.

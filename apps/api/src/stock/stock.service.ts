@@ -9,6 +9,7 @@ import { InjectModel, InjectConnection } from '@nestjs/mongoose';
 import { Model, Connection, ClientSession } from 'mongoose';
 import { StockLot, StockLotDocument } from './schemas/stock-lot.schema.js';
 import { CreateStockLotDto } from './dto/create-stock-lot.dto.js';
+import { escapeRegex } from '../common/utils/regex.js';
 import { QueryStockDto } from './dto/query-stock.dto.js';
 
 export interface LotConsumption {
@@ -52,9 +53,9 @@ export class StockService {
 
   async findAll(query: QueryStockDto) {
     const filter: Record<string, unknown> = { isActive: true };
-    if (query.sku) filter.sku = { $regex: query.sku, $options: 'i' };
+    if (query.sku) filter.sku = { $regex: escapeRegex(query.sku), $options: 'i' };
     if (query.warehouse) filter.warehouse = query.warehouse;
-    if (query.lot) filter.lot = { $regex: query.lot, $options: 'i' };
+    if (query.lot) filter.lot = { $regex: escapeRegex(query.lot), $options: 'i' };
 
     const page = query.page || 1;
     const limit = query.limit || 20;

@@ -35,35 +35,65 @@ export class SeedService implements OnModuleInit {
 
   async onModuleInit() {
     const userCount = await this.userModel.countDocuments().exec();
-    if (userCount === 0) {
-      this.logger.log('🌱 No data found — running seed...');
-      await this.seed();
-      this.logger.log('✅ Seed completed');
+    if (userCount !== 0) return;
+
+    // A-09: two different things used to happen under one "seed". The admin
+    // bootstrap is needed everywhere — register is anonymous and only creates
+    // operators, so an empty database has no way to get its first admin. The
+    // demo data (lots, orders, guides, operator accounts) is only for
+    // development and must not land in a production database by accident.
+    const admin = await this.bootstrapAdmin();
+
+    if (!this.configService.get<boolean>('seed.demoData')) {
+      this.logger.log('Demo seed skipped: disabled in production (SEED_DEMO_DATA=true forces it).');
+      return;
     }
+
+    this.logger.log('🌱 No data found — seeding demo data...');
+    await this.seedDemo(admin);
+    this.logger.log('✅ Seed completed');
   }
 
-  async seed() {
-    // 1. Users
+  private async bootstrapAdmin(): Promise<UserDocument> {
     const adminEmail = this.configService.get<string>('seed.adminEmail')!;
-    const adminPassword = this.configService.get<string>('seed.adminPassword')!;
-    const hashedPass = await bcrypt.hash(adminPassword, 12);
+    const adminPassword = this.configService.get<string>('seed.adminPassword');
+
+    if (!adminPassword) {
+      // Fail fast: without an admin the instance is unusable, and shipping a
+      // default password to production is worse than not starting.
+      throw new Error(
+        'SEED_ADMIN_PASSWORD is required to bootstrap the first admin in production',
+      );
+    }
+    if (this.configService.get<string>('nodeEnv') === 'production' && adminPassword === 'Admin123!') {
+      throw new Error('SEED_ADMIN_PASSWORD must not be the development default in production');
+    }
 
     const admin = await this.userModel.create({
-      email: adminEmail, password: hashedPass, name: 'Admin Cabo de Hornos',
+      email: adminEmail, password: await bcrypt.hash(adminPassword, 12), name: 'Admin Cabo de Hornos',
       role: 'admin', warehouse: 'Central', isActive: true,
     });
+    this.logger.log(`  → admin ${adminEmail} created`);
+    return admin;
+  }
 
-    const op1 = await this.userModel.create({
-      email: 'operador1@cabodehornos.cl', password: hashedPass, name: 'Carlos Operador',
-      role: 'operator', warehouse: 'Central', isActive: true,
+  async seedDemo(admin: UserDocument) {
+    // 1. Demo operators. Each gets its own hash: bcrypt salts per call, so
+    // even with the same password no two rows share a digest, and the
+    // operator password is separate from the admin one to begin with.
+    const operatorPassword = this.configService.get<string>('seed.operatorPassword')!;
+
+    await this.userModel.create({
+      email: 'operador1@cabodehornos.cl', password: await bcrypt.hash(operatorPassword, 12),
+      name: 'Carlos Operador', role: 'operator', warehouse: 'Central', isActive: true,
     });
 
-    const op2 = await this.userModel.create({
-      email: 'operador2@cabodehornos.cl', password: hashedPass, name: 'María Operadora',
-      role: 'operator', warehouse: 'Norte', isActive: true,
+    await this.userModel.create({
+      email: 'operador2@cabodehornos.cl', password: await bcrypt.hash(operatorPassword, 12),
+      name: 'María Operadora', role: 'operator', warehouse: 'Norte', isActive: true,
     });
 
-    this.logger.log('  → 3 users created');
+    this.logger.log('  → 2 operators created');
 
     // 2. Stock Lots (16 lots distributed 10-310 days ago)
     const now = new Date();

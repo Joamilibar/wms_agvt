@@ -1,4 +1,6 @@
 export default () => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const isProduction = nodeEnv === 'production';
   const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
   let redisHost = 'localhost';
   let redisPort = 6379;
@@ -37,9 +39,19 @@ export default () => {
       token: process.env.BSALE_TOKEN || '',
     },
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+    nodeEnv,
     seed: {
       adminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@cabodehornos.cl',
-      adminPassword: process.env.SEED_ADMIN_PASSWORD || 'Admin123!',
+      // A-09: no default password in production. The fallback exists so a dev
+      // clone boots with zero config; in production an empty database with no
+      // SEED_ADMIN_PASSWORD fails fast instead of shipping a known credential.
+      adminPassword: process.env.SEED_ADMIN_PASSWORD || (isProduction ? '' : 'Admin123!'),
+      // Demo lots, orders, guides and the two operator accounts. Never in
+      // production unless asked for explicitly.
+      demoData: process.env.SEED_DEMO_DATA
+        ? process.env.SEED_DEMO_DATA === 'true'
+        : !isProduction,
+      operatorPassword: process.env.SEED_OPERATOR_PASSWORD || 'Operador123!',
     },
   };
 };
