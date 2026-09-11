@@ -5,6 +5,15 @@ import { Model } from 'mongoose';
 import axios, { AxiosInstance } from 'axios';
 import { StockLot, StockLotDocument } from '../stock/schemas/stock-lot.schema.js';
 
+/** A pack as BSale describes it, with component SKUs already resolved. */
+export interface BsalePack {
+  packSku: string;
+  name: string;
+  bsaleVariantId: string;
+  bsaleProductId: string;
+  components: { bsaleVariantId: string; sku: string; name: string; qtyPerPack: number }[];
+}
+
 @Injectable()
 export class BsaleService {
   private readonly logger = new Logger(BsaleService.name);
@@ -32,6 +41,38 @@ export class BsaleService {
   isConfigured(): boolean {
     return this.client !== null;
   }
+
+  /**
+   * Every item of a BSale collection endpoint.
+   *
+   * BSale caps `limit` at 50 and does so silently: ask for 250 and the page
+   * still holds 50, while `count` reports the full total. A loop that advances
+   * the offset by the *requested* size therefore reads one row in five and
+   * never notices. This used to be the shape of the stock sync, which then
+   * archived every lot BSale "did not report" — four fifths of the inventory.
+   *
+   * The offset advances by what actually came back, and the loop ends on an
+   * empty page rather than on `count`, so a change of cap on BSale's side
+   * cannot reintroduce the gap.
+   */
+  private async fetchAll(path: string, query = ''): Promise<any[]> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+    const sep = path.includes('?') ? '&' : '?';
+    const out: any[] = [];
+    let offset = 0;
+    for (;;) {
+      const { data } = await this.client.get(
+        `${path}${sep}limit=${BsaleService.BSALE_PAGE_SIZE}&offset=${offset}${query}`,
+      );
+      const items: any[] = data?.items || [];
+      if (items.length === 0) break;
+      out.push(...items);
+      offset += items.length;
+    }
+    return out;
+  }
+
+  private static readonly BSALE_PAGE_SIZE = 50;
 
   async testConnection(): Promise<{ connected: boolean; message: string }> {
     if (!this.client) {
@@ -185,6 +226,73 @@ export class BsaleService {
    * trip BSale's rate limit. Requests now go out in fixed-size waves.
    */
   private static readonly BSALE_CONCURRENCY = 5;
+
+  /**
+   * The composition of every pack BSale knows about.
+   *
+   * There is no pack endpoint (`/packs`, `/variants/:id/pack` and
+   * `/products/:id/pack` all answer 404), but the product itself carries it:
+   * a product with `classification: 3` lists its components inline under
+   * `pack_details` as `{ variant, quantity }`. The pack's own SKU is the code
+   * of its variant, so each pack variant becomes one recipe.
+   *
+   * Components come back with their SKU resolved because that is how the WMS
+   * keys stock; the variant id is kept alongside for traceability.
+   */
+  async getPackCatalog(): Promise<BsalePack[]> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+
+    // 1. Every pack product, with its pack_details.
+    const packProducts = (await this.fetchAll('/products.json')).filter((p) => p.classification === 3);
+
+    // 2. Resolve each component variant once: SKU and a readable name.
+    const componentIds = new Set<string>();
+    for (const p of packProducts) {
+      for (const d of p.pack_details || []) componentIds.add(String(d.variant?.id));
+    }
+    const components = new Map<string, { sku: string; name: string }>();
+    const resolveOne = async (vid: string) => {
+      const { data: v } = await this.client!.get(`/variants/${vid}.json?expand=[product]`);
+      const pName: string = v.product?.name || '';
+      const vDesc: string = v.description || '';
+      components.set(vid, {
+        sku: v.code || v.barCode || vid,
+        name: pName && vDesc && pName !== vDesc ? `${pName} - ${vDesc}` : pName || vDesc || `Variante ${vid}`,
+      });
+    };
+    const ids = [...componentIds];
+    for (let i = 0; i < ids.length; i += BsaleService.BSALE_CONCURRENCY) {
+      await Promise.all(ids.slice(i, i + BsaleService.BSALE_CONCURRENCY).map(resolveOne));
+    }
+
+    // 3. One recipe per pack variant.
+    const packs: BsalePack[] = [];
+    for (const p of packProducts) {
+      const { data: vData } = await this.client.get(`/products/${p.id}/variants.json`);
+      const recipeComponents = (p.pack_details || []).map((d: any) => {
+        const vid = String(d.variant?.id);
+        const c = components.get(vid);
+        return {
+          bsaleVariantId: vid,
+          sku: c?.sku ?? vid,
+          name: c?.name ?? `Variante ${vid}`,
+          qtyPerPack: Number(d.quantity) || 0,
+        };
+      });
+      for (const v of vData.items || []) {
+        packs.push({
+          packSku: v.code || v.barCode || String(v.id),
+          name: p.name,
+          bsaleVariantId: String(v.id),
+          bsaleProductId: String(p.id),
+          components: recipeComponents,
+        });
+      }
+    }
+
+    this.logger.log(`BSale pack catalog: ${packs.length} packs, ${components.size} distinct components`);
+    return packs;
+  }
 
   async getStocksForVariants(officeid: string | number, variantids: string[]) {
     if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
@@ -372,37 +480,32 @@ export class BsaleService {
     }
 
     // 2. Resolve office → warehouse name mapping
-    const { data: officesData } = await this.client.get('/offices.json');
     const officeMap: Record<string, string> = {};
-    for (const o of officesData.items || []) {
+    for (const o of await this.fetchAll('/offices.json')) {
       officeMap[o.id.toString()] = o.name;
     }
 
     // 3. Pre-fetch all variants to resolve SKU and Names efficiently
     const variantMap: Record<string, { sku: string; name: string; cost: number }> = {};
-    let vOffset = 0, vLimit = 250, vTotal = Infinity;
     this.logger.log('Fetching BSale variants catalog...');
-    while (vOffset < vTotal) {
-      try {
-        const res: any = await this.client!.get(`/variants.json?limit=${vLimit}&offset=${vOffset}&expand=[product]`);
-        const data: any = res.data;
-        vTotal = data.count || 0;
-        for (const v of data.items || []) {
-          const varId = v.id.toString();
-          const pName = v.product?.name || '';
-          const vDesc = v.description || '';
-          variantMap[varId] = {
-            sku: v.code || v.barCode || varId,
-            name: (pName && vDesc && pName !== vDesc) ? `${pName} - ${vDesc}` : pName || vDesc || `Variante ${varId}`,
-            cost: v.standardCost || 0,
-          };
-        }
-        vOffset += vLimit;
-      } catch (e: any) {
-        errors.push(`Failed to fetch variants batch at offset ${vOffset}: ${e.message}`);
-        break; // If variants fail entirely, we might degrade gracefully but we need them
+    try {
+      for (const v of await this.fetchAll('/variants.json', '&expand=[product]')) {
+        const varId = v.id.toString();
+        const pName = v.product?.name || '';
+        const vDesc = v.description || '';
+        variantMap[varId] = {
+          sku: v.code || v.barCode || varId,
+          name: (pName && vDesc && pName !== vDesc) ? `${pName} - ${vDesc}` : pName || vDesc || `Variante ${varId}`,
+          cost: v.standardCost || 0,
+        };
       }
+    } catch (e: any) {
+      // Without the catalog every SKU would fall back to its variant id, which
+      // would then archive the real lots as "not reported". Stop here instead.
+      errors.push(`Failed to fetch variants catalog: ${e.message}`);
+      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors };
     }
+    this.logger.log(`  ${Object.keys(variantMap).length} variants`);
 
     // 4. Build BSale's picture of the world: units per (SKU, warehouse).
     const target = new Map<string, {
@@ -415,44 +518,40 @@ export class BsaleService {
       qty: number;
     }>();
 
-    let sOffset = 0, sLimit = 250, sTotal = Infinity;
     this.logger.log('Fetching BSale stock levels...');
+    let stockRows: any[];
+    try {
+      stockRows = await this.fetchAll('/stocks.json');
+    } catch (e: any) {
+      // A partial read is worse than none: whatever was not read would be
+      // archived below as absent from BSale.
+      errors.push(`Failed to fetch stock levels: ${e.message}`);
+      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors };
+    }
+    this.logger.log(`  ${stockRows.length} stock rows`);
 
-    while (sOffset < sTotal) {
-      try {
-        const res: any = await this.client!.get(`/stocks.json?limit=${sLimit}&offset=${sOffset}`);
-        const data: any = res.data;
-        sTotal = data.count || 0;
+    for (const stock of stockRows) {
+      const qty = stock.quantityAvailable;
+      const officeId = stock.office?.id?.toString();
+      const variantId = (stock.variant?.href || '').split('/').pop()?.split('.')[0];
 
-        for (const stock of data.items || []) {
-          const qty = stock.quantityAvailable;
-          const officeId = stock.office?.id?.toString();
-          const variantId = (stock.variant?.href || '').split('/').pop()?.split('.')[0];
-
-          if (!officeId || !variantId) {
-            skipped++;
-            continue;
-          }
-
-          const warehouse = officeMap[officeId] || `Sucursal ${officeId}`;
-          const vData = variantMap[variantId] || { sku: variantId, name: `Variante ${variantId}`, cost: 0 };
-
-          target.set(vData.sku + '|||' + warehouse, {
-            sku: vData.sku,
-            warehouse,
-            officeId,
-            variantId,
-            name: vData.name,
-            cost: vData.cost,
-            qty: Math.max(0, qty || 0),
-          });
-        }
-
-        sOffset += sLimit;
-      } catch (e: any) {
-        errors.push(`Failed to fetch stocks batch at offset ${sOffset}: ${e.message}`);
-        break;
+      if (!officeId || !variantId) {
+        skipped++;
+        continue;
       }
+
+      const warehouse = officeMap[officeId] || `Sucursal ${officeId}`;
+      const vData = variantMap[variantId] || { sku: variantId, name: `Variante ${variantId}`, cost: 0 };
+
+      target.set(vData.sku + '|||' + warehouse, {
+        sku: vData.sku,
+        warehouse,
+        officeId,
+        variantId,
+        name: vData.name,
+        cost: vData.cost,
+        qty: Math.max(0, qty || 0),
+      });
     }
 
     // 5. Reconcile the WMS against it.
@@ -515,7 +614,7 @@ export class BsaleService {
     );
 
     return {
-      consumed: vTotal,
+      consumed: stockRows.length,
       created,
       skipped,
       archived,

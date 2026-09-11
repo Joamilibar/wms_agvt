@@ -23,13 +23,13 @@ export class PackComponent {
 export const PackComponentSchema = SchemaFactory.createForClass(PackComponent);
 
 /**
- * The composition of a pack, which only the WMS can hold.
+ * The composition of a pack, mirrored here so pack stock can be computed.
  *
  * BSale marks packs as `classification: 3` with `unlimitedStock: 1` and keeps no
- * stock for them, and its API exposes no composition at all (`/packs`,
- * `/variants/:id/pack` and `/products/:id/pack` all answer 404). So while BSale
- * remains the source of truth for the *components'* quantities, the recipe that
- * turns those into a pack is ours to maintain.
+ * stock for them. It does carry the composition, inline as `pack_details` on
+ * the product (there is no pack endpoint), and `POST /packs/import-bsale`
+ * copies it here. Recipes can also be entered by hand for bundles BSale does
+ * not know about; the import leaves those alone.
  */
 @Schema({ timestamps: true, collection: 'pack_recipes' })
 export class PackRecipe {

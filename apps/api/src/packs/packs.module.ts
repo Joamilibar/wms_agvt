@@ -4,6 +4,7 @@ import { PackRecipe, PackRecipeSchema } from './schemas/pack-recipe.schema.js';
 import { StockLot, StockLotSchema } from '../stock/schemas/stock-lot.schema.js';
 import { PacksService } from './packs.service.js';
 import { PacksController } from './packs.controller.js';
+import { BsaleModule } from '../bsale/bsale.module.js';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { PacksController } from './packs.controller.js';
       { name: PackRecipe.name, schema: PackRecipeSchema },
       { name: StockLot.name, schema: StockLotSchema },
     ]),
+    BsaleModule,
   ],
   controllers: [PacksController],
   providers: [PacksService],

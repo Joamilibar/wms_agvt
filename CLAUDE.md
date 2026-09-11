@@ -94,6 +94,12 @@ Por eso el índice único `{lot, warehouse}` es parcial sobre `isActive: true`.
 En una base creada antes de ese cambio hay que correr una vez:
 `db.stocklots.dropIndex('lot_1_warehouse_1')`.
 
+**BSale limita `limit` a 50 en silencio.** Pide 250 y la página trae 50, mientras
+`count` reporta el total. Toda lectura de colección pasa por
+`BsaleService.fetchAll`, que avanza el offset por lo que llegó y termina en la
+página vacía. Un loop que avance por el `limit` pedido lee una fila de cada cinco
+— y el sync archiva las otras cuatro como "no reportadas". Ya pasó.
+
 ## Analítica
 
 `SalesRecord` se escribe en cada picking, dentro de la misma transacción que el
@@ -131,9 +137,12 @@ picking. Si Redis no está, se sirve sin caché en vez de fallar.
 ## Packs
 
 BSale marca los packs con `classification: 3` y `unlimitedStock: 1`: **no les lleva
-stock** (cero registros en `/stocks.json`) y **no expone su composición** —
-`/packs`, `/variants/:id/pack` y `/products/:id/pack` responden 404. La receta,
-entonces, es del WMS: vive en `pack_recipes` y se administra por `/api/packs`.
+stock** (cero registros en `/stocks.json`). La composición sí la tiene, pero no en
+un endpoint propio (`/packs`, `/variants/:id/pack` y `/products/:id/pack` dan
+404): viene inline en `pack_details` del producto, como `{ variant, quantity }`.
+`POST /api/packs/import-bsale` (admin) la copia a `pack_recipes` con upsert
+idempotente; un componente con cantidad 0 en BSale se omite y se reporta en
+`warnings`. Las recetas cargadas a mano que BSale no conoce no se tocan.
 
 El stock de un pack se calcula, nunca se almacena:
 

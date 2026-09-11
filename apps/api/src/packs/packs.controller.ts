@@ -18,7 +18,7 @@ export class PacksController {
   @ApiOperation({
     summary: 'Stock calculado de los packs',
     description:
-      'BSale no lleva stock de los packs (unlimitedStock=1) ni expone su composición, ' +
+      'BSale no lleva stock de los packs (unlimitedStock=1), ' +
       'así que se calcula desde los componentes: el mínimo de stock/qtyPerPack, por bodega. ' +
       '`limitedBy` nombra el componente que topa el total.',
   })
@@ -27,6 +27,18 @@ export class PacksController {
     @Query('sku') sku?: string,
   ) {
     return this.packsService.availability({ warehouse, packSku: sku });
+  }
+
+  @Post('import-bsale')
+  @Roles('admin')
+  @ApiOperation({
+    summary: 'Importar las recetas desde BSale',
+    description:
+      'Lee `pack_details` de cada producto con classification=3 y hace upsert de la receta. ' +
+      'Idempotente. Los componentes con cantidad 0 en BSale se omiten y se reportan en `warnings`.',
+  })
+  async importFromBsale() {
+    return this.packsService.importFromBsale();
   }
 
   @Get()
