@@ -15,6 +15,7 @@ import Aging from './pages/Aging';
 import BSaleConfig from './pages/BSaleConfig';
 import AnalisisInventario from './pages/AnalisisInventario';
 import Usuarios from './pages/Usuarios';
+import Packs from './pages/Packs';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,7 @@ export default function App() {
             <Route path="/picking" element={<Picking />} />
             <Route path="/picking-log" element={<PickingLog />} />
             <Route path="/guias" element={<Guias />} />
+            <Route path="/packs" element={<Packs />} />
             <Route path="/abc" element={<ABCAnalysis />} />
             <Route path="/cobertura" element={<Coverage />} />
             <Route path="/aging" element={<Aging />} />

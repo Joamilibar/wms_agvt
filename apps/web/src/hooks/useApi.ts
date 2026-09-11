@@ -252,3 +252,66 @@ export const useBsaleSyncJob = (jobId: string | null) => {
     },
   });
 };
+
+// Packs
+export interface PackComponentAvailability {
+  sku: string;
+  name: string;
+  qtyPerPack: number;
+  physical: number;
+  reserved: number;
+  available: number;
+  /** Complete packs this component alone could cover. */
+  packsFromThis: number;
+}
+
+export interface PackAvailability {
+  packSku: string;
+  name: string;
+  bsaleVariantId: string | null;
+  warehouse: string;
+  packsAvailable: number;
+  packsPhysical: number;
+  /** The component that caps the total — what to replenish first. */
+  limitedBy: PackComponentAvailability | null;
+  components: PackComponentAvailability[];
+}
+
+export interface PackRecipe {
+  packSku: string;
+  name: string;
+  bsaleVariantId: string | null;
+  components: { sku: string; name: string; bsaleVariantId: string | null; qtyPerPack: number }[];
+  isActive: boolean;
+  notes: string;
+}
+
+export interface PackImportResult {
+  found: number;
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: string[];
+  warnings: string[];
+}
+
+export const usePacks = () => useQuery({
+  queryKey: ['packs'],
+  queryFn: () => api.get('/packs').then(r => r.data as PackRecipe[]),
+});
+
+export const usePackAvailability = (warehouse?: string) => useQuery({
+  queryKey: ['packAvailability', warehouse],
+  queryFn: () => api.get('/packs/availability', { params: { warehouse } }).then(r => r.data as PackAvailability[]),
+});
+
+export const useImportPacksFromBsale = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post('/packs/import-bsale').then(r => r.data as PackImportResult),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['packs'] });
+      qc.invalidateQueries({ queryKey: ['packAvailability'] });
+    },
+  });
+};
