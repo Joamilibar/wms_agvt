@@ -1,5 +1,6 @@
 import { useCoverage } from '../hooks/useApi';
-import Badge, { statusVariant, statusLabel } from '../components/ui/Badge';
+import Badge from '../components/ui/Badge';
+import { statusVariant, statusLabel } from '../lib/status';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import KpiCard from '../components/ui/KpiCard';
 import { HiOutlineExclamation, HiOutlineCheck, HiOutlineClock } from 'react-icons/hi';
@@ -18,7 +19,7 @@ export default function Coverage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Cobertura de Inventario</h1>
-        <p className="text-sm text-text-muted mt-1">Días de cobertura = Stock Actual / Promedio Diario de Ventas (90 días)</p>
+        <p className="text-sm text-text-muted mt-1">Días de cobertura = Stock Actual / Promedio Diario de Ventas. El promedio divide lo vendido por los días transcurridos desde la primera venta del SKU (máximo 90), no por los días en que hubo movimiento.</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

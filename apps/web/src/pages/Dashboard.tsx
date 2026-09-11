@@ -52,7 +52,7 @@ export default function Dashboard() {
               <YAxis tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#161b27', border: '1px solid #2a3142', borderRadius: 8, color: '#f1f5f9', fontSize: 12 }}
-                formatter={(value: any, name: string) => [name === 'valor' ? `$${value}K` : value, name === 'valor' ? 'Valor (CLP)' : 'Lotes']}
+                formatter={(value: any, name: any) => [name === 'valor' ? `$${value}K` : value, name === 'valor' ? 'Valor (CLP)' : 'Lotes']}
               />
               <Bar dataKey="lotes" fill="#1a7fe8" radius={[4, 4, 0, 0]} />
               <Bar dataKey="valor" fill="#4ade80" radius={[4, 4, 0, 0]} />

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useOrders, useStartOrder, useCancelOrder } from '../hooks/useApi';
-import Badge, { statusVariant, statusLabel } from '../components/ui/Badge';
+import Badge from '../components/ui/Badge';
+import { statusVariant, statusLabel } from '../lib/status';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import CreatePickingModal from '../components/Picking/CreatePickingModal';
 import ExecutePickingModal from '../components/Picking/ExecutePickingModal';
+import { confirmDialog } from '../lib/confirm';
 
 const statusColumns: Record<string, string> = {
   pending: 'Pendientes',
@@ -81,8 +83,14 @@ export default function Picking() {
                           Iniciar
                         </button>
                         <button
-                          onClick={() => {
-                            if (window.confirm('¿Seguro que deseas anular este picking?')) {
+                          onClick={async () => {
+                            const ok = await confirmDialog({
+                              title: 'Anular este picking',
+                              detail: 'La orden queda cancelada y se liberan los lotes que tenia reservados.',
+                              confirmLabel: 'Anular',
+                              danger: true,
+                            });
+                            if (ok) {
                               cancelMutation.mutate(order._id);
                             }
                           }}
@@ -114,7 +122,7 @@ export default function Picking() {
       </div>
 
       {showCreateModal && <CreatePickingModal onClose={() => setShowCreateModal(false)} />}
-      {activeOrderToExecute && <ExecutePickingModal order={activeOrderToExecute} onClose={() => setActiveOrderToExecute(null)} />}
+      {activeOrderToExecute && <ExecutePickingModal key={activeOrderToExecute._id} order={activeOrderToExecute} onClose={() => setActiveOrderToExecute(null)} />}
     </div>
   );
 }

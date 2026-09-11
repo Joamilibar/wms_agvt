@@ -121,6 +121,8 @@ export class SeedService implements OnModuleInit {
             warehouse: 'Central',
             qty,
             unitPrice: Math.round(product.unitCost * 1.5),
+            // Synthetic: a 50% markup invented by the seed, not a real sale.
+            priceSource: 'seed',
             orderId: null,
             guideId: null,
           });

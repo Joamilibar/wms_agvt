@@ -49,8 +49,28 @@ export class OrderItem {
   @Prop({ default: 0, min: 0 })
   pickedQty!: number;
 
+  /**
+   * Net unit sale price, taken from the BSale document line when the order
+   * was created. Zero means it is unknown (a manual order), and the picking
+   * falls back to the lot's cost — which is why `priceSource` travels with it.
+   */
+  @Prop({ default: 0, min: 0 })
+  unitPrice!: number;
+
+  @Prop({ required: true, enum: ['bsale_document', 'unknown'], default: 'unknown' })
+  priceSource!: string;
+
   @Prop({ type: [OrderItemLotSchema], default: [] })
   lots!: OrderItemLot[];
+
+  /**
+   * What this order currently holds reserved on each lot. Distinct from
+   * `lots`, which is the picking sheet shown to the operator: this one is
+   * the ledger that must be given back on cancel or on picking, and is
+   * emptied once released so nothing is released twice.
+   */
+  @Prop({ type: [OrderItemLotSchema], default: [] })
+  reservedLots!: OrderItemLot[];
 
   @Prop({ required: true, enum: ['pending', 'partial', 'completed', 'unavailable'], default: 'pending' })
   status!: string;

@@ -10,7 +10,9 @@ export default function ABCAnalysis() {
 
   if (isLoading) return <LoadingSpinner />;
 
-  const items = data || [];
+  const items = data?.items || [];
+  const basis = data?.priceBasis;
+  const revenueShare = basis ? Math.round(basis.revenueShare * 100) : null;
   const fmtCurrency = (v: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(v);
 
   const chartData = items.slice(0, 15).map((i: any) => ({
@@ -31,6 +33,15 @@ export default function ABCAnalysis() {
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Análisis ABC</h1>
         <p className="text-sm text-text-muted mt-1">Clasificación Pareto (80-15-5) por valor de ventas — Últimos 90 días</p>
+        {revenueShare !== null && (
+          <p className="text-xs text-text-muted mt-2">
+            {revenueShare === 100
+              ? 'Ponderado por ingreso: todo el valor viene del precio de venta de BSale.'
+              : revenueShare === 0
+                ? 'Ponderado por costo: ninguna venta del período trae precio de BSale, así que se usa el costo del lote.'
+                : `Ponderación mixta: ${revenueShare}% del valor viene del precio de venta de BSale y el resto del costo del lote.`}
+          </p>
+        )}
       </div>
 
       {/* Class Summary */}

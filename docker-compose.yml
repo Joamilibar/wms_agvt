@@ -1,17 +1,91 @@
-version: '3.9'
-
 services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # MongoDB as a single-node replica set.
+  #
+  # OrdersService.processFIFO opens `session.withTransaction(...)`, and MongoDB
+  # only allows transactions on a replica set or a sharded cluster. Run as a
+  # standalone node — as this file did before — every picking fails with
+  # "Transaction numbers are only allowed on a replica set member or mongos".
+  #
+  # Enabling authentication together with replication requires an internal
+  # keyfile. It is generated once into a named volume so its 0400 / mongodb
+  # ownership holds on any host OS (a bind mount would lose it on Windows).
+  # ──────────────────────────────────────────────────────────────────────────
   mongo:
     image: mongo:8
     restart: unless-stopped
+    # The replica set member is declared as `mongo:27017`, and a node refuses to
+    # initiate a config it cannot recognise as itself. Pinning the hostname puts
+    # that name in the container's own /etc/hosts, so self-identification does
+    # not depend on the embedded DNS resolving the service name.
+    hostname: mongo
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
       MONGO_INITDB_DATABASE: wms_pro
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        KEYFILE=/etc/mongo-keyfile/keyfile
+        if [ ! -f "$$KEYFILE" ]; then
+          mkdir -p /etc/mongo-keyfile
+          openssl rand -base64 756 > "$$KEYFILE"
+        fi
+        chmod 400 "$$KEYFILE"
+        chown mongodb:mongodb "$$KEYFILE"
+        exec docker-entrypoint.sh mongod \
+          --replSet rs0 \
+          --keyFile "$$KEYFILE" \
+          --bind_ip_all
     volumes:
       - mongo_data:/data/db
+      - mongo_keyfile:/etc/mongo-keyfile
+    healthcheck:
+      # Healthy only once this node is an elected primary — which is exactly the
+      # precondition the API needs before it can open its first transaction.
+      test: |
+        mongosh --quiet \
+          -u "$$MONGO_INITDB_ROOT_USERNAME" -p "$$MONGO_INITDB_ROOT_PASSWORD" \
+          --authenticationDatabase admin \
+          --eval 'db.hello().isWritablePrimary' | grep -q true
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 20s
+
+  # One-shot job: initiates the replica set the first time the volume is empty.
+  # Idempotent — on later boots rs.status() already answers and it exits clean.
+  mongo-init:
+    image: mongo:8
+    restart: "no"
+    depends_on:
+      mongo:
+        condition: service_started
+    environment:
+      MONGO_USER: ${MONGO_USER}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -e
+        CONF='{_id:"rs0",members:[{_id:0,host:"mongo:27017"}]}'
+        for i in $$(seq 1 60); do
+          if mongosh --host mongo:27017 --quiet \
+               -u "$$MONGO_USER" -p "$$MONGO_PASSWORD" --authenticationDatabase admin \
+               --eval 'try { rs.status().ok } catch (e) { rs.initiate('"$$CONF"').ok }' 2>/dev/null | grep -q 1; then
+            echo "replica set rs0 ready"
+            exit 0
+          fi
+          echo "waiting for mongo ($$i/60)..."
+          sleep 2
+        done
+        echo "ERROR: could not initiate replica set rs0" >&2
+        exit 1
 
   redis:
     image: redis:8-alpine
@@ -21,6 +95,11 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   api:
     build:
@@ -31,16 +110,21 @@ services:
       - "3000:3000"
     environment:
       NODE_ENV: development
-      MONGODB_URI: ${MONGODB_URI}
+      MONGODB_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/wms_pro?authSource=admin&replicaSet=rs0
       REDIS_URL: ${REDIS_URL}
       JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: 7d
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
       BSALE_BASE_URL: https://api.bsale.cl/v1
       BSALE_TOKEN: ${BSALE_TOKEN}
       FRONTEND_URL: http://localhost:5173
     depends_on:
-      - mongo
-      - redis
+      # Wait for a writable primary, not merely for the container to exist:
+      # otherwise the first request races the election and the transaction fails.
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./apps/api/src:/app/src
 
@@ -60,4 +144,5 @@ services:
 
 volumes:
   mongo_data:
+  mongo_keyfile:
   redis_data:

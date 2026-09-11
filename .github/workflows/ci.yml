@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # M-02: the API had no CI at all — it was never built, linted or tested.
+  api:
+    name: API · build & test
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  web:
+    name: Web · build & lint
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - run: npm ci
+      # `tsc -b && vite build`: the type errors that used to block the bundle
+      # would now fail the pipeline instead of being discovered by hand.
+      - run: npm run build
+      - run: npm run lint
+
+  e2e:
+    name: E2E & a11y
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    needs: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Start Mongo (replica set) and Redis
+        env:
+          MONGO_USER: wms_admin
+          MONGO_PASSWORD: ci_password
+          REDIS_PASSWORD: ci_redis
+        run: |
+          docker compose up -d mongo mongo-init redis
+          # The compose healthcheck waits for a writable primary, which is what
+          # processFIFO needs before it can open a transaction.
+          timeout 180 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} $(docker compose ps -q mongo))" = healthy ]; do sleep 3; done'
+
+      - name: Install API deps
+        run: npm ci
+        working-directory: apps/api
+
+      - name: Install web deps
+        run: npm ci
+        working-directory: apps/web
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: apps/web
+
+      - name: Run E2E and a11y tests
+        env:
+          MONGODB_URI: mongodb://wms_admin:ci_password@localhost:27017/wms_pro?authSource=admin&directConnection=true
+          REDIS_URL: redis://:ci_redis@localhost:6379
+          JWT_SECRET: ci_secret_not_used_outside_this_job_padding_to_64_chars_minimum
+          JWT_ACCESS_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+          FRONTEND_URL: http://localhost:5173
+        run: npx playwright test
+        working-directory: apps/web
+
+      - name: Dump API logs on failure
+        if: failure()
+        run: docker compose logs --no-color mongo mongo-init redis
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-screenshots
+          path: apps/web/test-results/
+          retention-days: 7

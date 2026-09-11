@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useProcessFIFO, useCancelOrder } from '../../hooks/useApi';
+import toast from 'react-hot-toast';
+import { confirmDialog } from '../../lib/confirm';
+import { getErrorMessage } from '../../lib/errors';
 
 export default function ExecutePickingModal({ order, onClose }: { order: any; onClose: () => void }) {
-  const [items, setItems] = useState<{ sku: string; qty: number }[]>([]);
+  // Seeded once from the order, then edited by the operator. The parent
+  // remounts this modal per order (key={order._id}), so no effect is needed to
+  // resync — and calling setState synchronously in one caused a cascading render.
+  const [items, setItems] = useState<{ sku: string; qty: number }[]>(() =>
+    order.items.map((i: any) => ({
+      sku: i.sku,
+      qty: Math.max(0, i.requestedQty - i.pickedQty),
+    })),
+  );
   const processFifo = useProcessFIFO();
   const cancelOrder = useCancelOrder();
   const [errorObj, setErrorObj] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Prep what can be picked currently
-    setItems(order.items.map((i: any) => ({
-      sku: i.sku,
-      qty: Math.max(0, i.requestedQty - i.pickedQty)
-    })));
-  }, [order]);
 
   const updateQty = (index: number, val: number) => {
     const nw = [...items];
@@ -26,18 +29,24 @@ export default function ExecutePickingModal({ order, onClose }: { order: any; on
     try {
       await processFifo.mutateAsync({ id: order._id, items });
       onClose();
-    } catch (e: any) {
-      setErrorObj(e.response?.data?.message || e.message);
+    } catch (e) {
+      setErrorObj(getErrorMessage(e));
     }
   };
 
   const handleCancel = async () => {
-    if (confirm('¿Estás seguro que deseas Anular este Picking? Perderás el estado actual.')) {
+    const ok = await confirmDialog({
+      title: 'Anular este picking',
+      detail: 'Perderas el estado actual y se liberan los lotes reservados.',
+      confirmLabel: 'Anular',
+      danger: true,
+    });
+    if (ok) {
       try {
         await cancelOrder.mutateAsync(order._id);
         onClose();
-      } catch (e: any) {
-        alert('Error al Cancelar: ' + (e.response?.data?.message || e.message));
+      } catch (e) {
+        toast.error('No se pudo anular: ' + getErrorMessage(e));
       }
     }
   };

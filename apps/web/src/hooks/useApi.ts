@@ -6,6 +6,47 @@ export const useLogin = () => useMutation({
   mutationFn: (data: { email: string; password: string }) => api.post('/auth/login', data).then(r => r.data),
 });
 
+// Users (admin)
+export interface ApiUser {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'supervisor' | 'operator';
+  warehouse: string;
+  isActive: boolean;
+  lastLogin: string | null;
+}
+
+export const useUsers = () => useQuery({
+  queryKey: ['users'],
+  queryFn: () => api.get('/users').then(r => r.data as ApiUser[]),
+});
+
+export const useCreateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Record<string, unknown>) => api.post('/users', data).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); },
+  });
+};
+
+export const useUpdateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
+      api.patch(`/users/${id}`, data).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); },
+  });
+};
+
+export const useDeactivateUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/users/${id}`).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); },
+  });
+};
+
 // Dashboard
 export const useDashboardKPIs = (warehouse?: string) => useQuery({
   queryKey: ['dashboard', warehouse],
@@ -90,9 +131,14 @@ export const useCreateGuide = () => {
 };
 
 // Analytics
+export interface AbcResponse {
+  items: Record<string, unknown>[];
+  priceBasis: { bsale_document: number; lot_cost: number; seed: number; revenueShare: number };
+}
+
 export const useABC = (warehouse?: string) => useQuery({
   queryKey: ['abc', warehouse],
-  queryFn: () => api.get('/analytics/abc', { params: { warehouse } }).then(r => r.data),
+  queryFn: () => api.get('/analytics/abc', { params: { warehouse } }).then(r => r.data as AbcResponse),
 });
 
 export const useCoverage = (warehouse?: string) => useQuery({
@@ -157,14 +203,52 @@ export const usePickingLogs = (orderId?: string) => useQuery({
   queryFn: () => api.get(orderId ? `/picking-log/order/${orderId}` : '/picking-log').then(r => r.data),
 });
 
-export const useSyncBsaleStock = () => {
+// M-07: /bsale/sync-stock now returns { jobId, status } immediately and the
+// work runs on a BullMQ worker. Kick it off here, then poll with
+// useBsaleSyncJob until the job reaches a terminal state.
+export const useSyncBsaleStock = () => useMutation({
+  mutationFn: (clearExisting: boolean) =>
+    api.post('/bsale/sync-stock', { clearExisting })
+      .then(r => r.data as { jobId: string; status: string }),
+});
+
+export interface BsaleSyncJob {
+  jobId: string;
+  state: 'waiting' | 'active' | 'delayed' | 'completed' | 'failed' | 'unknown';
+  attemptsMade: number;
+  result: {
+    consumed: number;
+    created: number;
+    skipped: number;
+    archived: number;
+    unchanged: number;
+    increased: number;
+    decreased: number;
+    skusChecked: number;
+    errors: string[];
+  } | null;
+  failedReason: string | null;
+  queuedAt: string | null;
+  finishedAt: string | null;
+}
+
+const JOB_SETTLED = ['completed', 'failed'];
+
+export const useBsaleSyncJob = (jobId: string | null) => {
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (clearExisting = true) =>
-      api.post('/bsale/sync-stock', { clearExisting }).then(r => r.data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['stock'] });
-      qc.invalidateQueries({ queryKey: ['stockSummary'] });
+  return useQuery({
+    queryKey: ['bsaleSyncJob', jobId],
+    enabled: !!jobId,
+    queryFn: () => api.get(`/bsale/sync-jobs/${jobId}`).then(r => r.data as BsaleSyncJob),
+    refetchInterval: (query) => {
+      const state = query.state.data?.state;
+      if (state && JOB_SETTLED.includes(state)) {
+        // The worker rewrote the lots; drop the cached inventory views.
+        qc.invalidateQueries({ queryKey: ['stock'] });
+        qc.invalidateQueries({ queryKey: ['stockSummary'] });
+        return false;
+      }
+      return 2000;
     },
   });
 };

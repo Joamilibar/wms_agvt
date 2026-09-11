@@ -20,6 +20,14 @@ export class SalesRecord {
   @Prop({ required: true, min: 0 })
   unitPrice!: number;
 
+  /**
+   * Whether unitPrice is a real sale price or the lot's cost standing in.
+   * Without it, a cost-weighted ABC is indistinguishable from a revenue-
+   * weighted one, and the two answer different questions.
+   */
+  @Prop({ required: true, enum: ['bsale_document', 'lot_cost', 'seed'], default: 'lot_cost' })
+  priceSource!: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Order', default: null })
   orderId!: Types.ObjectId | null;
 

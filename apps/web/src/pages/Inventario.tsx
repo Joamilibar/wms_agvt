@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useStock, useCreateStockLot } from '../hooks/useApi';
-import Badge, { statusLabel } from '../components/ui/Badge';
+import Badge from '../components/ui/Badge';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';

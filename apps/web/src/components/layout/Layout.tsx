@@ -1,25 +1,31 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router';
-import { useAuthStore } from '../../stores/auth.store';
-import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineChartBar, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX, HiOutlineBeaker } from 'react-icons/hi';
+import { useAuthStore, type Role } from '../../stores/auth.store';
+import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX, HiOutlineBeaker, HiOutlineUsers } from 'react-icons/hi';
 
-const navItems = [
+// `roles` lists who may see the entry; absent means everyone signed in.
+// The API enforces the same matrix — this only keeps the menu honest, so an
+// operator is not offered a screen that would answer 403.
+const navItems: { to: string; icon: typeof HiOutlineHome; label: string; roles?: Role[] }[] = [
   { to: '/',            icon: HiOutlineHome,          label: 'Dashboard' },
   { to: '/inventario',  icon: HiOutlineCube,          label: 'Inventario' },
   { to: '/picking',     icon: HiOutlineClipboardList, label: 'Picking' },
   { to: '/picking-log', icon: HiOutlineClipboardList, label: 'Bitácora Picking' },
   { to: '/guias',       icon: HiOutlineTruck,         label: 'Guías' },
   { to: '/analisis',    icon: HiOutlineBeaker,        label: 'Análisis Inventario' },
-  { to: '/bsale',       icon: HiOutlineCog,           label: 'BSale' },
+  { to: '/bsale',       icon: HiOutlineCog,           label: 'BSale',      roles: ['admin', 'supervisor'] },
+  { to: '/usuarios',    icon: HiOutlineUsers,         label: 'Usuarios',   roles: ['admin'] },
 ];
 
 export default function Layout() {
-  const { user, logout } = useAuthStore();
+  const { user, logout, can } = useAuthStore();
+  const visibleNavItems = navItems.filter((item) => !item.roles || can(...item.roles));
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    // Revokes the refresh token family server-side before clearing locally.
+    await logout();
     navigate('/login');
   };
 
@@ -50,7 +56,7 @@ export default function Layout() {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

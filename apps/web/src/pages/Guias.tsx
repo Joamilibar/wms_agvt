@@ -1,5 +1,6 @@
 import { useGuides } from '../hooks/useApi';
-import Badge, { statusVariant, statusLabel } from '../components/ui/Badge';
+import Badge from '../components/ui/Badge';
+import { statusVariant, statusLabel } from '../lib/status';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';

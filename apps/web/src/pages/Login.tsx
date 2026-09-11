@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useLogin } from '../hooks/useApi';
 import { useAuthStore } from '../stores/auth.store';
+import { getErrorMessage } from '../lib/errors';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('admin@cabodehornos.cl');
-  const [password, setPassword] = useState('Admin123!');
+  const [email, setEmail] = useState(import.meta.env.DEV ? 'admin@cabodehornos.cl' : '');
+  const [password, setPassword] = useState(import.meta.env.DEV ? 'Admin123!' : '');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const login = useLogin();
@@ -16,10 +17,10 @@ export default function LoginPage() {
     setError('');
     try {
       const data = await login.mutateAsync({ email, password });
-      authLogin(data.access_token, data.user);
+      authLogin(data.access_token, data.refresh_token, data.user);
       navigate('/');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error de autenticación');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error de autenticación'));
     }
   };
 
@@ -43,8 +44,9 @@ export default function LoginPage() {
             </div>
           )}
           <div className="mb-4">
-            <label className="block text-xs font-medium text-text-muted mb-1.5">Email</label>
+            <label htmlFor="login-email" className="block text-xs font-medium text-text-muted mb-1.5">Email</label>
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -53,8 +55,9 @@ export default function LoginPage() {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-xs font-medium text-text-muted mb-1.5">Contraseña</label>
+            <label htmlFor="login-password" className="block text-xs font-medium text-text-muted mb-1.5">Contraseña</label>
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

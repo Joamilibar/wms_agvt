@@ -28,6 +28,15 @@ export class GuideItem {
   @Prop({ required: true, min: 0 })
   unitCost!: number;
 
+  /**
+   * BSale variant id for this line, copied from the consumed lot's
+   * `bsaleProductId`. A-02: it used to be guessed from the digits in the
+   * SKU (`SKU-001` -> variant 1), which pointed guide lines at arbitrary
+   * products in the BSale catalogue.
+   */
+  @Prop({ type: String, default: null })
+  bsaleVariantId!: string | null;
+
   @Prop({ type: [GuideItemLotSchema], default: [] })
   lots!: GuideItemLot[];
 }
@@ -74,6 +83,17 @@ export class Guide {
 
   @Prop({ type: String, default: null })
   bsaleShippingId!: string | null;
+
+  // Emission context, captured when the guide is created, so a retry does
+  // not have to reach back into the order.
+  @Prop({ type: Number, default: null })
+  bsaleOfficeId!: number | null;
+
+  @Prop({ type: String, default: null })
+  bsaleReferenceNumber!: string | null;
+
+  @Prop({ type: Number, default: null })
+  bsaleReferenceCodeSii!: number | null;
 
   @Prop({ type: Date, default: null })
   bsaleSyncedAt!: Date | null;

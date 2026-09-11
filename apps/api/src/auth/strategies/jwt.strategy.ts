@@ -22,6 +22,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user || !user.isActive) {
       throw new UnauthorizedException('User not found or inactive');
     }
-    return { userId: payload.sub, email: payload.email, role: payload.role };
+    // Read the role from the database, not from the (long-lived) token payload,
+    // so a demotion takes effect on the next request instead of in 7 days.
+    return { userId: payload.sub, email: user.email, role: user.role };
   }
 }

@@ -6,10 +6,13 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { JwtStrategy } from './strategies/jwt.strategy.js';
 import { UsersModule } from '../users/users.module.js';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RefreshToken, RefreshTokenSchema } from './schemas/refresh-token.schema.js';
 
 @Module({
   imports: [
     UsersModule,
+    MongooseModule.forFeature([{ name: RefreshToken.name, schema: RefreshTokenSchema }]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

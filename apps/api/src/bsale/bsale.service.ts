@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -54,7 +54,7 @@ export class BsaleService {
   }
 
   async getDocuments(params: { limit?: number; officeid?: string; number?: string } = {}) {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const q = new URLSearchParams();
     q.append('limit', String(params.limit || 25));
     if (params.officeid) q.append('officeid', params.officeid);
@@ -67,13 +67,13 @@ export class BsaleService {
   }
 
   async getOffices() {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const { data } = await this.client.get(`/offices.json`);
     return data;
   }
 
   async getClients(query?: string) {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const q = new URLSearchParams();
     if (query) q.append('company', query);
     // Expand to get contacts and addresses if needed, but standard limit is enough
@@ -82,7 +82,7 @@ export class BsaleService {
   }
 
   async getDocumentDetails(documentId: number) {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     
     // 1. Fetch original document details
     const { data: detailsData } = await this.client.get(`/documents/${documentId}/details.json`);
@@ -133,18 +133,23 @@ export class BsaleService {
           const variantProducts: Record<string, string> = {};
 
           if (uniqueVariantIds.length > 0) {
-            await Promise.all(
-              uniqueVariantIds.map(async (vId) => {
-                try {
-                  const res = await this.client!.get(`/variants/${vId}.json?expand=[product]`);
-                  if (res.data?.product?.name) {
-                    variantProducts[vId as string] = res.data.product.name;
-                  }
-                } catch (err) {
-                  // Ignore individually if a single expansion fails
+            // Same bound as getStocksForVariants: a document with many lines used
+            // to open one connection per line and could trip BSale's rate limit.
+            const expandOne = async (vId: unknown) => {
+              try {
+                const res = await this.client!.get(`/variants/${vId}.json?expand=[product]`);
+                if (res.data?.product?.name) {
+                  variantProducts[vId as string] = res.data.product.name;
                 }
-              })
-            );
+              } catch (err) {
+                // Ignore individually if a single expansion fails
+              }
+            };
+
+            for (let i = 0; i < uniqueVariantIds.length; i += BsaleService.BSALE_CONCURRENCY) {
+              const wave = uniqueVariantIds.slice(i, i + BsaleService.BSALE_CONCURRENCY);
+              await Promise.all(wave.map(expandOne));
+            }
 
             detailsData.items = detailsData.items.map((item: any) => {
               const varId = item.variant?.id?.toString() || item.variant?.href?.split('/').pop()?.split('.')[0];
@@ -174,49 +179,196 @@ export class BsaleService {
     return detailsData;
   }
 
+  /**
+   * M-07: this used to be an unbounded `Promise.all` over whatever list of ids
+   * the client sent, which could open hundreds of simultaneous connections and
+   * trip BSale's rate limit. Requests now go out in fixed-size waves.
+   */
+  private static readonly BSALE_CONCURRENCY = 5;
+
   async getStocksForVariants(officeid: string | number, variantids: string[]) {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const result: Record<string, number> = {};
-    
-    await Promise.all(variantids.map(async (vid) => {
+
+    const fetchOne = async (vid: string) => {
       try {
         const { data } = await this.client!.get(`/stocks.json?officeid=${officeid}&variantid=${vid}`);
-        if (data && data.items && data.items[0]) {
-          // You said "cantidad disponible para la venta" which is quantityAvailable
-          result[vid] = data.items[0].quantityAvailable;
-        } else {
-          result[vid] = 0;
-        }
+        result[vid] = data?.items?.[0]?.quantityAvailable ?? 0;
       } catch (e) {
         result[vid] = 0;
       }
-    }));
+    };
+
+    for (let i = 0; i < variantids.length; i += BsaleService.BSALE_CONCURRENCY) {
+      const wave = variantids.slice(i, i + BsaleService.BSALE_CONCURRENCY);
+      await Promise.all(wave.map(fetchOne));
+    }
+
     return result;
   }
 
+  /**
+   * Compares one SKU's WMS balance against BSale, per warehouse.
+   *
+   * Fills the gap the audit flagged: without a reconciliation endpoint the only
+   * corrective action available was the full wipe-and-rebuild of B-05. This one
+   * only reports — it never writes — so it is safe to run at any time.
+   */
+  async reconcileSku(sku: string, apply = false): Promise<{
+    sku: string;
+    checkedAt: string;
+    applied: boolean;
+    lines: {
+      warehouse: string;
+      bsaleVariantId: string | null;
+      wmsQty: number;
+      bsaleQty: number | null;
+      difference: number | null;
+      action?: string;
+      note?: string;
+    }[];
+  }> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+
+    const lots = await this.stockLotModel.find({ sku, isActive: true }).exec();
+
+    // WMS side: physical balance per warehouse, plus the variant mapping and the
+    // descriptors a top-up lot would need.
+    const byWarehouse = new Map<string, {
+      wmsQty: number;
+      variantId: string | null;
+      name: string;
+      cost: number;
+    }>();
+    for (const lot of lots) {
+      const entry = byWarehouse.get(lot.warehouse)
+        || { wmsQty: 0, variantId: null, name: lot.name, cost: lot.unitCost };
+      entry.wmsQty += lot.qty;
+      entry.variantId = entry.variantId || lot.bsaleProductId;
+      byWarehouse.set(lot.warehouse, entry);
+    }
+
+    // BSale side: office name -> id, to translate the warehouse names back.
+    const { data: officesData } = await this.client.get('/offices.json');
+    const officeIdByName: Record<string, string> = {};
+    for (const office of officesData?.items || []) {
+      officeIdByName[office.name] = office.id.toString();
+    }
+
+    const lines = [];
+    for (const [warehouse, entry] of byWarehouse) {
+      const officeId = officeIdByName[warehouse];
+
+      if (!entry.variantId || !officeId) {
+        lines.push({
+          warehouse,
+          bsaleVariantId: entry.variantId,
+          wmsQty: entry.wmsQty,
+          bsaleQty: null,
+          difference: null,
+          note: !entry.variantId
+            ? 'Lotes sin bsaleProductId: no hay mapeo con el catalogo BSale'
+            : 'La bodega no corresponde a ninguna sucursal BSale',
+        });
+        continue;
+      }
+
+      const stocks = await this.getStocksForVariants(officeId, [entry.variantId]);
+      const bsaleQty = stocks[entry.variantId] ?? 0;
+
+      const line: {
+        warehouse: string;
+        bsaleVariantId: string | null;
+        wmsQty: number;
+        bsaleQty: number | null;
+        difference: number | null;
+        action?: string;
+        note?: string;
+      } = {
+        warehouse,
+        bsaleVariantId: entry.variantId,
+        wmsQty: entry.wmsQty,
+        bsaleQty,
+        difference: entry.wmsQty - bsaleQty,
+      };
+
+      // BSale is the source of truth for quantity, so correcting means moving the
+      // WMS to it — through the same routine the full sync uses, never a second
+      // implementation of the same decision.
+      if (apply) {
+        const now = new Date();
+        const result = await this.alignSkuWarehouse({
+          sku,
+          warehouse,
+          variantId: entry.variantId,
+          officeId,
+          name: entry.name,
+          cost: entry.cost,
+          targetQty: bsaleQty,
+          now,
+          stamp: now.toISOString().slice(0, 10).replace(/-/g, ''),
+        });
+        line.action = result.action;
+        if (result.warnings.length > 0) line.note = result.warnings.join(' · ');
+      }
+
+      lines.push(line);
+    }
+
+    return { sku, checkedAt: new Date().toISOString(), applied: apply, lines };
+  }
+
   async generateGuide(payload: any) {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const { data } = await this.client.post('/documents.json', payload);
     return data;
   }
 
   // ── BSale → MongoDB Stock Sync (Day Zero Approach) ──────────────────────
-  async syncStockFromBsale(clearExisting = true): Promise<{
+  // `clearExisting` defaults to false on purpose: this used to delete the whole
+  // StockLot collection whenever the flag was merely absent from the body.
+  async syncStockFromBsale(clearExisting = false, requestedBy?: string): Promise<{
     consumed: number;
     created: number;
     skipped: number;
+    archived: number;
+    unchanged: number;
+    increased: number;
+    decreased: number;
+    skusChecked: number;
     errors: string[];
   }> {
-    if (!this.client) throw new Error('BSale no configurado');
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
 
     const errors: string[] = [];
     let created = 0;
     let skipped = 0;
+    let archived = 0;
+    let unchanged = 0;
+    let increased = 0;
+    let decreased = 0;
 
-    // 1. Optionally wipe existing data
+    this.logger.warn(
+      `BSale stock sync requested by user ${requestedBy ?? 'unknown'} ` +
+      `(clearExisting=${clearExisting})`,
+    );
+
+    // 1. `clearExisting` is now an escape hatch, not the normal path: it throws
+    // away every entry date and therefore the aging report. Leave it false and
+    // step 5 reconciles quantities while preserving lot history.
+    //
+    // Archive, never delete: orders and guides hold ObjectId references to these
+    // documents, and a WMS exists to keep that trail. Archived lots drop out of
+    // every FIFO/analytics query via isActive, and out of the partial unique index.
     if (clearExisting) {
-      const deleted = await this.stockLotModel.deleteMany({}).exec();
-      this.logger.log(`Cleared ${deleted.deletedCount} existing StockLots (Day Zero Reset)`);
+      const res = await this.stockLotModel
+        .updateMany(
+          { isActive: true },
+          { $set: { isActive: false, archivedAt: new Date() } },
+        )
+        .exec();
+      archived = res.modifiedCount;
+      this.logger.log(`Archived ${archived} StockLots (Day Zero Reset, reversible)`);
     }
 
     // 2. Resolve office → warehouse name mapping
@@ -252,10 +404,19 @@ export class BsaleService {
       }
     }
 
-    // 4. Fetch all current stocks
+    // 4. Build BSale's picture of the world: units per (SKU, warehouse).
+    const target = new Map<string, {
+      sku: string;
+      warehouse: string;
+      officeId: string;
+      variantId: string;
+      name: string;
+      cost: number;
+      qty: number;
+    }>();
+
     let sOffset = 0, sLimit = 250, sTotal = Infinity;
-    const now = new Date(); // DAY ZERO TIMESTAMP
-    this.logger.log('Fetching and creating current stock lots...');
+    this.logger.log('Fetching BSale stock levels...');
 
     while (sOffset < sTotal) {
       try {
@@ -265,14 +426,8 @@ export class BsaleService {
 
         for (const stock of data.items || []) {
           const qty = stock.quantityAvailable;
-          if (!qty || qty <= 0) {
-            skipped++;
-            continue;
-          }
-
           const officeId = stock.office?.id?.toString();
-          const variantHref = stock.variant?.href || '';
-          const variantId = variantHref.split('/').pop()?.split('.')[0];
+          const variantId = (stock.variant?.href || '').split('/').pop()?.split('.')[0];
 
           if (!officeId || !variantId) {
             skipped++;
@@ -281,38 +436,18 @@ export class BsaleService {
 
           const warehouse = officeMap[officeId] || `Sucursal ${officeId}`;
           const vData = variantMap[variantId] || { sku: variantId, name: `Variante ${variantId}`, cost: 0 };
-          const lotKey = `BSL-INI-${variantId}-${officeId}`;
 
-          try {
-            await this.stockLotModel.create({
-              sku: vData.sku,
-              name: vData.name,
-              lot: lotKey,
-              entryDate: now, // Day Zero
-              qty: qty,
-              initialQty: qty,
-              unitCost: vData.cost, // Uses standardCost if available
-              warehouse,
-              location: '',
-              rack: '',
-              col: '',
-              row: '',
-              pallet: '',
-              supplier: null,
-              bsaleProductId: variantId,
-              isActive: true,
-              createdBy: null,
-            });
-            created++;
-          } catch (e: any) {
-            if (e.code === 11000) {
-              errors.push(`Duplicate lot for ${vData.sku} in ${warehouse}`);
-            } else {
-              errors.push(`Create failed for lot ${lotKey}: ${e.message}`);
-            }
-            skipped++;
-          }
+          target.set(vData.sku + '|||' + warehouse, {
+            sku: vData.sku,
+            warehouse,
+            officeId,
+            variantId,
+            name: vData.name,
+            cost: vData.cost,
+            qty: Math.max(0, qty || 0),
+          });
         }
+
         sOffset += sLimit;
       } catch (e: any) {
         errors.push(`Failed to fetch stocks batch at offset ${sOffset}: ${e.message}`);
@@ -320,8 +455,191 @@ export class BsaleService {
       }
     }
 
-    this.logger.log(`Sync complete. Created: ${created}, Skipped (Zero-stock or dup): ${skipped}, Errors: ${errors.length}`);
-    return { consumed: vTotal /* variants analyzed conceptually */, created, skipped, errors };
+    // 5. Reconcile the WMS against it.
+    //
+    // BSale is the source of truth for *how many units exist*. It does not track
+    // lots, so it cannot be the source of truth for something it does not record:
+    // the WMS keeps owning lot codes, entry dates and physical locations.
+    //
+    // That split is the whole point of reconciling instead of rebuilding. The
+    // previous behaviour archived every lot and recreated them all with
+    // entryDate = now, which matched BSale's quantities and destroyed the aging
+    // report in the same stroke — every SKU looked like it arrived today. Here a
+    // lot whose quantity already agrees with BSale is left untouched, and keeps
+    // the entry date that makes aging mean something.
+    const now = new Date();
+    const stamp = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const seen = new Set<string>();
+
+    for (const [key, entry] of target) {
+      seen.add(key);
+
+      const result = await this.alignSkuWarehouse({
+        sku: entry.sku,
+        warehouse: entry.warehouse,
+        variantId: entry.variantId,
+        officeId: entry.officeId,
+        name: entry.name,
+        cost: entry.cost,
+        targetQty: entry.qty,
+        now,
+        stamp,
+      });
+
+      if (result.action === 'unchanged') unchanged++;
+      if (result.action === 'increased') increased++;
+      if (result.action === 'decreased') decreased++;
+      created += result.created;
+      archived += result.archived;
+      errors.push(...result.warnings);
+    }
+
+    // 6. Anything active in the WMS that BSale no longer reports does not exist.
+    const orphaned = await this.stockLotModel.find({ isActive: true }).exec();
+    for (const lot of orphaned) {
+      if (seen.has(lot.sku + '|||' + lot.warehouse)) continue;
+      if (lot.reservedQty > 0) {
+        errors.push(`${lot.sku} en ${lot.warehouse}: BSale no lo reporta pero tiene unidades reservadas`);
+        continue;
+      }
+      await this.stockLotModel
+        .updateOne({ _id: lot._id }, { $set: { isActive: false, archivedAt: now } })
+        .exec();
+      archived++;
+    }
+
+    this.logger.log(
+      `Sync complete. Sin cambios: ${unchanged}, con faltante cubierto: ${increased}, ` +
+      `ajustados a la baja: ${decreased}, lotes creados: ${created}, archivados: ${archived}, ` +
+      `omitidos: ${skipped}, avisos: ${errors.length}`,
+    );
+
+    return {
+      consumed: vTotal,
+      created,
+      skipped,
+      archived,
+      unchanged,
+      increased,
+      decreased,
+      skusChecked: target.size,
+      errors,
+    };
   }
+
+  /**
+   * Brings one (SKU, warehouse) pair to the quantity BSale reports.
+   *
+   * This is the one place that acts on the source-of-truth decision, so the full
+   * sync and the per-SKU reconciliation cannot drift apart:
+   *
+   *  - BSale owns the quantity.
+   *  - The WMS owns the lot structure — codes, entry dates, locations — because
+   *    BSale does not record it and so cannot be authoritative over it.
+   *  - Only an unexplained surplus gets a day-zero entry date. Lots that already
+   *    agree keep theirs, which is what keeps the aging report meaningful.
+   *  - Reserved units are never taken away: an operator mid-aisle beats a
+   *    temporary discrepancy, and the leftover is reported instead.
+   */
+  private async alignSkuWarehouse(input: {
+    sku: string;
+    warehouse: string;
+    variantId: string | null;
+    officeId: string | null;
+    name: string;
+    cost: number;
+    targetQty: number;
+    now: Date;
+    stamp: string;
+  }): Promise<{
+    action: 'unchanged' | 'increased' | 'decreased';
+    wmsQty: number;
+    created: number;
+    archived: number;
+    shortfall: number;
+    warnings: string[];
+  }> {
+    const { sku, warehouse, targetQty, now, stamp } = input;
+    const warnings: string[] = [];
+
+    const lots = await this.stockLotModel
+      .find({ sku, warehouse, isActive: true })
+      .sort({ entryDate: 1 })
+      .exec();
+
+    const wmsQty = lots.reduce((sum, lot) => sum + lot.qty, 0);
+
+    if (wmsQty === targetQty) {
+      return { action: 'unchanged', wmsQty, created: 0, archived: 0, shortfall: 0, warnings };
+    }
+
+    if (wmsQty < targetQty) {
+      const surplus = targetQty - wmsQty;
+      const base = 'BSL-ADJ-' + (input.variantId ?? 'NA') + '-' + (input.officeId ?? 'NA') + '-' + stamp;
+      let lotKey = base;
+      let attempt = 1;
+
+      while (await this.stockLotModel.exists({ lot: lotKey, warehouse, isActive: true })) {
+        attempt++;
+        lotKey = base + '-' + attempt;
+      }
+
+      try {
+        await this.stockLotModel.create({
+          sku,
+          name: input.name,
+          lot: lotKey,
+          entryDate: now,
+          qty: surplus,
+          initialQty: surplus,
+          unitCost: input.cost,
+          warehouse,
+          bsaleProductId: input.variantId,
+          isActive: true,
+          createdBy: null,
+        });
+        return { action: 'increased', wmsQty, created: 1, archived: 0, shortfall: 0, warnings };
+      } catch (e: any) {
+        warnings.push(`${sku} en ${warehouse}: no se pudieron agregar ${surplus} unidades: ${e.message}`);
+        return { action: 'increased', wmsQty, created: 0, archived: 0, shortfall: surplus, warnings };
+      }
+    }
+
+    let excess = wmsQty - targetQty;
+    let archived = 0;
+
+    for (const lot of lots) {
+      if (excess <= 0) break;
+
+      const reducible = Math.max(0, lot.qty - lot.reservedQty);
+      if (reducible <= 0) continue;
+
+      const take = Math.min(reducible, excess);
+      const emptied = lot.qty - take <= 0;
+
+      const res = await this.stockLotModel.updateOne(
+        { _id: lot._id, qty: { $gte: take } },
+        {
+          $inc: { qty: -take },
+          ...(emptied ? { $set: { isActive: false, archivedAt: now } } : {}),
+        },
+      ).exec();
+
+      if (res.modifiedCount !== 1) continue;
+
+      if (emptied) archived++;
+      excess -= take;
+    }
+
+    if (excess > 0) {
+      warnings.push(
+        `${sku} en ${warehouse}: quedan ${excess} unidades sobre BSale que no se pudieron ` +
+        `descontar porque estan reservadas por una orden en curso`,
+      );
+    }
+
+    return { action: 'decreased', wmsQty, created: 0, archived, shortfall: excess, warnings };
+  }
+
 }
 

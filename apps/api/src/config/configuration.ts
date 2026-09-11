@@ -26,7 +26,11 @@ export default () => {
     },
     jwt: {
       secret: process.env.JWT_SECRET || 'dev-secret-change-me',
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      // M-08: the access token is short-lived now; the 7 days moved to the
+      // refresh token, which is revocable. JWT_EXPIRES_IN is no longer read —
+      // it used to give every session a 7-day bearer token with no way back.
+      expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
+      refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
     },
     bsale: {
       baseUrl: process.env.BSALE_BASE_URL || 'https://api.bsale.cl/v1',

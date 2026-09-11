@@ -1,0 +1,31 @@
+import { IsOptional, IsString, IsNumber, IsIn, Min, Max } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+
+export class QueryOrdersDto {
+  @ApiPropertyOptional({ enum: ['pending', 'in_progress', 'completed', 'cancelled'] })
+  @IsOptional()
+  @IsIn(['pending', 'in_progress', 'completed', 'cancelled'])
+  status?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  warehouse?: string;
+
+  @ApiPropertyOptional({ default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  page?: number = 1;
+
+  // Capped: an uncapped limit turns any list endpoint into a full-collection dump.
+  @ApiPropertyOptional({ default: 20, maximum: 100 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
+}

@@ -4,7 +4,7 @@ interface KpiCardProps {
   subtitle?: string;
   icon?: React.ReactNode;
   trend?: 'up' | 'down' | 'neutral';
-  color?: 'green' | 'blue' | 'amber' | 'red' | 'purple';
+  color?: 'green' | 'blue' | 'amber' | 'red' | 'purple' | 'gray';
 }
 
 const colorMap = {
@@ -13,6 +13,7 @@ const colorMap = {
   amber: 'from-brand-amber/20 to-brand-amber/5 border-brand-amber/30',
   red: 'from-brand-red/20 to-brand-red/5 border-brand-red/30',
   purple: 'from-brand-purple/20 to-brand-purple/5 border-brand-purple/30',
+  gray: 'from-text-muted/20 to-text-muted/5 border-text-muted/30',
 };
 
 const iconColorMap = {
@@ -21,6 +22,7 @@ const iconColorMap = {
   amber: 'text-brand-amber',
   red: 'text-brand-red',
   purple: 'text-brand-purple',
+  gray: 'text-text-muted',
 };
 
 export default function KpiCard({ title, value, subtitle, icon, color = 'blue' }: KpiCardProps) {

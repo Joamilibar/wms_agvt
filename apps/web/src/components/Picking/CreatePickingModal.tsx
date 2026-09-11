@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import {
   useBsaleDocuments,
   useBsaleDocumentDetails,
@@ -8,6 +9,7 @@ import {
   useStockSummary,
   useBsaleStocksBulk,
 } from '../../hooks/useApi';
+import { getErrorMessage } from '../../lib/errors';
 
 type DestinationType = 'client' | 'internal_production' | 'store_restock';
 type OriginMode = 'manual' | 'bsale';
@@ -33,7 +35,15 @@ export default function CreatePickingModal({ onClose }: { onClose: () => void })
   const [selectedBsaleDocId, setSelectedBsaleDocId] = useState('');
 
   // ── Items ──────────────────────────────────────────────────────────
-  const [items, setItems] = useState<{ sku: string; name: string; requestedQty: number; maxQty?: number; variantId?: string }[]>([]);
+  const [items, setItems] = useState<{
+    sku: string;
+    name: string;
+    requestedQty: number;
+    maxQty?: number;
+    variantId?: string;
+    // Net unit sale price from the BSale line; absent on manual rows.
+    unitPrice?: number;
+  }[]>([]);
 
   // ── Queries ───────────────────────────────────────────────────────
   const officesQuery   = useBsaleOffices();
@@ -62,14 +72,30 @@ export default function CreatePickingModal({ onClose }: { onClose: () => void })
     const list = detailsQuery.data.items || detailsQuery.data || [];
     const mapped = list.map((i: any) => {
       const pendingQty = i.pendingQuantity !== undefined ? i.pendingQuantity : i.quantity;
+      // Verificado contra la API: `netUnitValue` es el precio unitario NETO y ya
+      // viene con el descuento de linea aplicado (netAmount = netUnitValue x qty).
+      // `totalUnitValue` queda fuera a proposito: es bruto con IVA, y usarlo de
+      // respaldo mezclaria dos bases en el mismo ABC sin que nadie lo note.
+      // Si no hay precio neto, se manda 0 y el picking cae al costo del lote,
+      // que queda marcado en priceSource.
+      const unitPrice =
+        i.netUnitValue
+        ?? (i.netAmount && i.quantity ? i.netAmount / i.quantity : 0);
+
       return {
         sku: i.variant?.code || 'SIN-CODE',
         variantId: i.variant?.id?.toString() || i.variant?.href?.split('/').pop()?.split('.')[0],
         name: i.variant?.description || 'Desconocido',
         requestedQty: pendingQty,
         maxQty: pendingQty,
+        unitPrice: Math.max(0, Math.round(Number(unitPrice) || 0)),
       };
     }).filter((i: any) => (i.maxQty || 0) > 0);
+    // Deferred: `mapped` derives from an async query (the BSale document
+    // details), so a lazy initializer will not do, and the derive-during-render
+    // rewrite changes the document-selection flow. Left as-is until it can be
+    // exercised against a real BSale document rather than refactored blind.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(mapped);
   }, [detailsQuery.data, selectedBsaleDocId]);
 
@@ -91,7 +117,9 @@ export default function CreatePickingModal({ onClose }: { onClose: () => void })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validItems = items.filter(i => i.sku && i.requestedQty > 0);
-    if (!clientLabel || validItems.length === 0) return alert('Completa los campos obligatorios.');
+    if (!clientLabel || validItems.length === 0) {
+      return toast.error('Falta el cliente o las lineas del picking.');
+    }
 
     let bsaleOriginType = 'manual';
     if (originMode === 'bsale') {
@@ -118,11 +146,19 @@ export default function CreatePickingModal({ onClose }: { onClose: () => void })
         type: 'picking',
         priority: 'normal',
         warehouse: 'Central',
-        items: validItems,
+        // Only the fields the DTO declares: `forbidNonWhitelisted` is on, so the
+        // UI-only `variantId` and `maxQty` that ride along in local state would
+        // make the whole request a 400.
+        items: validItems.map((i) => ({
+          sku: i.sku,
+          name: i.name,
+          requestedQty: i.requestedQty,
+          unitPrice: i.unitPrice ?? 0,
+        })),
       } as any);
       onClose();
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al generar picking');
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'No se pudo generar el picking'));
     }
   };
 

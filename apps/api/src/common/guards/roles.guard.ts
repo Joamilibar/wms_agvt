@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator.js';
 
@@ -11,9 +11,20 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredRoles) return true;
+    // No @Roles() on the route: authentication alone is enough.
+    if (!requiredRoles || requiredRoles.length === 0) return true;
 
     const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.includes(user.role);
+    // Fail closed: a @Roles() route reached without an authenticated user is a
+    // wiring mistake (JwtAuthGuard missing), not an anonymous pass.
+    if (!user?.role) {
+      throw new ForbiddenException('Authenticated user required for this operation');
+    }
+    if (!requiredRoles.includes(user.role)) {
+      throw new ForbiddenException(
+        `Requires role: ${requiredRoles.join(' or ')} (current role: ${user.role})`,
+      );
+    }
+    return true;
   }
 }

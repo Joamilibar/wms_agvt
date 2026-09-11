@@ -26,6 +26,15 @@ export class StockLot {
   @Prop({ required: true, min: 0 })
   initialQty!: number;
 
+  /**
+   * Units promised to an in-progress order but not yet picked.
+   * Available stock is `qty - reservedQty`; FIFO *reservation* reads the
+   * available figure, FIFO *consumption* reads `qty`, because the picker
+   * physically takes what is on the shelf.
+   */
+  @Prop({ required: true, min: 0, default: 0 })
+  reservedQty!: number;
+
   @Prop({ default: '' })
   location!: string;
 
@@ -56,6 +65,9 @@ export class StockLot {
   @Prop({ default: true })
   isActive!: boolean;
 
+  @Prop({ type: Date, default: null })
+  archivedAt!: Date | null;
+
   @Prop({ type: Types.ObjectId, ref: 'User', default: null })
   createdBy!: Types.ObjectId | null;
 }
@@ -65,4 +77,12 @@ export const StockLotSchema = SchemaFactory.createForClass(StockLot);
 // Composite indexes for FIFO queries
 StockLotSchema.index({ sku: 1, entryDate: 1 });
 StockLotSchema.index({ sku: 1, warehouse: 1 });
-StockLotSchema.index({ lot: 1, warehouse: 1 }, { unique: true });
+// Partial: only *active* lots must have a unique {lot, warehouse}. Archived lots
+// (isActive:false) are kept for traceability and must not block a re-sync that
+// regenerates the same deterministic BSale lot key.
+// NOTE: on a database created before this change, drop the old index once:
+//   db.stocklots.dropIndex('lot_1_warehouse_1')
+StockLotSchema.index(
+  { lot: 1, warehouse: 1 },
+  { unique: true, partialFilterExpression: { isActive: true } },
+);

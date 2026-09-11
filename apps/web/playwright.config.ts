@@ -57,10 +57,24 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-  },
+  // M-02: this used to start Vite alone. Every test signs in, so with no API
+  // behind it the login failed and all 11 specs failed with it. Playwright now
+  // brings up both; Mongo and Redis come from `docker compose up -d` in CI.
+  webServer: [
+    {
+      command: 'npm run start:dev',
+      cwd: '../api',
+      url: 'http://localhost:3000/api/docs',
+      reuseExistingServer: !process.env.CI,
+      timeout: 180000,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    },
+    {
+      command: 'npm run dev',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+    },
+  ],
 });

@@ -4,11 +4,13 @@ import { StockService } from './stock.service.js';
 import { CreateStockLotDto } from './dto/create-stock-lot.dto.js';
 import { QueryStockDto } from './dto/query-stock.dto.js';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 
 @ApiTags('Stock')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('stock')
 export class StockController {
   constructor(private stockService: StockService) {}
@@ -41,6 +43,7 @@ export class StockController {
   }
 
   @Post()
+  @Roles('admin', 'supervisor')
   @ApiOperation({ summary: 'Create a new stock lot' })
   @ApiResponse({ status: 201, description: 'Stock lot created' })
   async create(@Body() dto: CreateStockLotDto, @CurrentUser('userId') userId: string) {
@@ -48,12 +51,14 @@ export class StockController {
   }
 
   @Patch(':id')
+  @Roles('admin', 'supervisor')
   @ApiOperation({ summary: 'Adjust stock lot quantity' })
   async adjustQty(@Param('id') id: string, @Body('qty') qty: number) {
     return this.stockService.adjustQty(id, qty);
   }
 
   @Delete(':id')
+  @Roles('admin', 'supervisor')
   @ApiOperation({ summary: 'Deactivate a stock lot' })
   async deactivate(@Param('id') id: string) {
     return this.stockService.deactivate(id);
