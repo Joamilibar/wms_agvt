@@ -1,6 +1,7 @@
 import {
-  Controller, Get, Post, Patch, Body, Param, Query, UseGuards, NotFoundException, BadRequestException,
+  Controller, Get, Post, Patch, Body, Param, Query, UseGuards, NotFoundException, BadRequestException, Res, Header,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -18,8 +19,9 @@ import { SALES_HISTORY_QUEUE, LoadHistoryJob } from './sales-history/sales-histo
 import { historyWindow, HISTORY_FLOOR } from './history-window.js';
 import { CreateSupplierDto, UpdateSupplierDto } from './dto/supplier.dto.js';
 import { BulkPlanningItemsDto, UpdatePlanningItemDto, QueryPlanningItemsDto } from './dto/planning-item.dto.js';
-import { UpdateWarehouseDto, UpdateParamsDto, ChannelOverrideDto, LoadHistoryDto, SetEtaDto } from './dto/misc.dto.js';
-import { CreatePurchaseOrderDto } from './dto/purchase-order.dto.js';
+import { UpdateWarehouseDto, UpdateParamsDto, ChannelOverrideDto, LoadHistoryDto, SetEtaDto, RunDto } from './dto/misc.dto.js';
+import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto, UpdateDraftPurchaseOrderDto, CreateOrderFromRunDto } from './dto/purchase-order.dto.js';
+import { PlanningRunsService } from './engine/planning-runs.service.js';
 import type { PoStatus } from './schemas/purchase-order.schema.js';
 import type { Channel } from './schemas/sales-history.schema.js';
 
@@ -35,6 +37,7 @@ export class PlanningController {
     private params: PlanningParamsService,
     private history: SalesHistoryService,
     private purchaseOrders: PurchaseOrdersService,
+    private runs: PlanningRunsService,
     @InjectQueue(SALES_HISTORY_QUEUE) private historyQueue: Queue<LoadHistoryJob>,
   ) {}
 
@@ -225,7 +228,71 @@ export class PlanningController {
     return this.history.setChannelOverride(Number(bsaleDocId), dto.channel ?? null, dto.reason ?? '');
   }
 
-  // ── purchase orders (phase 0: create, list, ETA) ──────────────────────────
+  // ── planning runs ──────────────────────────────────────────────────────────
+
+  @Post('runs')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Ejecuta el motor y guarda la corrida completa (foto de stock, tránsito y parámetros)' })
+  async createRun(@Body() dto: RunDto, @CurrentUser('userId') userId: string) {
+    const run = await this.runs.run(userId ?? null, dto.notes ?? '');
+    const { results: _r, ...header } = run.toObject();
+    void _r;
+    return header;
+  }
+
+  @Get('runs')
+  listRuns() {
+    return this.runs.list();
+  }
+
+  @Get('runs/latest')
+  async latestRun() {
+    const run = await this.runs.latest();
+    if (!run) return null;
+    const { results: _r, ...header } = run.toObject();
+    void _r;
+    return header;
+  }
+
+  @Get('runs/:id/results')
+  @ApiOperation({ summary: 'Resultados de una corrida, filtrables; ordenados por urgencia' })
+  runResults(
+    @Param('id') id: string,
+    @Query('state') state?: string, @Query('origin') origin?: string, @Query('supplierId') supplierId?: string,
+    @Query('abc') abc?: string, @Query('search') search?: string, @Query('onlySuggested') onlySuggested?: string,
+  ) {
+    return this.runs.results(id, { state, origin, supplierId, abc, search, onlySuggested: onlySuggested === 'true' });
+  }
+
+  @Get('runs/:id/proposal')
+  @ApiOperation({ summary: 'Propuesta de compra de la corrida agrupada por proveedor' })
+  runProposal(@Param('id') id: string) {
+    return this.runs.proposal(id);
+  }
+
+  @Get('runs/:id/export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @ApiOperation({ summary: 'CSV con las columnas de Datos_PowerBI y las nuevas' })
+  async exportRun(@Param('id') id: string, @Res() res: Response) {
+    const run = await this.runs.findById(id);
+    res.setHeader('Content-Disposition', `attachment; filename="${run.number}.csv"`);
+    res.send(await this.runs.exportCsv(id));
+  }
+
+  @Post('runs/:id/approve')
+  @Roles('admin')
+  approveRun(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.runs.approve(id, userId ?? null);
+  }
+
+  @Post('runs/:id/purchase-orders')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Crea una OC en borrador con la propuesta de un proveedor; las cantidades cambiadas llevan motivo' })
+  orderFromRun(@Param('id') id: string, @Body() dto: CreateOrderFromRunDto, @CurrentUser('userId') userId: string) {
+    return this.runs.createPurchaseOrder(id, dto.supplierId ?? null, dto.overrides ?? [], userId ?? null);
+  }
+
+  // ── purchase orders ────────────────────────────────────────────────────────
 
   @Get('purchase-orders')
   listPurchaseOrders(@Query('status') status?: PoStatus) {
@@ -249,6 +316,32 @@ export class PlanningController {
   @Roles('admin', 'supervisor')
   setEta(@Param('id') id: string, @Param('sku') sku: string, @Body() dto: SetEtaDto) {
     return this.purchaseOrders.setLineEta(id, sku, dto.eta ? new Date(dto.eta) : null);
+  }
+
+  @Patch('purchase-orders/:id')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Editar una orden en borrador' })
+  updateDraft(@Param('id') id: string, @Body() dto: UpdateDraftPurchaseOrderDto) {
+    return this.purchaseOrders.updateDraft(id, dto);
+  }
+
+  @Post('purchase-orders/:id/approve')
+  @Roles('admin')
+  approvePurchaseOrder(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.purchaseOrders.approve(id, userId ?? null);
+  }
+
+  @Post('purchase-orders/:id/send')
+  @Roles('admin', 'supervisor')
+  sendPurchaseOrder(@Param('id') id: string) {
+    return this.purchaseOrders.markSent(id);
+  }
+
+  @Post('purchase-orders/:id/receive')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Recibe líneas (total o parcial) y crea los lotes con fecha real y costo desembarcado' })
+  receivePurchaseOrder(@Param('id') id: string, @Body() dto: ReceivePurchaseOrderDto, @CurrentUser('userId') userId: string) {
+    return this.purchaseOrders.receive(id, dto, userId ?? null);
   }
 
   @Post('purchase-orders/:id/cancel')

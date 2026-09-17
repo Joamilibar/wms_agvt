@@ -87,3 +87,68 @@ export class CreatePurchaseOrderDto {
   @IsString()
   notes?: string;
 }
+
+export class ReceiveLineDto {
+  @ApiProperty({ example: '62697040648535' })
+  @IsString()
+  @MinLength(1)
+  sku!: string;
+
+  @ApiProperty({ example: 140, description: 'Unidades recibidas ahora' })
+  @IsNumber()
+  @Min(0)
+  qty!: number;
+
+  @ApiPropertyOptional({ example: 'A-01-02' })
+  @IsOptional()
+  @IsString()
+  location?: string;
+}
+
+export class ReceivePurchaseOrderDto {
+  @ApiProperty({ type: [ReceiveLineDto] })
+  @IsArray()
+  @ArrayNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => ReceiveLineDto)
+  lines!: ReceiveLineDto[];
+
+  @ApiPropertyOptional({ example: 950, description: 'Tipo de cambio a CLP; obligatorio si la orden no lo trae' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  fxRate?: number | null;
+
+  @ApiPropertyOptional({ example: '2026-10-15' })
+  @IsOptional()
+  @IsDateString()
+  receivedAt?: string;
+}
+
+export class UpdateDraftLineDto {
+  @IsString() @MinLength(1) sku!: string;
+  @IsNumber() @Min(0) qtyOrdered!: number;
+  @IsOptional() @IsDateString() eta?: string | null;
+  @IsOptional() @IsNumber() @Min(0) unitCost?: number | null;
+}
+
+export class UpdateDraftPurchaseOrderDto {
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => UpdateDraftLineDto) lines?: UpdateDraftLineDto[];
+  @IsOptional() @IsNumber() @Min(0) fxRate?: number | null;
+  @IsOptional() @IsString() notes?: string;
+  @IsOptional() @IsString() destinationWarehouse?: string;
+}
+
+export class RunOverrideDto {
+  @IsString() @MinLength(1) sku!: string;
+  @IsNumber() @Min(0) qty!: number;
+  @IsOptional() @IsString() reason?: string;
+}
+
+export class CreateOrderFromRunDto {
+  @ApiPropertyOptional({ description: 'ObjectId del proveedor; omitir para el grupo sin proveedor' })
+  @IsOptional() @IsString() supplierId?: string | null;
+
+  @ApiPropertyOptional({ type: [RunOverrideDto], description: 'Cantidades distintas a la sugerida, con motivo' })
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => RunOverrideDto) overrides?: RunOverrideDto[];
+}

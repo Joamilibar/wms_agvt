@@ -48,6 +48,10 @@ export class PlanningParams {
   @Prop({ type: Object, default: {} })
   growthByCategory!: Record<string, number>;
 
+  /** Seasonal factor by calendar month ('01'..'12'); missing = 1. Only December and January are backed by the history so far. */
+  @Prop({ type: Object, default: { '12': 2.4, '01': 1.7 } })
+  seasonalFactors!: Record<string, number>;
+
   /** Alert when forecast and same month last year differ by more than this fraction (D2). */
   @Prop({ default: 0.5 })
   yoyAlertPct!: number;

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { usePlanningAlerts } from '../hooks/useApi';
+import BoardTab from '../components/Planning/BoardTab';
+import ProposalTab from '../components/Planning/ProposalTab';
 import HistoryTab from '../components/Planning/HistoryTab';
 import DocumentsTab from '../components/Planning/DocumentsTab';
 import ItemsTab from '../components/Planning/ItemsTab';
@@ -7,6 +9,8 @@ import MastersTab from '../components/Planning/MastersTab';
 import PurchaseOrdersTab from '../components/Planning/PurchaseOrdersTab';
 
 const TABS = [
+  { key: 'board', label: 'Tablero' },
+  { key: 'proposal', label: 'Pedido' },
   { key: 'history', label: 'Historial' },
   { key: 'documents', label: 'Documentos' },
   { key: 'items', label: 'Abastecimiento' },
@@ -16,12 +20,11 @@ const TABS = [
 type TabKey = (typeof TABS)[number]['key'];
 
 /**
- * Phase 0 of the planning module: the history the engine will read and the
- * masters it needs. The forecast, the semaphore and the purchase proposal
- * come with phase 1 and will sit in this same screen.
+ * The planning screen: the board and the purchase proposal (phase 1) over
+ * the history and the masters they read (phase 0).
  */
 export default function Planificacion() {
-  const [tab, setTab] = useState<TabKey>('history');
+  const [tab, setTab] = useState<TabKey>('board');
   const { data: alerts } = usePlanningAlerts();
   const pending = (alerts?.importedWithoutSupplier ?? 0) + (alerts?.unknownOrigin ?? 0);
 
@@ -29,7 +32,7 @@ export default function Planificacion() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Planificación</h1>
-        <p className="text-sm text-text-muted mt-1">Historial de ventas por canal, fichas de abastecimiento y tránsito: la base de compras, producción y reposición</p>
+        <p className="text-sm text-text-muted mt-1">Semáforo por SKU, pedido por proveedor, historial por canal y fichas de abastecimiento</p>
       </div>
 
       <div className="flex flex-wrap gap-1 border-b border-border-primary">
@@ -47,6 +50,8 @@ export default function Planificacion() {
         ))}
       </div>
 
+      {tab === 'board' && <BoardTab />}
+      {tab === 'proposal' && <ProposalTab />}
       {tab === 'history' && <HistoryTab />}
       {tab === 'documents' && <DocumentsTab />}
       {tab === 'items' && <ItemsTab />}

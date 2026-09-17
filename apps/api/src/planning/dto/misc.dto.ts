@@ -72,6 +72,7 @@ export class UpdateParamsDto {
   @IsOptional() @IsNumber() @Min(0) baseWeight12m?: number;
   @IsOptional() @IsNumber() growthDefault?: number;
   @IsOptional() @IsObject() growthByCategory?: Record<string, number>;
+  @IsOptional() @IsObject() seasonalFactors?: Record<string, number>;
   @IsOptional() @IsNumber() @Min(0) yoyAlertPct?: number;
   @IsOptional() @IsBoolean() yoyMultiplierEnabled?: boolean;
   @IsOptional() @IsNumber() @Min(0) ssMonthsImported?: number;
@@ -90,4 +91,11 @@ export class UpdateParamsDto {
   @IsOptional() @IsNumber() @Min(1) storeSplitDeliveryUnits?: number;
   @IsOptional() @IsNumber() @Min(0) scrapPct?: number;
   @IsOptional() @IsString() changeNote?: string;
+}
+
+export class RunDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

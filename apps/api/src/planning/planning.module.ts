@@ -11,6 +11,7 @@ import { PlanningItem, PlanningItemSchema } from './schemas/planning-item.schema
 import { SalesHistory, SalesHistorySchema } from './schemas/sales-history.schema.js';
 import { PlanningParams, PlanningParamsSchema } from './schemas/planning-params.schema.js';
 import { PurchaseOrder, PurchaseOrderSchema } from './schemas/purchase-order.schema.js';
+import { PlanningRun, PlanningRunSchema } from './schemas/planning-run.schema.js';
 import { WarehousesService } from './masters/warehouses.service.js';
 import { SuppliersService } from './masters/suppliers.service.js';
 import { PlanningItemsService } from './masters/planning-items.service.js';
@@ -18,12 +19,13 @@ import { PlanningParamsService } from './masters/planning-params.service.js';
 import { SalesHistoryService } from './sales-history/sales-history.service.js';
 import { SalesHistoryProcessor, SALES_HISTORY_QUEUE } from './sales-history/sales-history.processor.js';
 import { PurchaseOrdersService } from './purchase-orders/purchase-orders.service.js';
+import { PlanningRunsService } from './engine/planning-runs.service.js';
 import { PlanningController } from './planning.controller.js';
 
 /**
  * Purchasing, production and store replenishment share one demand engine.
- * Phase 0 (this module as it stands) holds the masters, the parameters and
- * the sales history the engine will read; the engine itself is phase 1.
+ * Phase 0 holds the masters, the parameters and the sales history; phase 1
+ * adds the engine (`engine/`), the saved runs and the purchase-order cycle.
  */
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { PlanningController } from './planning.controller.js';
       { name: SalesHistory.name, schema: SalesHistorySchema },
       { name: PlanningParams.name, schema: PlanningParamsSchema },
       { name: PurchaseOrder.name, schema: PurchaseOrderSchema },
+      { name: PlanningRun.name, schema: PlanningRunSchema },
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
@@ -50,7 +53,8 @@ import { PlanningController } from './planning.controller.js';
     SalesHistoryService,
     SalesHistoryProcessor,
     PurchaseOrdersService,
+    PlanningRunsService,
   ],
-  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService],
+  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService],
 })
 export class PlanningModule {}

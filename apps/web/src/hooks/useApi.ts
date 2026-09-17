@@ -430,3 +430,74 @@ export const useSetPoEta = () => {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'purchaseOrders'] }); },
   });
 };
+
+// Planning (Fase 1): runs, proposal, purchase-order cycle
+export type SkuState = 'NUEVO' | 'SIN_VENTA' | 'QUIEBRE' | 'REPONER' | 'OK' | 'SOBRE_STOCK' | 'PHASE_OUT' | 'DESCONTINUADO';
+export interface RunResult {
+  sku: string; name: string; category: string; origin: ItemOrigin; supplierName: string | null; supplierId: string | null; moq: number | null; unitCost: number | null;
+  abc: 'A' | 'B' | 'C'; pattern: 'smooth' | 'erratic' | 'intermittent' | 'lumpy' | null; lifecycle: Lifecycle;
+  monthsOfData: number; monthsWithSales: number; firstSaleMonth: string | null;
+  base: number | null; seasonalNext: number; growth: number; demandNext: number; demandMonthly: number; sigma: number; leadTimeDays: number;
+  ssRule: number; ssStat: number | null; ss: number; rop: number; target: number;
+  available: number; inTransit: number; inTransitLate: number; position: number; suggested: number; rounded: number; moqExceedsHorizon: boolean;
+  coverageDays: number | null; coverageMonths: number | null;
+  yoy: { month: string; lastYear: number | null; forecast: number; deltaPct: number | null; alert: boolean };
+  state: SkuState; reasons: string[];
+}
+export interface PlanningRunHeader {
+  _id: string; number: string; status: 'draft' | 'approved' | 'superseded'; asOf: string; fromMonth: string; toMonth: string; paramsVersion: number;
+  purchaseWarehouses: string[]; summary: Record<string, number>; notes: string; createdAt: string; approvedAt: string | null;
+}
+export interface ProposalGroup {
+  supplierId: string | null; supplierName: string; currency: string; containerMin: number | null; cadenceDays: number | null;
+  lines: RunResult[]; units: number; value: number;
+}
+
+export const usePlanningRuns = () => useQuery({ queryKey: ['planning', 'runs'], queryFn: () => api.get('/planning/runs').then(r => r.data as PlanningRunHeader[]) });
+export const useLatestRun = () => useQuery({ queryKey: ['planning', 'runs', 'latest'], queryFn: () => api.get('/planning/runs/latest').then(r => r.data as PlanningRunHeader | null) });
+export const useRunResults = (runId: string | null, params: { state?: string; origin?: string; supplierId?: string; abc?: string; search?: string; onlySuggested?: boolean }) => useQuery({
+  queryKey: ['planning', 'runs', runId, 'results', params], enabled: !!runId,
+  queryFn: () => api.get(`/planning/runs/${runId}/results`, { params }).then(r => r.data as { run: PlanningRunHeader; rows: RunResult[] }),
+});
+export const useRunProposal = (runId: string | null) => useQuery({
+  queryKey: ['planning', 'runs', runId, 'proposal'], enabled: !!runId,
+  queryFn: () => api.get(`/planning/runs/${runId}/proposal`).then(r => r.data as ProposalGroup[]),
+});
+export const useCreateRun = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (notes: string) => api.post('/planning/runs', { notes }).then(r => r.data as PlanningRunHeader),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'runs'] }); },
+  });
+};
+export const useApproveRun = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/planning/runs/${id}/approve`).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'runs'] }); },
+  });
+};
+export const useOrderFromRun = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ runId, supplierId, overrides }: { runId: string; supplierId: string | null; overrides: { sku: string; qty: number; reason?: string }[] }) =>
+      api.post(`/planning/runs/${runId}/purchase-orders`, { supplierId, overrides }).then(r => r.data as PurchaseOrder),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'purchaseOrders'] }); },
+  });
+};
+export const usePurchaseOrderAction = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action, body }: { id: string; action: 'approve' | 'send' | 'cancel' | 'receive'; body?: Record<string, unknown> }) =>
+      api.post(`/planning/purchase-orders/${id}/${action}`, body ?? {}).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'purchaseOrders'] }); qc.invalidateQueries({ queryKey: ['stock'] }); },
+  });
+};
+export const useUpdateDraftOrder = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) => api.patch(`/planning/purchase-orders/${id}`, data).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'purchaseOrders'] }); },
+  });
+};
+export const runExportUrl = (runId: string) => `${api.defaults.baseURL ?? ''}/planning/runs/${runId}/export`;

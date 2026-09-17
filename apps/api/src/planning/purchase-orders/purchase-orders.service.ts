@@ -1,10 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CountersService } from '../../common/counters/counters.service.js';
+import { StockLot, StockLotDocument } from '../../stock/schemas/stock-lot.schema.js';
 import { PurchaseOrder, PurchaseOrderDocument, PO_OPEN_STATUSES, PoStatus } from '../schemas/purchase-order.schema.js';
 import { SuppliersService } from '../masters/suppliers.service.js';
-import { CreatePurchaseOrderDto } from '../dto/purchase-order.dto.js';
+import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto } from '../dto/purchase-order.dto.js';
 
 export interface InTransitLine {
   sku: string;
@@ -15,13 +16,18 @@ export interface InTransitLine {
 }
 
 /**
- * Phase 0 scope: create and list orders, and answer "what is in transit for
- * this SKU and when". Approval, sending and receipt come with phase 1.
+ * The life of a purchase order: draft → approved (admin, D12) → sent →
+ * partial/received. What is approved and not yet received is the only "in
+ * transit" the engine sees. Receiving creates the lots, with the real date
+ * and the landed cost, so the aging of an imported SKU starts when it arrives.
  */
 @Injectable()
 export class PurchaseOrdersService {
+  private readonly logger = new Logger(PurchaseOrdersService.name);
+
   constructor(
     @InjectModel(PurchaseOrder.name) private model: Model<PurchaseOrderDocument>,
+    @InjectModel(StockLot.name) private stockModel: Model<StockLotDocument>,
     private counters: CountersService,
     private suppliers: SuppliersService,
   ) {}
@@ -36,7 +42,7 @@ export class PurchaseOrdersService {
     return doc;
   }
 
-  async create(dto: CreatePurchaseOrderDto, userId: string | null): Promise<PurchaseOrderDocument> {
+  async create(dto: CreatePurchaseOrderDto, userId: string | null, planningRunId: Types.ObjectId | null = null): Promise<PurchaseOrderDocument> {
     if (!dto.lines?.length) throw new BadRequestException('La orden necesita al menos una línea');
     const supplier = dto.supplierName ? await this.suppliers.ensure(dto.supplierName) : null;
     const year = new Date().getFullYear();
@@ -64,6 +70,7 @@ export class PurchaseOrdersService {
         eta: l.eta ? new Date(l.eta) : null, unitCost: l.unitCost ?? null,
       })),
       source: dto.source ?? 'manual',
+      planningRunId,
       createdBy: userId ? new Types.ObjectId(userId) : null,
       notes: dto.notes ?? '',
     });
@@ -94,8 +101,103 @@ export class PurchaseOrdersService {
     return po.save();
   }
 
+  async updateDraft(id: string, patch: { lines?: { sku: string; qtyOrdered: number; eta?: string | null; unitCost?: number | null }[]; fxRate?: number | null; notes?: string; destinationWarehouse?: string }): Promise<PurchaseOrderDocument> {
+    const po = await this.findById(id);
+    if (po.status !== 'draft') throw new BadRequestException('Solo se edita una orden en borrador');
+    if (patch.lines) {
+      for (const l of patch.lines) {
+        const line = po.lines.find((x) => x.sku === l.sku);
+        if (!line) continue;
+        line.qtyOrdered = l.qtyOrdered;
+        if (l.eta !== undefined) line.eta = l.eta ? new Date(l.eta) : null;
+        if (l.unitCost !== undefined) line.unitCost = l.unitCost;
+      }
+      po.lines = po.lines.filter((l) => l.qtyOrdered > 0);
+      po.markModified('lines');
+    }
+    if (patch.fxRate !== undefined) po.fxRate = patch.fxRate;
+    if (patch.notes !== undefined) po.notes = patch.notes;
+    if (patch.destinationWarehouse) po.destinationWarehouse = patch.destinationWarehouse;
+    return po.save();
+  }
+
+  async approve(id: string, userId: string | null): Promise<PurchaseOrderDocument> {
+    const po = await this.findById(id);
+    if (po.status !== 'draft') throw new BadRequestException(`La orden está ${po.status}; solo se aprueba un borrador`);
+    if (po.lines.length === 0) throw new BadRequestException('La orden no tiene líneas');
+    po.status = 'approved';
+    po.approvedBy = userId ? new Types.ObjectId(userId) : null;
+    po.approvedAt = new Date();
+    return po.save();
+  }
+
+  async markSent(id: string): Promise<PurchaseOrderDocument> {
+    const po = await this.findById(id);
+    if (po.status !== 'approved') throw new BadRequestException('Solo se envía una orden aprobada');
+    po.status = 'sent';
+    return po.save();
+  }
+
+  /**
+   * Receives some or all lines and creates one lot per line received. The
+   * lot carries the real arrival date, the supplier and the landed unit cost
+   * in CLP (FOB × fx × factor). BSale remains the source of truth for the
+   * quantity: the receipt must be registered there too or the next sync
+   * reverses it — same warning StockService.create logs for manual entries.
+   */
+  async receive(id: string, dto: ReceivePurchaseOrderDto, userId: string | null): Promise<{ order: PurchaseOrderDocument; lots: string[] }> {
+    const po = await this.findById(id);
+    if (!['approved', 'sent', 'partial'].includes(po.status)) throw new BadRequestException(`La orden está ${po.status}; no se puede recibir`);
+    const fx = po.currency === 'CLP' ? 1 : (dto.fxRate ?? po.fxRate);
+    if (!fx) throw new BadRequestException(`Falta el tipo de cambio ${po.currency}/CLP para valorizar la recepción`);
+    const supplier = po.supplierId ? await this.suppliers.findById(String(po.supplierId)) : null;
+    const landed = supplier?.landedFactor ?? 1;
+    const receivedAt = dto.receivedAt ? new Date(dto.receivedAt) : new Date();
+    const stamp = receivedAt.toISOString().slice(0, 10).replace(/-/g, '');
+    const lots: string[] = [];
+
+    for (const r of dto.lines) {
+      const line = po.lines.find((l) => l.sku === r.sku);
+      if (!line) throw new NotFoundException(`La orden no tiene la línea ${r.sku}`);
+      const pending = line.qtyOrdered - line.qtyReceived;
+      if (r.qty <= 0) continue;
+      if (r.qty > pending) throw new BadRequestException(`${r.sku}: se reciben ${r.qty} pero faltan ${pending}`);
+
+      let lotCode = `${po.number}-${stamp}`;
+      let n = 2;
+      while (await this.stockModel.exists({ lot: lotCode, warehouse: po.destinationWarehouse, isActive: true })) lotCode = `${po.number}-${stamp}-${n++}`;
+      // Without a FOB on the line, the SKU's latest lot cost keeps the valuation from collapsing to zero.
+      let unitCostClp = Math.round((line.unitCost ?? 0) * fx * landed);
+      if (!unitCostClp) {
+        const last = await this.stockModel.findOne({ sku: r.sku, unitCost: { $gt: 0 } }).sort({ entryDate: -1 }).exec();
+        unitCostClp = last?.unitCost ?? 0;
+        if (last) this.logger.warn(`${po.number} ${r.sku}: sin costo en la orden, lote valorizado con el último costo conocido (${unitCostClp})`);
+      }
+      await this.stockModel.create({
+        sku: r.sku, name: line.name || r.sku, lot: lotCode, entryDate: receivedAt, qty: r.qty, initialQty: r.qty,
+        unitCost: unitCostClp, warehouse: po.destinationWarehouse, supplier: po.supplierName || null, isActive: true,
+        location: r.location ?? '', createdBy: userId ? new Types.ObjectId(userId) : null,
+      });
+      lots.push(lotCode);
+      line.qtyReceived += r.qty;
+    }
+    if (lots.length === 0) throw new BadRequestException('Nada que recibir');
+
+    po.fxRate = fx;
+    const allDone = po.lines.every((l) => l.qtyReceived >= l.qtyOrdered);
+    po.status = allDone ? 'received' : 'partial';
+    po.markModified('lines');
+    await po.save();
+    this.logger.warn(
+      `Recepción ${po.number}: ${lots.length} lotes creados en ${po.destinationWarehouse} por ${userId ?? 'unknown'}. ` +
+      `Registrar la recepción en BSale o el próximo sync la revertirá.`,
+    );
+    return { order: po, lots };
+  }
+
   async cancel(id: string): Promise<PurchaseOrderDocument> {
     const po = await this.findById(id);
+    if (po.status === 'received') throw new BadRequestException('Una orden recibida no se anula');
     po.status = 'cancelled';
     return po.save();
   }
