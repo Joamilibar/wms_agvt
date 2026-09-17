@@ -97,7 +97,7 @@ export class PlanningItemsService {
    * planning item. New ones come in as `unknown` origin, which is the second
    * alert the screen shows after "imported without supplier".
    */
-  async syncFromCatalog(): Promise<{ created: number; total: number }> {
+  async syncFromCatalog(): Promise<{ created: number; pruned: number; total: number }> {
     const [lotSkus, soldSkus, lotNames] = await Promise.all([
       this.stockModel.distinct('sku', { isActive: true }).exec(),
       this.salesModel.distinct('sku', { isService: false }).exec(),
@@ -126,7 +126,12 @@ export class PlanningItemsService {
       });
       created++;
     }
-    return { created, total: all.size };
+    // An `unknown` item nobody touched, whose SKU no longer has lots or demand
+    // (a glosa reclassified as service, a reload that changed the key) is noise.
+    const { deletedCount: pruned } = await this.model
+      .deleteMany({ origin: 'unknown', supplierId: null, notes: '', sku: { $nin: [...all] } })
+      .exec();
+    return { created, pruned, total: all.size };
   }
 
   /** Supply terms of a SKU with supplier defaults applied. Used by the engine and the alerts. */
@@ -170,8 +175,9 @@ export class PlanningItemsService {
   }
 
   private async normalize(dto: UpdatePlanningItemDto): Promise<Record<string, unknown>> {
-    const { supplierName, supplierId, launchDate, sku: _sku, ...rest } = dto;
+    const { supplierName, supplierId, launchDate, ...rest } = dto;
     const patch: Record<string, unknown> = { ...rest };
+    delete patch.sku;
     if (supplierName !== undefined) {
       patch.supplierId = supplierName ? (await this.suppliersService.ensure(supplierName))._id : null;
     } else if (supplierId !== undefined) {

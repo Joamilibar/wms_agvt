@@ -37,7 +37,7 @@ export class SalesHistory {
   @Prop({ required: true })
   isCreditNote!: boolean;
 
-  /** BSale detail line id. With `fromPackSku` it identifies an exploded component line. */
+  /** BSale detail line id. With `fromPackSku` and `sku` it identifies an exploded component line. */
   @Prop({ required: true })
   lineId!: number;
 
@@ -117,6 +117,8 @@ export class SalesHistory {
 
 export const SalesHistorySchema = SchemaFactory.createForClass(SalesHistory);
 
-SalesHistorySchema.index({ bsaleDocId: 1, lineId: 1, fromPackSku: 1 }, { unique: true });
+// A pack line explodes into one row per component, all sharing lineId and
+// fromPackSku: the component sku is part of the key.
+SalesHistorySchema.index({ bsaleDocId: 1, lineId: 1, fromPackSku: 1, sku: 1 }, { unique: true });
 SalesHistorySchema.index({ sku: 1, channel: 1, month: 1 });
 SalesHistorySchema.index({ warehouse: 1, sku: 1, month: 1 });

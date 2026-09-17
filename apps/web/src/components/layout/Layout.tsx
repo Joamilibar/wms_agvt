@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router';
 import { useAuthStore, type Role } from '../../stores/auth.store';
-import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX, HiOutlineBeaker, HiOutlineUsers, HiOutlineCollection } from 'react-icons/hi';
+import { HiOutlineHome, HiOutlineCube, HiOutlineClipboardList, HiOutlineTruck, HiOutlineCog, HiOutlineLogout, HiOutlineMenu, HiOutlineX, HiOutlineBeaker, HiOutlineUsers, HiOutlineCollection, HiOutlineChartBar } from 'react-icons/hi';
 
 // `roles` lists who may see the entry; absent means everyone signed in.
 // The API enforces the same matrix — this only keeps the menu honest, so an
@@ -13,6 +13,7 @@ const navItems: { to: string; icon: typeof HiOutlineHome; label: string; roles?:
   { to: '/picking-log', icon: HiOutlineClipboardList, label: 'Bitácora Picking' },
   { to: '/guias',       icon: HiOutlineTruck,         label: 'Guías' },
   { to: '/packs',       icon: HiOutlineCollection,    label: 'Packs' },
+  { to: '/planificacion', icon: HiOutlineChartBar,    label: 'Planificación', roles: ['admin', 'supervisor'] },
   { to: '/analisis',    icon: HiOutlineBeaker,        label: 'Análisis Inventario' },
   { to: '/bsale',       icon: HiOutlineCog,           label: 'BSale',      roles: ['admin', 'supervisor'] },
   { to: '/usuarios',    icon: HiOutlineUsers,         label: 'Usuarios',   roles: ['admin'] },

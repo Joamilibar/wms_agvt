@@ -39,7 +39,7 @@ interface RawLine {
  * invoice they cancel through /returns, packs exploded to components with
  * the recipes the WMS keeps, services set aside, retail outliers flagged.
  *
- * Idempotent: lines are upserted by (document, line, component), so the
+ * Idempotent: lines are upserted by (document, line, pack, sku), so the
  * monthly re-run over the last months only touches what changed.
  */
 @Injectable()
@@ -113,7 +113,7 @@ export class SalesHistoryService {
       const customerName: string = d.client?.company || [d.client?.firstName, d.client?.lastName].filter(Boolean).join(' ').trim() || '';
       const sign = type.kind === 'credit' ? -1 : 1;
 
-      const productLines = details.filter((l) => l.variant?.code && classification.get(String(l.product?.id)) !== 2);
+      const productLines = details.filter((l) => l.variant?.code && l.product?.id && classification.get(String(l.product.id)) !== 2);
       const docUnits = productLines.reduce((s, l) => s + Math.abs(Number(l.quantity) || 0), 0);
       const channel = classifyDocument({ warehouse, customerRut, docUnits }, rule);
 
@@ -148,7 +148,9 @@ export class SalesHistoryService {
           ...base, lineId: Number(l.id), variantId: String(l.variant?.id ?? ''), productName: l.product?.name ?? l.variant?.description ?? '',
         };
 
-        if (cls === 2 || this.looksLikeService(common.productName)) {
+        // A free-text line ("glosa") has no product behind it: BSale mints a
+        // numeric variant code for it. Services and glosas are audit, not demand.
+        if (cls === 2 || !l.product?.id || !common.productName || this.looksLikeService(common.productName)) {
           lines.push({ ...common, fromPackSku: null, sku, qty, net, isService: true });
           continue;
         }
@@ -199,7 +201,7 @@ export class SalesHistoryService {
       const doc = o ? { ...l, channel: o.channelOverride, channelOverride: o.channelOverride, channelReason: o.channelReason } : { ...l, channelOverride: null, channelReason: '' };
       return {
         updateOne: {
-          filter: { bsaleDocId: l.bsaleDocId, lineId: l.lineId, fromPackSku: l.fromPackSku },
+          filter: { bsaleDocId: l.bsaleDocId, lineId: l.lineId, fromPackSku: l.fromPackSku, sku: l.sku },
           update: { $set: doc },
           upsert: true,
         },

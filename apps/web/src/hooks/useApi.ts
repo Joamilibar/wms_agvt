@@ -315,3 +315,118 @@ export const useImportPacksFromBsale = () => {
     },
   });
 };
+
+// Planning (Fase 0)
+export interface HistoryWindow {
+  from: string; to: string; fromMonth: string; toMonth: string; months: number; monthKeys: string[];
+}
+export type WarehouseRole = 'sellable' | 'store' | 'workshop' | 'raw' | 'reserved' | 'project';
+export type PlanningUse = 'purchase' | 'production' | 'store';
+export interface PlanningWarehouse {
+  _id: string; name: string; bsaleOfficeId: string | null; role: WarehouseRole; countsFor: PlanningUse[]; isActive: boolean; notes: string;
+}
+export interface PlanningSupplier {
+  _id: string; name: string; currency: string; leadTimeDays: number; transitDays: number; cadenceDays: number;
+  containerMin: number | null; moqScope: 'sku' | 'family' | 'order'; landedFactor: number; paymentTerms: string; isActive: boolean; notes: string;
+}
+export type ItemOrigin = 'imported' | 'national' | 'raw_material' | 'supply' | 'pack' | 'service' | 'unknown';
+export type Lifecycle = 'new' | 'active' | 'phase_out' | 'discontinued';
+export interface PlanningItem {
+  _id: string; sku: string; name: string; category: string; origin: ItemOrigin;
+  supplierId: PlanningSupplier | null; leadTimeDays: number | null; transitDays: number | null; moq: number | null; orderMultiple: number;
+  familyKey: string | null; lifecycle: Lifecycle; launchDate: string | null;
+  successorSku: string | null; analogSku: string | null; isHotelLine: boolean; fobCost: number | null; costCurrency: string | null; notes: string;
+}
+export interface PlanningAlerts { importedWithoutSupplier: number; unknownOrigin: number; total: number }
+export type Channel = 'retail' | 'project';
+export interface MonthlyTotal { _id: { month: string; channel: Channel }; units: number; net: number; lines: number }
+export interface SkuSeriesRow { _id: { month: string; channel: Channel; warehouse?: string }; units: number; net: number; viaPack: number }
+export interface HistoryDocument {
+  _id: number; docKey: string; docType: string; date: string; month: string; warehouse: string; customerName: string; customerRut: string | null;
+  channel: Channel; channelOverride: Channel | null; channelReason: string; units: number; net: number; isOutlier: boolean; refDocId: number | null;
+}
+export interface HistoryCoverage { firstMonth: string | null; lastMonth: string | null; lines: number; documents: number }
+export interface PurchaseOrderLine { sku: string; name: string; qtyOrdered: number; qtyReceived: number; eta: string | null; unitCost: number | null }
+export interface PurchaseOrder {
+  _id: string; number: string; supplierName: string; status: 'draft' | 'approved' | 'sent' | 'partial' | 'received' | 'cancelled';
+  currency: string; destinationWarehouse: string; lines: PurchaseOrderLine[]; source: string; notes: string; createdAt: string;
+}
+export interface HistoryLoadResult {
+  from: string; to: string; documents: number; skippedDocuments: number; lines: number; packLinesExploded: number;
+  creditNotesLinked: number; creditNotesUnlinked: number; outlierDocs: number; outlierThreshold: number;
+  byChannel: Record<Channel, { documents: number; units: number }>; warnings: string[];
+}
+export interface HistoryJob { jobId: string; state: string; result: HistoryLoadResult | null; failedReason: string | null }
+
+export const usePlanningWindow = () => useQuery({ queryKey: ['planning', 'window'], queryFn: () => api.get('/planning/window').then(r => r.data as HistoryWindow) });
+export const useHistoryCoverage = () => useQuery({ queryKey: ['planning', 'coverage'], queryFn: () => api.get('/planning/sales-history/coverage').then(r => r.data as HistoryCoverage) });
+export const useHistoryMonthly = () => useQuery({ queryKey: ['planning', 'monthly'], queryFn: () => api.get('/planning/sales-history/monthly').then(r => r.data as MonthlyTotal[]) });
+export const useSkuSeries = (sku: string, byWarehouse = false) => useQuery({
+  queryKey: ['planning', 'sku', sku, byWarehouse], enabled: sku.length > 0,
+  queryFn: () => api.get(`/planning/sales-history/sku/${encodeURIComponent(sku)}`, { params: { byWarehouse } }).then(r => r.data as SkuSeriesRow[]),
+});
+export const useHistoryDocuments = (params: { channel?: string; month?: string; search?: string; page?: number }) => useQuery({
+  queryKey: ['planning', 'documents', params],
+  queryFn: () => api.get('/planning/sales-history/documents', { params }).then(r => r.data as { data: HistoryDocument[]; total: number; page: number; limit: number }),
+});
+export const useOverrideChannel = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bsaleDocId, channel, reason }: { bsaleDocId: number; channel: Channel | null; reason: string }) =>
+      api.patch(`/planning/sales-history/documents/${bsaleDocId}/channel`, { channel: channel ?? undefined, reason }).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning'] }); },
+  });
+};
+export const useLoadHistory = () => useMutation({
+  mutationFn: (range: { from?: string; to?: string }) => api.post('/planning/sales-history/load', range).then(r => r.data as { jobId: string }),
+});
+export const useHistoryJob = (jobId: string | null) => {
+  const qc = useQueryClient();
+  return useQuery({
+    queryKey: ['planning', 'historyJob', jobId], enabled: !!jobId,
+    queryFn: () => api.get(`/planning/sales-history/jobs/${jobId}`).then(r => r.data as HistoryJob),
+    refetchInterval: (q) => {
+      const s = q.state.data?.state;
+      if (s === 'completed' || s === 'failed') { qc.invalidateQueries({ queryKey: ['planning'] }); return false; }
+      return 3000;
+    },
+  });
+};
+export const usePlanningWarehouses = () => useQuery({ queryKey: ['planning', 'warehouses'], queryFn: () => api.get('/planning/warehouses').then(r => r.data as PlanningWarehouse[]) });
+export const useUpdateWarehouse = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Pick<PlanningWarehouse, 'role' | 'countsFor' | 'isActive' | 'notes'>> }) =>
+      api.patch(`/planning/warehouses/${id}`, data).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'warehouses'] }); },
+  });
+};
+export const useSuppliers = () => useQuery({ queryKey: ['planning', 'suppliers'], queryFn: () => api.get('/planning/suppliers', { params: { includeInactive: true } }).then(r => r.data as PlanningSupplier[]) });
+export const useSaveSupplier = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: Partial<PlanningSupplier> }) =>
+      (id ? api.patch(`/planning/suppliers/${id}`, data) : api.post('/planning/suppliers', data)).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning'] }); },
+  });
+};
+export const usePlanningItems = (params: { origin?: string; lifecycle?: string; missingSupply?: string; search?: string }) => useQuery({
+  queryKey: ['planning', 'items', params], queryFn: () => api.get('/planning/items', { params }).then(r => r.data as PlanningItem[]),
+});
+export const usePlanningAlerts = () => useQuery({ queryKey: ['planning', 'alerts'], queryFn: () => api.get('/planning/items/alerts').then(r => r.data as PlanningAlerts) });
+export const useUpdatePlanningItem = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ sku, data }: { sku: string; data: Record<string, unknown> }) => api.patch(`/planning/items/${encodeURIComponent(sku)}`, data).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'items'] }); qc.invalidateQueries({ queryKey: ['planning', 'alerts'] }); },
+  });
+};
+export const usePurchaseOrders = () => useQuery({ queryKey: ['planning', 'purchaseOrders'], queryFn: () => api.get('/planning/purchase-orders').then(r => r.data as PurchaseOrder[]) });
+export const useSetPoEta = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, sku, eta }: { id: string; sku: string; eta: string | null }) =>
+      api.patch(`/planning/purchase-orders/${id}/lines/${encodeURIComponent(sku)}/eta`, { eta }).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'purchaseOrders'] }); },
+  });
+};
