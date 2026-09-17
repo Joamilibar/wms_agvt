@@ -179,7 +179,7 @@ export class PlanningRunsService {
       'Punto_Reorden', 'Objetivo', 'Stock_Disponible', 'En_Transito', 'Posicion', 'Sugerido', 'Pedido_Redondeado', 'MOQ_Excede_Horizonte',
       'Cobertura_Dias', 'Cobertura_Meses', 'Mismo_Mes_Ano_Anterior', 'Alerta_Interanual', 'Estado', 'Motivos',
     ];
-    const esc = (v: unknown) => {
+    const esc = (v: string | number | boolean | null | undefined) => {
       const s = v === null || v === undefined ? '' : String(v);
       return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
     };
@@ -252,7 +252,7 @@ export class PlanningRunsService {
         notes,
       },
       userId,
-      run._id as Types.ObjectId,
+      run._id,
     );
   }
 }
