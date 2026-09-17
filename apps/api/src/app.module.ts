@@ -17,6 +17,7 @@ import { BsaleModule } from './bsale/bsale.module.js';
 import { SeedModule } from './seed/seed.module.js';
 import { PickingLogModule } from './picking-log/picking-log.module.js';
 import { PacksModule } from './packs/packs.module.js';
+import { PlanningModule } from './planning/planning.module.js';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { PacksModule } from './packs/packs.module.js';
     SeedModule,
     PickingLogModule,
     PacksModule,
+    PlanningModule,
   ],
   providers: [
     // Without this the ThrottlerModule config above is inert and every

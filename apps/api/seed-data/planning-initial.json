@@ -1,0 +1,3470 @@
+{
+ "suppliers": [
+  {
+   "name": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "currency": "USD",
+   "cadenceDays": 90
+  },
+  {
+   "name": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "currency": "USD",
+   "cadenceDays": 90
+  },
+  {
+   "name": "Jiangsu Mengxian Household Products Co.,LTD",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "currency": "USD",
+   "cadenceDays": 90
+  },
+  {
+   "name": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "currency": "USD",
+   "cadenceDays": 90
+  },
+  {
+   "name": "Peter Kohl K.G.",
+   "leadTimeDays": 15.0,
+   "transitDays": 10.0,
+   "currency": "EUR",
+   "cadenceDays": 30
+  },
+  {
+   "name": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "currency": "USD",
+   "cadenceDays": 30
+  },
+  {
+   "name": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "currency": "EUR",
+   "cadenceDays": 90
+  },
+  {
+   "name": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "currency": "EUR",
+   "cadenceDays": 90
+  }
+ ],
+ "items": [
+  {
+   "sku": "1636382622782",
+   "name": "Plumón Thinsulate Toda Estación Queen 220x220",
+   "category": "PLUMONES",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1636382757081",
+   "name": "Plumón Thinsulate Toda Estación King 260x220",
+   "category": "PLUMONES",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1636382932496",
+   "name": "Plumón Thinsulate Verano Súper King 280x220",
+   "category": "PLUMONES",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1637084089862",
+   "name": "Protector de Colchón 100% Algodón Extra King Fuelle Elasticado 210x200",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1637874990914",
+   "name": "Cinta Embalaje CDH - Printed Ribbon 7542U (Verde Claro)",
+   "category": "EMPAQUE",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637876502304",
+   "name": "Juego de Cubreplumón Lino Charcoal Súper King Liso 285x225+2*50x90",
+   "category": "CUBREPLUMÓN LINO",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637876777881",
+   "name": "Juego de Cubreplumón Lino Charcoal King Liso 265x225+2*50x90",
+   "category": "CUBREPLUMÓN LINO",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637876995455",
+   "name": "Juego de Cubreplumón Lino Charcoal Queen - Liso 225x225+2*50x70",
+   "category": "CUBREPLUMÓN LINO",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637877512714",
+   "name": "Juego Piecera Blanco  Lino Lazos 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879257330",
+   "name": "Faldón de Cama Stone Súper King Elasticado Lino Francés 200x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879424508",
+   "name": "Faldón de Cama Charcoal Súper King Elasticado Lino Francés 200x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879578400",
+   "name": "Faldón de Cama Charcoal King Elasticado Lino Francés 180x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879633923",
+   "name": "Faldón de Cama Stone King Elasticado Lino Francés 180x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879877414",
+   "name": "Faldón de Cama Stone Queen Elasticado Lino Francés 155x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1637879919388",
+   "name": "Faldón de Cama Charcoal Queen Elasticado Lino Francés 155x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1642453255365",
+   "name": "Plumón Piecera Microfibra 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1642453277786",
+   "name": "Plumón Piecera Microfibra - 130x150",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "1643661612573",
+   "name": "Toalla de Baño Algodón Portugués Oporto Lino Natural 70x150",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "1643661646917",
+   "name": "Toalla de Baño Algodón Portugués Oporto Lino Menta 70x150",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "1643738641196",
+   "name": "Toalla de Mano Algodón Portugués Oporto Doble Franja Verde 50x90",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "1643988544913",
+   "name": "Cubreplumón 500H Azul - Single Liso 165x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "1647441328558",
+   "name": "Poliéster - Grueso",
+   "category": "MICROFIBRA",
+   "origin": "national"
+  },
+  {
+   "sku": "1647443987625",
+   "name": "Funda relleno Piecera 420TC T/E Nacional - 120x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "1649087223128",
+   "name": "Funda de Cojín Especial",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "1650913729918",
+   "name": "Empaque Almohada King 50X90",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "1650913800405",
+   "name": "Empaque Almohada - Americana 50X70",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "1650913873540",
+   "name": "Empaque Plumón - Pequeño 55X45+16cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "1650913965887",
+   "name": "Empaque Plumón - Grande 55X45+22cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "1650914049488",
+   "name": "Empaque Featherbed - Pequeño 65X55X33cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "1650914130039",
+   "name": "Empaque Featherbed - Grande 65X59X42cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "1650914187398",
+   "name": "Empaque Accesorios - 40X45+7cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "1650914246746",
+   "name": "Empaque Sábanas - 46X37cm",
+   "category": "EMPAQUE",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 3.0
+  },
+  {
+   "sku": "1650914315274",
+   "name": "Empaque para Seda - Lino Blanco 30X20cm",
+   "category": "EMPAQUE",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040657367",
+   "name": "Funda de Almohada 500H Blanco/Blanco King Crucero 50x90",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 500.0
+  },
+  {
+   "sku": "62697040648535",
+   "name": "Funda de Almohada 500H Blanco/Blanco Americana Crucero 50x70",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 500.0
+  },
+  {
+   "sku": "63422182407351",
+   "name": "Toalla Sábana de Baño Algodón Portugués (700 grs) Vila Real Blanco/Gris",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 321.0
+  },
+  {
+   "sku": "63422182389565",
+   "name": "Toalla Sábana de Baño Algodón Portugués (700 grs) Vila Real Blanco/Blanco",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 576.0
+  },
+  {
+   "sku": "63422182407830",
+   "name": "Toalla de Mano Algodón Portugués (700 grs) Vila Real Blanco/Gris",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 864.0
+  },
+  {
+   "sku": "63422182399326",
+   "name": "Toalla Sábana de Baño Algodón Portugués (700 grs) Vila Real Blanco/Arena",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 302.0
+  },
+  {
+   "sku": "62697037725143",
+   "name": "Almohada King Microfibra 50x90",
+   "category": "ALMOHADAS",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "H00173947148440992",
+   "name": "Piso de Baño Hotel Algodón Portugués Turco Acanalado Blanco 60x95 1200 gms",
+   "category": "PISOS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "moq": 500.0
+  },
+  {
+   "sku": "62697037716311",
+   "name": "Almohada Americana Microfibra 50x70",
+   "category": "ALMOHADAS",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "62697037592663",
+   "name": "Almohada Duvet Americana Plus 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "67769553903594",
+   "name": "Juego de Sábanas 500H Blanco King Crucero",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037610327",
+   "name": "Almohada Duvet Especial A medida",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037619159",
+   "name": "Almohada Duvet Especial King  A medida",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "H00173946981515649",
+   "name": "Toalla Sábana de Baño Hotel Algodón Portugués Turca Punto Arroz Blanca 90x170 650gms",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040622039",
+   "name": "Sábana King Bajera Elasticada 500Hilos. 180x200",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "67881753849877",
+   "name": "Juego de Sábanas 500H Blanco Super King Crucero",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037654487",
+   "name": "Almohada Duvet King Premium Classic 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037574999",
+   "name": "Almohada Duvet Americana Classic 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037583831",
+   "name": "Almohada Duvet King Classic 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039924311",
+   "name": "Protector de Colchón 100% Algodón King Fuelle Elasticado 180x200",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "67881809997419",
+   "name": "Juego de Sábanas 500H Blanco Queen Crucero",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037742807",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris Queen - Elisa 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037769303",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Ostra Queen Elisa 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037778135",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Ostra King Elisa 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037786967",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Ostra Súper King Elisa 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037813463",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco Súper King Elisa 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037822295",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris Queen Sofía 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037831127",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris King Sofía 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037848791",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Vison Queen Sofía 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037857623",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Vison King Sofía 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037937111",
+   "name": "Juego de Cubreplumón 500H Especial",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037954775",
+   "name": "Cubreplumón 500H Queen DA Doble Alforza 225x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037963607",
+   "name": "Cubreplumón 500H King DA Doble Alforza 265x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037972439",
+   "name": "Cubreplumón 500H Súper King DA Doble Alforza 285x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037981271",
+   "name": "Cubreplumón 500H Especial Especial",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697038210903",
+   "name": "Cubreplumón 500H Blanco/Blanco Twin Crucero 165x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697038219735",
+   "name": "Cubreplumón 500H Blanco/Blanco Queen Crucero 225x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "67881957925140",
+   "name": "Juego de Sábanas 500H Blanco Twin Crucero",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037672151",
+   "name": "Almohada Duvet King Premium Plus 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697038246231",
+   "name": "Cubreplumón 500H Blanco/Blanco Especial Crucero",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697038661335",
+   "name": "Cubreplumón 300H Blanco/Blanco Queen - Plié 225x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038749655",
+   "name": "Cubreplumón 300H Blanco/Verde Queen - Plié 225x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038873303",
+   "name": "Funda de Almohada Lino Blanco Americana Lazo 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038890967",
+   "name": "Funda de Almohada Lino Natural Americana Lazo 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038943959",
+   "name": "Funda de Almohada Lino Stone Americana Lazo 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038970455",
+   "name": "Juego de Cubreplumón Lino Blanco Queen Liso 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038979287",
+   "name": "Juego de Cubreplumón Lino Blanco King Liso 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697038228567",
+   "name": "Cubreplumón 500H Blanco/Blanco King Crucero 265x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697039014615",
+   "name": "Juego de Cubreplumón Lino Natural Queen Liso 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039023447",
+   "name": "Juego de Cubreplumón Lino Natural King Liso 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039076439",
+   "name": "Juego de Cubreplumón Lino Acero Súper King - Liso 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039102935",
+   "name": "Juego de Cubreplumón Lino Stone Queen Liso 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039111767",
+   "name": "Juego de Cubreplumón Lino Stone King Liso 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039120599",
+   "name": "Juego de Cubreplumón Lino Stone Súper King Liso 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039155927",
+   "name": "Cubreplumón Lino Blanco King Liso 265x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039173591",
+   "name": "Cubreplumón Lino Blanco Especial Liso",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039191255",
+   "name": "Cubreplumón Lino Natural Queen Liso 225x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039200087",
+   "name": "Cubreplumón Lino Natural King Liso 265x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039314903",
+   "name": "Funda de Almohada Lino Blanco Americana Marco 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039323735",
+   "name": "Funda de Almohada Lino Blanco King - Marco 50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039332567",
+   "name": "Funda de Almohada Lino Natural Americana Marco 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039341399",
+   "name": "Funda de Almohada Lino Natural King - Marco 50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039367895",
+   "name": "Funda de Almohada Lino Charcoal Americana Marco 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039376727",
+   "name": "Funda de Almohada Lino Charcoal King - Marco 50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039385559",
+   "name": "Funda de Almohada Lino Stone Americana - Marco 50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039394391",
+   "name": "Funda de Almohada Lino Stone King Marco 50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039403223",
+   "name": "Featherbed Single - Esencial 90x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039412055",
+   "name": "Featherbed Twin Esencial 105x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039420887",
+   "name": "Featherbed Queen Esencial 155x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697040630871",
+   "name": "Sábana Súper King Bajera Elasticada 500Hilos. 200x200",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697039438551",
+   "name": "Featherbed Súper King Esencial 200x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039456215",
+   "name": "Featherbed Single - Classic 90x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039465047",
+   "name": "Featherbed Twin Classic 105x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697037627991",
+   "name": "Almohada Duvet Americana Premium Soft 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039986135",
+   "name": "Juego de Sábanas 500H Especial",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "72478976845509",
+   "name": "Cubreplumón 500H Blanco/Blanco Twin Crucero 185x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039509207",
+   "name": "Featherbed Single - Premium 90x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039518039",
+   "name": "Featherbed Twin Premium 105x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697038237399",
+   "name": "Cubreplumón 500H Blanco/Blanco Súper King Crucero 285x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697037636823",
+   "name": "Almohada Duvet King Premium Soft 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "74726128560655",
+   "name": "Almohada Duvet Premium Especial Americana  Medium 50x70 100% Duvet",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037601495",
+   "name": "Almohada Duvet King Plus 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039624023",
+   "name": "Plumón Duvet Verano Queen Premium 220x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039632855",
+   "name": "Plumón Duvet Verano King Premium 260x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039641687",
+   "name": "Plumón Duvet Verano Súper King Premium 280x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039677015",
+   "name": "Plumón Duvet Toda Estacion King Premium 260x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037566167",
+   "name": "Almohada Duvet King Soft 50x90",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037663319",
+   "name": "Almohada Duvet Americana Premium Plus 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697037557335",
+   "name": "Almohada Duvet Americana Soft 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "69713526831520",
+   "name": "Juego de Cubreplumón 500H Blanco/Blanco King Crucero 265x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "69713959522552",
+   "name": "Juego de Cubreplumón 500H Blanco/Blanco Súper King Crucero 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039668183",
+   "name": "Plumón Duvet Toda Estacion Queen Premium 220x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039756503",
+   "name": "Plumón Duvet Verano Queen Classic 220x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039765335",
+   "name": "Plumón Duvet Verano King Classic 260x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039774167",
+   "name": "Plumón Duvet Verano Súper King Classic 280x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697037645655",
+   "name": "Almohada Duvet Americana Premium Classic 50x70",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039685847",
+   "name": "Plumón Duvet Toda Estacion Súper King Premium 280x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039553367",
+   "name": "Featherbed Especial Premium",
+   "category": "FEATHERBED",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039844823",
+   "name": "Plumón Duvet Invierno Queen Classic 220x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "74726149251503",
+   "name": "Almohada Duvet Premium Especial King  Medium 50x90 100% Duvet",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039809495",
+   "name": "Plumón Duvet Toda Estacion King Classic 260x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039897815",
+   "name": "Protector de Colchón 100% Algodón Single Fuelle Elasticado 90x190",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039906647",
+   "name": "Protector de Colchón 100% Algodón Twin Fuelle Elasticado 105x200",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697039915479",
+   "name": "Protector de Colchón 100% Algodón Queen Fuelle Elasticado 155x200",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697039933143",
+   "name": "Protector de Colchón 100% Algodón Súper King Fuelle Elasticado 200x200",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697038988119",
+   "name": "Juego de Cubreplumón Lino Blanco Súper King Liso 285x225+2*50x90",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039994967",
+   "name": "Sábana Encimera 500H Single - Doble Alforza 190x290",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040021463",
+   "name": "Sábana Encimera 500H King Doble Alforza 280x290",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040030295",
+   "name": "Sábana Encimera 500H Súper King Doble Alforza 300x290",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040047959",
+   "name": "Funda de Almohada 500H Americana DA Doble Alforza 50x70",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040056791",
+   "name": "Funda de Almohada 500H King DA Doble Alforza 50x90",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040330583",
+   "name": "Sábana Encimera 500H Blanco/Blanco Single Crucero 190x290",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040339415",
+   "name": "Sábana Encimera 500H Blanco/Blanco Twin Crucero 205x290",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697040348247",
+   "name": "Sábana Encimera 500H Blanco/Blanco Queen Crucero 255x290",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697040357079",
+   "name": "Sábana Encimera 500H Blanco/Blanco King Crucero 280x290",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697040365911",
+   "name": "Sábana Encimera 500H Blanco/Blanco Súper King Crucero 300x290",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697040569047",
+   "name": "Sábana Encimera 500H Blanco/Azul King - Crucero 280x290",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040595543",
+   "name": "Sábana Single Bajera Elasticada 500Hilos. 90x190",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697040604375",
+   "name": "Sábana Twin Bajera Elasticada 500Hilos. 105x200",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697040613207",
+   "name": "Sábana Queen Bajera Elasticada 500Hilos. 155x200",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "62697039535703",
+   "name": "Featherbed King Premium 180x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "71993370224321",
+   "name": "Relleno para Cojín Especial ESPECIAL",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697040639703",
+   "name": "Sábana Bajera Especial Bajera Elasticada 500Hilos.",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039473879",
+   "name": "Featherbed Queen Classic 155x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "72442489189675",
+   "name": "Plumón Duvet Toda Estacion Twin Classic 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041337431",
+   "name": "Funda de Almohada 300H Blanco/Gris Americana Plié 50x70",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041390423",
+   "name": "Funda de Almohada 300H Blanco/Azul Americana - Plié 50x70",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041399255",
+   "name": "Funda de Almohada 300H Blanco/Azul King Plié 50x90",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041408087",
+   "name": "Protector de Almohada Americana Con cierre 50x70",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 1500.0
+  },
+  {
+   "sku": "62697041416919",
+   "name": "Protector de Almohada King Con cierre 50x90",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 1500.0
+  },
+  {
+   "sku": "62697041425751",
+   "name": "Protector de Almohada Especial Con cierre",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041452247",
+   "name": "Funda de Cojín 300H Blanco/Gris - Plié 50x50",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041461079",
+   "name": "Funda de Cojín 300H Blanco/Verde  Plié 50x50",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041469911",
+   "name": "Funda de Cojín 300H Blanco/Arena - Plié 50x50",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041478743",
+   "name": "Funda de Cojín 300H Blanco/Azul - Plié 50x50",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041487575",
+   "name": "Relleno para Cojín 55x55 100% Pluma 55x55",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041496407",
+   "name": "Relleno para Cojín 65x45 100% Pluma 65x45",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041505239",
+   "name": "Relleno para Cojín 65x65 100% Pluma 65x65",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041514071",
+   "name": "Relleno para Cojín 50x70 - 100% Pluma 50x70",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041522903",
+   "name": "Relleno para Cojín 50x90 100% Pluma 50x90",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041549399",
+   "name": "Faldón de Cama Blanco Queen Elasticado Lino Francés 155x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041558231",
+   "name": "Faldón de Cama Blanco King Elasticado Lino Francés 180x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041567063",
+   "name": "Faldón de Cama Blanco Súper King Elasticado Lino Francés 200x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041611223",
+   "name": "Faldón de Cama Natural King Elasticado Lino Francés 180x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041620055",
+   "name": "Faldón de Cama Natural Súper King Elasticado Lino Francés 200x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041655383",
+   "name": "Faldón de Cama Blanco Queen Liso Lino Francés 155x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041664215",
+   "name": "Faldón de Cama Blanco King Liso Lino Francés 180x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041726039",
+   "name": "Faldón de Cama Natural Súper King Liso Lino Francés 200x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041805527",
+   "name": "Juego Piecera Charcoal  Lino Lazos 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041814359",
+   "name": "Juego Piecera Stone  Lino Lazos 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041823191",
+   "name": "Juego Piecera Natural  Lino Lazos 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041840855",
+   "name": "Plumón Piecera 100% Duvet  TE 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041849687",
+   "name": "Plumón Piecera 100% Duvet  VE  120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041858519",
+   "name": "Plumón Piecera 50/50 Duvet  TE 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041876183",
+   "name": "Juego Piecera Marfil Estopa 230x125+2*60x60",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041885015",
+   "name": "Juego Piecera Natural/Azul - Estopa 230x125+2*60x60",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697041911511",
+   "name": "Toalla Sábana de Baño Algodón Portugués Blanca (600) Lisa 90x170",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697041920343",
+   "name": "Toalla Sábana de Baño Algodón Portugués Arena Lisa 90x170",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 348.0
+  },
+  {
+   "sku": "62697041946839",
+   "name": "Toalla de Mano Algodón Portugués Blanca (600) Lisa 50x80",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697041955671",
+   "name": "Toalla Facial Algodón Portugués Blanca 30x30 600 grms",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697041964503",
+   "name": "Toalla Sábana de Baño Algodón Portugués Oporto Lino Natural 90X170",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041982167",
+   "name": "Toalla de Mano Algodón Portugués Oporto Lino Natural 50x80",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041990999",
+   "name": "Toalla Facial Algodón Portugués Oporto Lino Natural 30x30",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697041999831",
+   "name": "Toalla Sábana de Baño Algodón Portugués Oporto Lino Menta 90x170",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697042017495",
+   "name": "Toalla de Mano Algodón Portugués Oporto Lino Menta 50x80",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697042026327",
+   "name": "Toalla Facial Algodón Portugués Oporto Lino Menta 30x30",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697042035159",
+   "name": "Bata Algodón Blanca Small Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042043991",
+   "name": "Bata Algodón Blanca Medium Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042052823",
+   "name": "Bata Algodón Blanca Large Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042061655",
+   "name": "Bata Algodón Blanca Extra Large Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042070487",
+   "name": "Bata Algodón Blanca Kids 4 años Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042079319",
+   "name": "Bata Algodón Blanca Kids 8 años Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042088151",
+   "name": "Bata Algodón Blanca Kids 10 años Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697042096983",
+   "name": "Piso de Baño Algodón Portugués Liso Blanco 50x70 Terry 50x70",
+   "category": "PISOS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "moq": 600.0
+  },
+  {
+   "sku": "62697042105815",
+   "name": "Piso de Baño Algodón Portugués Liso Blanco  Terry 50x90",
+   "category": "PISOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697042114647",
+   "name": "Piso de Baño Algodón Portugués Liso Blanco 50x70 Velvet 50x70",
+   "category": "PISOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697042123479",
+   "name": "Piso de Baño Algodón Portugués Liso Blanco  Velvet 50x90",
+   "category": "PISOS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "moq": 525.0
+  },
+  {
+   "sku": "62697042132311",
+   "name": "Tela Algodón 500TC Blanca Ancho 310 cms - Ancho 310 cms",
+   "category": "TELAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 4000.0
+  },
+  {
+   "sku": "62697042194135",
+   "name": "Tela Algodón Downproof 420TC Blanco (Plumón)",
+   "category": "TELAS",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 500.0
+  },
+  {
+   "sku": "62697042202967",
+   "name": "Tela Algodón Downproof 233TC Blanco (Featherbed)",
+   "category": "TELAS",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 500.0
+  },
+  {
+   "sku": "62697042211799",
+   "name": "Tela Algodón Downproof Blanco FB200 Plumón Premium 224 cms",
+   "category": "TELAS",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 400.0
+  },
+  {
+   "sku": "62697042282455",
+   "name": "Funda relleno Plumón 420TC TE/IN Single Importada 160x220 - 160x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042291287",
+   "name": "Funda relleno Plumón 420TC TE/IN Queen Importada - 225x225",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042300119",
+   "name": "Funda relleno Plumón 420TC TE/IN King Importada - 265x225",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042308951",
+   "name": "Funda relleno Plumón 420TC TE/IN Súper King Importada - 285x225",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042361943",
+   "name": "Funda relleno Plumón Premium Bordada Cabo de Hornos Single Importada - 160x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042370775",
+   "name": "Funda relleno Plumón Premium Bordada Cabo de Hornos Queen Importada - 220x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042379607",
+   "name": "Funda relleno Plumón Premium Bordada Cabo de Hornos King Importada - 260x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042388439",
+   "name": "Funda relleno Plumón Premium Bordada Cabo de Hornos Súper King Importada - 280x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042397271",
+   "name": "Funda relleno almohada Premium Bordada Cabo de Hornos Americana Importada - 50x70",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042406103",
+   "name": "Funda relleno almohada Premium Bordada Cabo de Hornos King Importada - 50x90",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "62697042520919",
+   "name": "Funda relleno Plumón 420TC VE Twin Nacional - 180x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042529751",
+   "name": "Funda relleno Plumón 420TC VE Queen Nacional",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042538583",
+   "name": "Funda relleno Plumón 420TC VE King Nacional",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042547415",
+   "name": "Funda relleno Plumón 420TC VE Súper King Nacional",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042565079",
+   "name": "Funda relleno Piecera 420TC VE Nacional 120x220 - 120x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042600407",
+   "name": "Funda relleno Featherbed Single Importada - 95x200",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697042609239",
+   "name": "Funda relleno Featherbed Twin Importada - 108x205cm",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697042618071",
+   "name": "Funda relleno Featherbed Queen Importada - 158x205cm",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697042626903",
+   "name": "Funda relleno Featherbed King Importada - 185x205cm",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697042635735",
+   "name": "Funda relleno Featherbed Súper King Importada - 205x205cm",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697042653399",
+   "name": "Funda relleno Almohada Americana Importada - 50x70",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "62697042662231",
+   "name": "Funda relleno Almohada King Importada - 50x90",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "62697042706391",
+   "name": "Funda relleno Featherbed Súper King Nacional - 205x205cm",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042732887",
+   "name": "Funda relleno Almohada King Nacional - 50x90",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "62697042741719",
+   "name": "Pluma White Goose Down EN90/10 (770 FP)",
+   "category": "PLUMAS",
+   "origin": "raw_material",
+   "supplierName": "Peter Kohl K.G.",
+   "leadTimeDays": 15.0,
+   "transitDays": 10.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "62697042750551",
+   "name": "Pluma White Goose Down EN100 (850 FP)",
+   "category": "PLUMAS",
+   "origin": "raw_material",
+   "supplierName": "Peter Kohl K.G.",
+   "leadTimeDays": 15.0,
+   "transitDays": 10.0,
+   "moq": 40.0
+  },
+  {
+   "sku": "62697042759383",
+   "name": "Pluma White Goose Feathers 3-5cm Grado A Alemana",
+   "category": "PLUMAS",
+   "origin": "raw_material",
+   "supplierName": "Peter Kohl K.G.",
+   "leadTimeDays": 15.0,
+   "transitDays": 10.0,
+   "moq": 300.0
+  },
+  {
+   "sku": "62697042944855",
+   "name": "Cinta Embalaje CDH - Printed Ribbon 7547U (Gris Oscuro)",
+   "category": "EMPAQUE",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404535732456",
+   "name": "Sábana Queen Bajera Elasticada Algodón Egipcio 160x202+42",
+   "category": "SABANAS",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63404535770437",
+   "name": "Manta Algodón Rosa - Oporto 127x178",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404535783571",
+   "name": "Juego de Cubreplumón 800H Carolina Blanco Súper King Carolina 285x225+5+52x92+6*2",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63404535836109",
+   "name": "Manta Algodón Menta Lisboa 127x178",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404535838212",
+   "name": "Manta Algodón Nilo Sintra 127x178",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404535863890",
+   "name": "Manta Algodón Gris Oporto 127x178",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404535904737",
+   "name": "Antifaz de Seda Mulberry Beige con elástico",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404536019621",
+   "name": "Plumón de Seda Súper King TE 280x220",
+   "category": "PLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404536026438",
+   "name": "Plumón de Seda Súper King VE 280x220",
+   "category": "PLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "63404536041849",
+   "name": "Plumón de Seda King TE 260x220",
+   "category": "PLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039800663",
+   "name": "Plumón Duvet Toda Estacion Queen Classic 220x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "63422182391259",
+   "name": "Toalla de Mano Algodón Portugués (700 grs) Vila Real Blanco/Blanco",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 868.0
+  },
+  {
+   "sku": "62697039429719",
+   "name": "Featherbed King Esencial 180x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "63422182400998",
+   "name": "Toalla de Mano Algodón Portugués (700 grs) Vila Real Blanco/Arena",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Fábrica de Tecidos do Carvalho, Lda",
+   "leadTimeDays": 50.0,
+   "transitDays": 50.0,
+   "moq": 960.0
+  },
+  {
+   "sku": "72442508598529",
+   "name": "Plumón Duvet Toda Estacion Twin Premium 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039482711",
+   "name": "Featherbed King Classic 180x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "63845371813586",
+   "name": "Toalla Facial Algodón Portugués Blanca 30x30 450 grms",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63845371889592",
+   "name": "Funda de Cojín Lino Francés Blanco - 50x50 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845371893523",
+   "name": "Tela Algodón 500TC Blanca Ancho 305 cms",
+   "category": "TELAS",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 4000.0
+  },
+  {
+   "sku": "63845371900988",
+   "name": "Funda de Cojín Lino Francés Stone - 50x50 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845371924907",
+   "name": "Tela Lino Envejecido Blanco Ancho 290",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845371926051",
+   "name": "Funda de Cojín Lino Francés Charcoal 50x50 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845371934610",
+   "name": "Tela Lino Envejecido Stone Ancho 290",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845371958560",
+   "name": "Tela Lino Envejecido Charcoal Ancho 290",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "63845372039511",
+   "name": "Funda de Cojín Lino Francés Natural 50x50 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697039491543",
+   "name": "Featherbed Súper King Classic 200x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039818327",
+   "name": "Plumón Duvet Toda Estacion Súper King Classic 280x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039526871",
+   "name": "Featherbed Queen Premium 155x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039544535",
+   "name": "Featherbed Súper King Premium 200x200",
+   "category": "FEATHERBED",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "67882050100674",
+   "name": "Juego de Sábanas 500H Blanco Single Crucero",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "68209407889318",
+   "name": "Tela Algodón 200TC Blanca - Ancho 280 cms",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69160430434751",
+   "name": "Juego de Cubreplumón Lino Charcoal Twin",
+   "category": "CUBREPLUMÓN LINO",
+   "origin": "imported"
+  },
+  {
+   "sku": "69282318161431",
+   "name": "Cama Esencial Super King",
+   "category": "Sin Tipo",
+   "origin": "national"
+  },
+  {
+   "sku": "72961551039820",
+   "name": "Plumón Duvet Verano Súper King Clima Balance Premium 280x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "69282570929269",
+   "name": "Cama Luxury Queen",
+   "category": "Sin Tipo",
+   "origin": "national"
+  },
+  {
+   "sku": "69282620147276",
+   "name": "Cama Luxury Super King",
+   "category": "Sin Tipo",
+   "origin": "national"
+  },
+  {
+   "sku": "69323337696527",
+   "name": "Piecera Lino Stone Lazos 120x220",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69323373520712",
+   "name": "Funda de Cojín Lino Francés Blanco 50x50 Bordado",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69323384949859",
+   "name": "Funda de Cojín Lino Francés Charcoal - 50x50 Bordado",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69323404784075",
+   "name": "Funda de Cojín Lino Francés Natural - 50x50 Bordado",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69323411423909",
+   "name": "Funda de Cojín Lino Francés Stone - 50x50 Bordado",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "69712308702148",
+   "name": "Juego de Sábanas 500H King Doble Alforza",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "69712455216490",
+   "name": "Juego de Sábanas 500H Súper King Doble Alforza",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039694679",
+   "name": "Plumón Duvet Toda Estacion Especial Premium",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "69713827292742",
+   "name": "Juego de Cubreplumón 500H Blanco/Blanco Queen Crucero 225x225+2*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72961588463989",
+   "name": "Plumón Duvet Verano King Clima Balance Premium 260x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "69714046502195",
+   "name": "Juego de Cubreplumón 500H Blanco/Blanco Twin Crucero 185x225+1*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "69756961291108",
+   "name": "Toalla Gim Blanca 30x90 600grs",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "70248618367211",
+   "name": "Faldón de Cama Stone Queen - Liso Lino Francés",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70255464594552",
+   "name": "Funda de Cojín Lino Francés Charcoal - 40x60 con marco 3cm",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70255489854334",
+   "name": "Funda de Cojín Lino Francés Blanco - 40x60 con marco 3cm",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70255504898687",
+   "name": "Funda de Cojín Lino Francés Stone - 40x60 con marco 3cm",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70255615574653",
+   "name": "Funda de Cojín Lino Francés Rosa - 40x60 con marco 3cm",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70680319606403",
+   "name": "Funda de Cojín Lino Francés Charcoal 60x60 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70680333502022",
+   "name": "Funda de Cojín Lino Francés Stone 60x60 con marco",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "70690729680541",
+   "name": "Poliéster - Fino",
+   "category": "MICROFIBRA",
+   "origin": "imported"
+  },
+  {
+   "sku": "70749550072166",
+   "name": "Funda relleno Plumón 420TC TE/IN Twin Importada 180x220 - 180x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "70776665260069",
+   "name": "Funda de Almohada 500H Blanco/Blanco De Apoyo Crucero 20x50",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "71527680158580",
+   "name": "Almohada De Apoyo",
+   "category": "ALMOHADAS",
+   "origin": "national"
+  },
+  {
+   "sku": "71699156513880",
+   "name": "Pantuflas - Velvet 28 CM",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "Jiangsu Mengxian Household Products Co.,LTD",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 5000.0
+  },
+  {
+   "sku": "71699195135188",
+   "name": "Pantuflas - Velvet 30 CM",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "Jiangsu Mengxian Household Products Co.,LTD",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 5000.0
+  },
+  {
+   "sku": "71699201495016",
+   "name": "Pantuflas - Velvet 32 CM",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "Jiangsu Mengxian Household Products Co.,LTD",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 5000.0
+  },
+  {
+   "sku": "62697039721175",
+   "name": "Plumón Duvet Invierno King Premium 260x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "71993665562833",
+   "name": "Faldón de Cama Especial",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "72315361282420",
+   "name": "Funda relleno Plumón Premium Bordada VE-VENTILADA Queen Importada",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "72315556966485",
+   "name": "Funda relleno Plumón Premium Bordada VE-VENTILADA King Importada",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "72315575223601",
+   "name": "Funda relleno Plumón Premium Bordada VE-VENTILADA Súper King Importada",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "72442169316566",
+   "name": "Plumón Duvet Invierno Single Classic 160x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442183265251",
+   "name": "Plumón Duvet Invierno Single Premium 160x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442209689596",
+   "name": "Plumón Duvet Toda Estacion Single Classic 160x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442219502179",
+   "name": "Plumón Duvet Toda Estacion Single Premium 160x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442242518064",
+   "name": "Plumón Duvet Verano Single Classic 160x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442450224800",
+   "name": "Plumón Duvet Invierno Twin 180x220 Classic 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039730007",
+   "name": "Plumón Duvet Invierno Súper King Premium 280x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039853655",
+   "name": "Plumón Duvet Invierno King Classic 260x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "62697039862487",
+   "name": "Plumón Duvet Invierno Súper King Classic 280x220",
+   "category": "PLUMONES",
+   "origin": "national",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "notes": "Fila SAMSUNG en la planilla original; MOQ importado descartado (hallazgo N7)"
+  },
+  {
+   "sku": "72442525245511",
+   "name": "Plumón Duvet Verano Twin 180x220 - Classic 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442537452398",
+   "name": "Plumón Duvet Verano Twin 180x220 Premium 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72478897108316",
+   "name": "Cubreplumón 500H Blanco/Blanco Single Crucero 165x225",
+   "category": "CUBREPLUMONES",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 80.0
+  },
+  {
+   "sku": "72478936962919",
+   "name": "Cubreplumón 500H Single DA Doble Alforza 165x225",
+   "category": "CUBREPLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72442462186830",
+   "name": "Plumón Duvet Invierno Twin 180x220 Premium 180x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "62697039712343",
+   "name": "Plumón Duvet Invierno Queen Premium 220x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "72961576361517",
+   "name": "Plumón Duvet Verano Queen - Clima Balance Premium 220x220",
+   "category": "PLUMONES",
+   "origin": "national"
+  },
+  {
+   "sku": "69282466855209",
+   "name": "Cama Classic King",
+   "category": "Sin Tipo",
+   "origin": "national"
+  },
+  {
+   "sku": "73254408399742",
+   "name": "Funda relleno Plumón 420TC VE Single Nacional - 160x220",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "supply"
+  },
+  {
+   "sku": "73654005480119",
+   "name": "Bata Algodón Blanca Extra-Extra Large Kimono",
+   "category": "BATAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "73956297119738",
+   "name": "Toalla de Baño Algodón Portugués Oporto Lino Rosa 70x150",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "73956362526026",
+   "name": "Toalla de Mano Algodón Portugués Oporto Lino Rosa 50x80",
+   "category": "TOALLAS",
+   "origin": "national"
+  },
+  {
+   "sku": "74186852573530",
+   "name": "Faldón de Cama Natural Twin Elasticado Lino Francés 105x200",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "74284757324077",
+   "name": "Juego de Cubreplumón 500H Blanco/Blanco Single Crucero 165x225+1*50x70",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "74414449808422",
+   "name": "Cubreplumón Algodón Egipcio King Sofía 265x225 Blanco/Vison",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "74533380448318",
+   "name": "Manta Alpaca Suri Baby XG - Jaspeada Camel/Gris 140x230",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "74533390989074",
+   "name": "Manta Alpaca Suri Baby XG - Gris Carbón 130x240",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "74673996300347",
+   "name": "Tela Lino Aplicación Para Toalla Natural - 280 ancho nro 5",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "74674028151498",
+   "name": "Tela Lino Aplicación Para Toalla Menta - 140 ancho Nro 21",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "75147969810377",
+   "name": "Juego Piecera Charcoal  Especial",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "75199386154529",
+   "name": "Protector de Colchón 100% Algodón Medida Especial Fuelle Elasticado Medida Especial",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "national"
+  },
+  {
+   "sku": "75986775343941",
+   "name": "Cojín Paula Délano - Set Lino Gris Rosa Shivory 40x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775349501",
+   "name": "Cojín Paula Délano - Set Lino Gris con Blanco Puntos 30x50",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775359587",
+   "name": "Cojín Paula Délano - Set Terciopelo Gris Petroleo 40x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775363986",
+   "name": "Cojín Paula Délano - Set Tercipelo Gris nota Magenta 30x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775368708",
+   "name": "Cojín Paula Délano - Set Lino Azul Bosque 40x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775373768",
+   "name": "Cojín Paula Délano - Set Lino Gris Rosa 50x70",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775378485",
+   "name": "Cojín Paula Délano - Set Lino Azul Celeste 50x50",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775383192",
+   "name": "Cojín Paula Délano - Set Terciopelo Gris Rosa 30x70",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775396437",
+   "name": "Cojín Paula Délano - Set Lino Blanco Gris 40x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775406790",
+   "name": "Cojín Paula Délano Set Lino Celeste Gris 30x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775414064",
+   "name": "Cojín Paula Délano - Set Lino Azul Gris 40x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775418864",
+   "name": "Cojín Paula Délano - Set Terciopelo Ivory Gris 30x60",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "75986775424988",
+   "name": "Cojín Paula Délano - Set Lino Celeste Gris 25x70",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "76036490582482",
+   "name": "Funda relleno Plumón Premium Bordada Cabo de Hornos Twin Importada - 185x225",
+   "category": "FUNDAS PARA RELLENAR",
+   "origin": "imported",
+   "supplierName": "SANDERS",
+   "leadTimeDays": 30.0,
+   "transitDays": 10.0,
+   "moq": 30.0
+  },
+  {
+   "sku": "76045275566192",
+   "name": "Cojín Paula Délano - Set Lino Blanco Shivory Azul 50x70",
+   "category": "Cojín Microfibra",
+   "origin": "imported"
+  },
+  {
+   "sku": "76245029193483",
+   "name": "Bolsa de Papel - Grande 50x40x15 Blanco. Lujo",
+   "category": "",
+   "origin": "imported"
+  },
+  {
+   "sku": "76245029199311",
+   "name": "Bolsa de Papel - Mediana 40x30x9 Blanco. Lujo",
+   "category": "",
+   "origin": "imported"
+  },
+  {
+   "sku": "76245029204845",
+   "name": "Bolsa de Papel - Pequeña 20x30x6 Blanco. Lujo",
+   "category": "",
+   "origin": "imported"
+  },
+  {
+   "sku": "76305358121780",
+   "name": "Faldón de Cama Charcoal Queen - Liso Lino Francés 155x200+30",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76305511492855",
+   "name": "Piecera Marfil - Estopa 230x125",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341252230128",
+   "name": "Manta Parma - Burgundy 130x180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341271514517",
+   "name": "Manta Parma Foresta 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341281661351",
+   "name": "Manta Parma Perla 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341290394374",
+   "name": "Manta Parma Grafito 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341313920735",
+   "name": "MANTA VERONA Antracita 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341326297416",
+   "name": "MANTA VERONA Mokka 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341334997022",
+   "name": "MANTA VERONA Ecru 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76341343080975",
+   "name": "MANTA VERONA Gris 130X180",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76469256970387",
+   "name": "Bobina de Cinta de Gamuza 100% Acrílica - BEIGE 1848300097",
+   "category": "",
+   "origin": "imported"
+  },
+  {
+   "sku": "76650253620575",
+   "name": "Featherbed Sintético 150X200 HOTELERO",
+   "category": "FEATHERBED",
+   "origin": "imported"
+  },
+  {
+   "sku": "76720325255830",
+   "name": "Funda de Almohada 500H Blanco/Blanco Crucero Medida Especial",
+   "category": "SABANAS",
+   "origin": "national"
+  },
+  {
+   "sku": "76857541031966",
+   "name": "Funda de Almohada Cascais Colcha Medium Gris 50 x 70",
+   "category": "FUNDA DE ALMOHADA",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541031990",
+   "name": "Colcha Cascais Medium Gris 250 x 270",
+   "category": "COLCHA ALGODON",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541043061",
+   "name": "Colcha Cascais Medium Latte 250 x 270",
+   "category": "COLCHA ALGODON",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541043558",
+   "name": "Funda de Almohada Cascais Colcha Medium Latte 50 x 70",
+   "category": "FUNDA DE ALMOHADA",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541050292",
+   "name": "Colcha Cascais Large Gris 280 x 270",
+   "category": "COLCHA ALGODON",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541050847",
+   "name": "Funda de Almohada Cascais Colcha Large Gris 50 x 90",
+   "category": "FUNDA DE ALMOHADA",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541057515",
+   "name": "Colcha Cascais Large Latte 280 x 270",
+   "category": "COLCHA ALGODON",
+   "origin": "imported"
+  },
+  {
+   "sku": "76857541057939",
+   "name": "Funda de Almohada Cascais Colcha Large Latte 50 x 90",
+   "category": "FUNDA DE ALMOHADA",
+   "origin": "imported"
+  },
+  {
+   "sku": "76900811513302",
+   "name": "Chal Lino Jacquard Algarve Medium 140 x 240 Liso",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76900811524379",
+   "name": "Chal Lino Jacquard - Algarve Medium 140 x 240 Rayas",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76900811529017",
+   "name": "Chal Lino Jacquard Algarve Large 290 x 280 Liso",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "76900811534000",
+   "name": "Chal Lino Jacquard Algarve Large 290 x 280 Rayas",
+   "category": "COMPLEMENTOS",
+   "origin": "imported"
+  },
+  {
+   "sku": "77219257926914",
+   "name": "Tela Algodón 800TC Blanca Ancho - Ancho",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "77219271596756",
+   "name": "Tela Algodón 1600TC Blanca Ancho - Ancho",
+   "category": "TELAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "77747221574610",
+   "name": "Relleno para Cojín Especial - HOTEL DREAMS",
+   "category": "COMPLEMENTOS",
+   "origin": "national"
+  },
+  {
+   "sku": "77851061177293",
+   "name": "Bolsa Plástica - Contenedora 115x135",
+   "category": "Bolsa Plástica",
+   "origin": "imported"
+  },
+  {
+   "sku": "CA14BV210C",
+   "name": "Caja 14C - Sábana Armable",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS066C",
+   "name": "Caja 14C - Sábana Hotelera",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS081C",
+   "name": "Caja 14C - Plumón Grande",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS083C",
+   "name": "Caja 14C - Plumón Pequeño",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS090C",
+   "name": "Caja 14C - Featherbed Pequeño",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS094C",
+   "name": "Caja 14C - Almohada Americana",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "CE14CS097C",
+   "name": "Caja 14C - Featherbed Grande",
+   "category": "Caja de cartón",
+   "origin": "imported"
+  },
+  {
+   "sku": "H00173947197450852",
+   "name": "Toalla de Mano Hotel Algodón Portugués Turca Punto de Arroz Blanca 50x80 650 gms",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H00173947278293725",
+   "name": "Toalla Facial Hotel Algodón Portugués Turca Punto Arroz Blanca 35x35 650 gms",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1636134894261",
+   "name": "Sábana 500H Hotel - Encimera Super King 310x290 500H Basta 10CM Bordes 2CM Doble Puntada",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1637775331881",
+   "name": "Cubreplumón Hotel 500H Super King",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1638214747759",
+   "name": "Featherbed Sintético 100x200 (Hotelero)",
+   "category": "FEATHERBED",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1643895973786",
+   "name": "Funda de Almohada Hotel Basic 300Hilos. Blanco Americana 50x70",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1643898527728",
+   "name": "Funda de Almohada Hotel - Luxury 500Hilos. Blanco King",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1647273806724",
+   "name": "Funda de Almohada Hotel - 300Hilos. Blanco Americana 50x70 +3 (con marco)",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1647377505308",
+   "name": "Toalla de Baño Hotel Algodón Portugués Blanca Lisa 70x140 (500 AH)",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H1647377521408",
+   "name": "Toalla de Baño Hotel Algodón Portugués - Blanca Lisa 70x140 (550)",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H62697041929175",
+   "name": "Toalla de Baño Hotel Algodón Portugués Blanca Lisa 70x150 (600)",
+   "category": "TOALLAS",
+   "origin": "imported",
+   "supplierName": "Texteis J.F. Almeida, S.A.",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0,
+   "moq": 534.0
+  },
+  {
+   "sku": "H63845371802482",
+   "name": "Sábana Bajera Minera Centinela - 200TC",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H67231739380164",
+   "name": "Funda de Almohada Hotel - Luxury 500Hilos. Blanco Americana 51X72+5",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H67232156551687",
+   "name": "Cubreplumón Hotel 500H - Twin",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "H67508929933961",
+   "name": "Plumón Microfibra Hotel - King",
+   "category": "PLUMONES",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "H68148045418670",
+   "name": "Plumón Microfibra Hotel Queen",
+   "category": "PLUMONES",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "H71276508874391",
+   "name": "Cubreplumón 300 Hilos Hotel - Single",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "H71276547864776",
+   "name": "Funda de Almohada Hotel - King 300H Abertura lateral basta",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H71276596969886",
+   "name": "Funda de Almohada Hotel - King Lino",
+   "category": "SABANAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H71276628096315",
+   "name": "Cubreplumón Lino Hotel - Twin",
+   "category": "CUBREPLUMONES",
+   "origin": "imported"
+  },
+  {
+   "sku": "H75129081303195",
+   "name": "Toalla de Mano Hotel Algodón Portugués - Turca Punto de Arroz Vainilla 50x80 650 gms",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H75146558962505",
+   "name": "Toalla Facial Hotel Algodón Portugués - 30x30 650 grms Vira Vira",
+   "category": "TOALLAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H75562830273926",
+   "name": "Protector de Colchón Hotel  Algodón 144H - 100x200 Esquina Elasticada",
+   "category": "PROTECTORES DE COLCHÓN",
+   "origin": "imported"
+  },
+  {
+   "sku": "H77627242373382",
+   "name": "Bata de Baño Algodón Hotel - Kimono Bordado Large Beige",
+   "category": "BATAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "H77627259156191",
+   "name": "Bata de Baño Algodón Hotel - Kimono Bordado Medium Beige",
+   "category": "BATAS",
+   "origin": "imported"
+  },
+  {
+   "sku": "62697037751639",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris King Elisa 265x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037760471",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris Súper King Elisa 285x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037795799",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco Queen Elisa 225x225+2*50x70",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037804631",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco King Elisa 265x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037839959",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Gris Súper King Sofía 285x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037866455",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Vison Súper King Sofía 285x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037875287",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco Queen Sofía 225x225+2*50x70",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037884119",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco King Sofía 265x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "62697037892951",
+   "name": "Juego de Cubreplumón Algodón Egipcio Blanco/Blanco Súper King Sofía 285x225+2*50x90",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63404535673031",
+   "name": "Sábana King Bajera Elasticada Algodón Egipcio 182x202+42",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63404535730637",
+   "name": "Sábana Súper King Bajera Elasticada Algodón Egipcio 202x202+42",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "63404535756996",
+   "name": "Juego de Cubreplumón 800H Carolina Blanco King Carolina 265x225+8+52x92+8*2",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250540575",
+   "name": "Cubreplumón Royal 600H King Blanco/Gris",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250531184",
+   "name": "Cubreplumón Royal 600H Queen Blanco/Gris",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250546782",
+   "name": "Cubreplumón Royal 600H Super King Blanco/Gris",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250536484",
+   "name": "Cubreplumón Supreme Bamboo 300H King Blanco/Taupe",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250526142",
+   "name": "Cubreplumón Supreme Bamboo 300H Queen Blanco/Taupe",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250544522",
+   "name": "Cubreplumón Supreme Bamboo 300H Super King Blanco/Taupe",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250469119",
+   "name": "Funda de Almohada Royal 600H Americana 50x70 Blanco/Gris",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250486997",
+   "name": "Funda de Almohada Royal 600H King 50x90 Blanco/Gris",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250525992",
+   "name": "Sábana Bajera Royal 600H King Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250510580",
+   "name": "Sábana Bajera Royal 600H Queen Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250533568",
+   "name": "Sábana Bajera Royal 600H Super King Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250490903",
+   "name": "Sábana Bajera Supreme Bamboo 300H King Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250470766",
+   "name": "Sábana Bajera Supreme Bamboo 300H Queen Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250505039",
+   "name": "Sábana Bajera Supreme Bamboo 300H Super King Blanca",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250468766",
+   "name": "Set Fundas de Almohada Supreme Bamboo 300H Americanas 50x70 Blanco/Taupe (02 unidades)",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "78058250495666",
+   "name": "Set Fundas de Almohada Supreme Bamboo 300H King 50x90 Blanco/Taupe (02 unidades)",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "ACL Impex, Lda",
+   "leadTimeDays": 40.0,
+   "transitDays": 50.0
+  },
+  {
+   "sku": "H68148029069953",
+   "name": "Poly Comforter / Plumón Microfibra Hotel Super King",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "H74103075556264",
+   "name": "Poly Comforter / Plumón Microfibra Hotel Twin",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "H68148053079465",
+   "name": "Poly Comforter / Plumón Microfibra Hotel Single",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1636382871318",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Toda Estación Súper King 280x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "70448850333878",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Toda Estación Twin 180x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "74621869836174",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Toda Estación Single 160x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1636382818410",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Verano King 260x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "1636382688054",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Verano Queen 220x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "74621827212064",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Verano Twin 180x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "74621854409594",
+   "name": "Thinsulate Comforter / Plumón Thinsulate Verano Single 160x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 50.0
+  },
+  {
+   "sku": "62697039747671",
+   "name": "Down Comforter / Plumón Duvet Verano Twin Classic 160x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 10.0
+  },
+  {
+   "sku": "62697039791831",
+   "name": "Down Comforter / Plumón Duvet Toda Estacion Twin Classic 160x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 20.0
+  },
+  {
+   "sku": "62697039835991",
+   "name": "Down Comforter / Plumón Duvet Invierno Twin Classic 160x220",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "SAMSUNG",
+   "leadTimeDays": 30.0,
+   "transitDays": 50.0,
+   "moq": 10.0
+  },
+  {
+   "sku": "62697042141143",
+   "name": "Tela Algodón 500TC Blanco Ancho 280 cms",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 4000.0
+  },
+  {
+   "sku": "68148029069953",
+   "name": "Plumón Microfibra Hotel Super King",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  },
+  {
+   "sku": "68148045418670",
+   "name": "Plumón Microfibra Hotel Queen",
+   "category": "",
+   "origin": "imported",
+   "supplierName": "BAMBOOLYO",
+   "leadTimeDays": 70.0,
+   "transitDays": 50.0,
+   "moq": 100.0
+  }
+ ]
+}

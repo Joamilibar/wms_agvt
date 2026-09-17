@@ -55,7 +55,7 @@ export class BsaleService {
    * empty page rather than on `count`, so a change of cap on BSale's side
    * cannot reintroduce the gap.
    */
-  private async fetchAll(path: string, query = ''): Promise<any[]> {
+  async fetchAll(path: string, query = ''): Promise<any[]> {
     if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
     const sep = path.includes('?') ? '&' : '?';
     const out: any[] = [];
@@ -73,6 +73,13 @@ export class BsaleService {
   }
 
   private static readonly BSALE_PAGE_SIZE = 50;
+
+  /** One resource, raw. For callers that need a single document or an expanded sub-collection. */
+  async getRaw<T = any>(path: string): Promise<T> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+    const { data } = await this.client.get(path);
+    return data as T;
+  }
 
   async testConnection(): Promise<{ connected: boolean; message: string }> {
     if (!this.client) {
