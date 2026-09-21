@@ -6,7 +6,8 @@ import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { SheetingMastersService } from './sheeting-masters.service.js';
 import type { SheetingModel } from '../schemas/sheeting-model.schema.js';
-import { UpsertFabricDto, SaveModelDto, QuoteDto } from '../dto/sheeting.dto.js';
+import { UpsertFabricDto, SaveModelDto, QuoteDto, UpsertRateDto } from '../dto/sheeting.dto.js';
+import { WorkshopRatesService } from './workshop-rates.service.js';
 import { SheetingCalcService } from './sheeting-calc.service.js';
 
 /**
@@ -18,7 +19,7 @@ import { SheetingCalcService } from './sheeting-calc.service.js';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('planning/sheeting')
 export class SheetingController {
-  constructor(private masters: SheetingMastersService, private calc: SheetingCalcService) {}
+  constructor(private masters: SheetingMastersService, private calc: SheetingCalcService, private rates: WorkshopRatesService) {}
 
   // ── fabrics ────────────────────────────────────────────────────────────────
 
@@ -59,9 +60,27 @@ export class SheetingController {
 
   @Post('seed')
   @Roles('admin')
-  @ApiOperation({ summary: 'Carga las telas y los modelos de referencia (idempotente)' })
-  seed(@CurrentUser('email') email: string) {
-    return this.masters.seed(email ?? 'seed');
+  @ApiOperation({ summary: 'Carga telas, modelos de referencia y tarifas de la hoja (idempotente)' })
+  async seed(@CurrentUser('email') email: string) {
+    const masters = await this.masters.seed(email ?? 'seed');
+    const rates = await this.rates.seed(email ?? 'seed');
+    return { ...masters, rates };
+  }
+
+  // ── workshop rates ─────────────────────────────────────────────────────────
+
+  @Get('rates')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Tarifas de taller vigentes (o todas con all=true)' })
+  rateList(@Query('workshop') workshop?: string, @Query('modelCode') modelCode?: string, @Query('all') all?: string) {
+    return this.rates.list({ workshop, modelCode, all: all === 'true' });
+  }
+
+  @Post('rates')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Nueva versión de una tarifa (taller, modelo, talla, calidad); la anterior queda inactiva' })
+  upsertRate(@Body() dto: UpsertRateDto, @CurrentUser('email') email: string) {
+    return this.rates.upsert(dto, email ?? 'unknown');
   }
 
   // ── quote ──────────────────────────────────────────────────────────────────

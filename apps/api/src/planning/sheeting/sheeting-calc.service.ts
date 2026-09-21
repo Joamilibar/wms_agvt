@@ -2,7 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { StockLot, StockLotDocument } from '../../stock/schemas/stock-lot.schema.js';
-import { WorkshopRate, WorkshopRateDocument } from '../schemas/workshop-rate.schema.js';
+import { WorkshopRateDocument } from '../schemas/workshop-rate.schema.js';
+import { WorkshopRatesService } from './workshop-rates.service.js';
 import { FabricSpec } from '../schemas/fabric-spec.schema.js';
 import { SheetingModel } from '../schemas/sheeting-model.schema.js';
 import { PlanningParamsService } from '../masters/planning-params.service.js';
@@ -81,7 +82,7 @@ export interface QuoteResult {
   theoretical: { netAreaM2: number; pricePerM2: number; fabric: number; deltaPct: number };
   price: { marginFactor: number; netPvp: number; grossPvp: number; vatRate: number };
   supplies: { sku: string; name: string; qty: number; uom: string; unitCost: number | null; cost: number }[];
-  labourRate: { rate: number; sizeLabel: string | null; version: number };
+  labourRate: { rate: number; sizeLabel: string | null; quality: string | null; version: number };
   paramsVersion: number;
   warnings: string[];
 }
@@ -100,7 +101,7 @@ export interface QuoteResult {
 export class SheetingCalcService {
   constructor(
     @InjectModel(StockLot.name) private stockModel: Model<StockLotDocument>,
-    @InjectModel(WorkshopRate.name) private rateModel: Model<WorkshopRateDocument>,
+    private rates: WorkshopRatesService,
     private masters: SheetingMastersService,
     private params: PlanningParamsService,
   ) {}
@@ -169,12 +170,12 @@ export class SheetingCalcService {
 
     // 4 · labour: never zero by default
     const sizeLabel = input.sizeLabel ?? null;
-    const rate = await this.resolveRate(input.workshop, model.code, sizeLabel);
+    const rate: WorkshopRateDocument | null = await this.rates.resolve(input.workshop, model.code, sizeLabel, baseFabric.quality || null);
     if (!rate) {
       throw new BadRequestException({
         message: `El taller ${input.workshop} no tiene tarifa para ${model.code}${sizeLabel ? ` (${sizeLabel})` : ''}`,
         error: 'Bad Request',
-        details: { code: 'NO_WORKSHOP_RATE', workshop: input.workshop, modelCode: model.code, sizeLabel },
+        details: { code: 'NO_WORKSHOP_RATE', workshop: input.workshop, modelCode: model.code, sizeLabel, quality: baseFabric.quality || null },
       });
     }
 
@@ -211,7 +212,7 @@ export class SheetingCalcService {
       theoretical: { netAreaM2: netArea, pricePerM2: Math.round(base.cost.pricePerLinearMetre / (baseFabric.rollWidthCm / 100)), fabric: theoreticalFabric, deltaPct: theoreticalFabric > 0 ? round4(fabricClp / theoreticalFabric - 1) : 0 },
       price: { marginFactor, netPvp, grossPvp: Math.round(netPvp * (1 + p.vatRate)), vatRate: p.vatRate },
       supplies,
-      labourRate: { rate: rate.rate, sizeLabel: rate.sizeLabel, version: rate.version },
+      labourRate: { rate: rate.rate, sizeLabel: rate.sizeLabel, quality: rate.quality, version: rate.version },
       paramsVersion: p.version,
       warnings,
     };
@@ -232,16 +233,6 @@ export class SheetingCalcService {
     const costSyncedAt = pick.costSyncedAt ?? null;
     const fresh = costSyncedAt !== null && Date.now() - costSyncedAt.getTime() <= staleDays * 86400000;
     return { sku: fabric.sku, pricePerLinearMetre: fabricPricePerLinearMetre(pick.unitCost, fabric), costSource: fresh ? 'bsale' : 'stale', costSyncedAt, unit: 'ml' };
-  }
-
-  /** Exact size first, then the model-wide rate, valid on the date; else null. */
-  async resolveRate(workshop: string, modelCode: string, sizeLabel: string | null, at = new Date()): Promise<WorkshopRateDocument | null> {
-    const valid = { workshop, modelCode, isActive: true, validFrom: { $lte: at }, $or: [{ validTo: null }, { validTo: { $gte: at } }] };
-    if (sizeLabel) {
-      const exact = await this.rateModel.findOne({ ...valid, sizeLabel }).sort({ version: -1 }).exec();
-      if (exact) return exact;
-    }
-    return this.rateModel.findOne({ ...valid, sizeLabel: null }).sort({ version: -1 }).exec();
   }
 
   private async suppliesCost(model: SheetingModel) {

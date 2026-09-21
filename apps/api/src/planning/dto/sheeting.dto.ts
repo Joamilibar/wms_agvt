@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  ArrayNotEmpty, IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
+  ArrayNotEmpty, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
 } from 'class-validator';
 import { SHEETING_FAMILIES, type SheetingFamily } from '../schemas/sheeting-model.schema.js';
 
@@ -86,6 +86,29 @@ export class SaveModelDto {
   @ApiPropertyOptional({ description: 'Traslado por unidad, CLP' }) @IsOptional() @IsNumber() @Min(0) freightClp?: number;
 
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) notes?: string;
+}
+
+// ── workshop rates ───────────────────────────────────────────────────────────
+
+export class UpsertRateDto {
+  @ApiProperty({ example: 'Taller Santa Cruz Los Lirios' })
+  @IsString() @MinLength(1) workshop!: string;
+
+  @ApiProperty({ example: 'ENCIMERA_CRUCERO' })
+  @IsString() @MinLength(1) modelCode!: string;
+
+  @ApiPropertyOptional({ example: 'Queen', description: 'null = todo el modelo' })
+  @IsOptional() @IsString() @MaxLength(40) sizeLabel?: string | null;
+
+  @ApiPropertyOptional({ example: '500TC', description: 'Calidad de la tela base; null = cualquiera' })
+  @IsOptional() @IsString() @MaxLength(40) quality?: string | null;
+
+  @ApiProperty({ example: 14000, description: 'CLP por unidad terminada' })
+  @IsNumber() @Min(0) rate!: number;
+
+  @ApiPropertyOptional() @IsOptional() @IsDateString() validFrom?: string;
+  @ApiPropertyOptional() @IsOptional() @IsDateString() validTo?: string | null;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(500) notes?: string;
 }
 
 // ── quote ────────────────────────────────────────────────────────────────────

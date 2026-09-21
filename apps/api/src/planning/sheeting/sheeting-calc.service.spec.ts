@@ -3,7 +3,7 @@ import { SheetingCalcService, fabricPricePerLinearMetre } from './sheeting-calc.
 import { ENCIMERA_CRUCERO, REFERENCE_FABRICS } from './reference-models.js';
 
 type Lot = { unitCost: number; costSyncedAt: Date | null; entryDate: Date; sku?: string };
-type Rate = { workshop: string; modelCode: string; sizeLabel: string | null; rate: number; version: number };
+type Rate = { workshop: string; modelCode: string; sizeLabel: string | null; quality?: string | null; rate: number; version: number };
 
 /** Minimal stand-ins for the Mongoose models the service reads. */
 function build(lots: Lot[], rates: Rate[], params: Record<string, unknown> = {}) {
@@ -13,8 +13,16 @@ function build(lots: Lot[], rates: Rate[], params: Record<string, unknown> = {})
     find: (f: { sku?: string }) => query(forSku(f)),
     findOne: (f: { sku?: string }) => query(forSku(f)),
   };
-  const rateModel = {
-    findOne: (f: { sizeLabel: string | null }) => query(rates.filter((r) => r.sizeLabel === f.sizeLabel)),
+  // Same resolution order as WorkshopRatesService: (size, quality) → (size) → (quality) → (model).
+  const ratesSvc = {
+    resolve: (_w: string, _m: string, sizeLabel: string | null, quality: string | null) => {
+      const tries: [string | null, string | null][] = [[sizeLabel, quality], [sizeLabel, null], [null, quality], [null, null]];
+      for (const [sz, q] of tries) {
+        const hit = rates.find((r) => r.sizeLabel === sz && (r.quality ?? null) === q);
+        if (hit) return Promise.resolve(hit);
+      }
+      return Promise.resolve(null);
+    },
   };
   const fabric = { ...REFERENCE_FABRICS[0], bsaleVariantId: null, isActive: true };
   const colour = { ...fabric, sku: 'COLOR-290', name: 'Tela color 290', rollWidthCm: 290 };
@@ -26,7 +34,7 @@ function build(lots: Lot[], rates: Rate[], params: Record<string, unknown> = {})
   };
   const paramsSvc = { current: () => Promise.resolve({ version: 1, cuttingScrapPct: 0.03, defaultCutBatchUnits: 20, fabricCostStaleDays: 45, marginByChannel: { tienda: 3 }, vatRate: 0.19, ...params }) };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
-  return new SheetingCalcService(stockModel as any, rateModel as any, masters as any, paramsSvc as any);
+  return new SheetingCalcService(stockModel as any, ratesSvc as any, masters as any, paramsSvc as any);
 }
 
 const input = { modelCode: 'ENCIMERA_CRUCERO', fabricSku: '63845371893523', measures: { A: 255, L: 290 }, qty: 20, workshop: 'Taller', channel: 'tienda', sizeLabel: 'Queen' };
@@ -39,11 +47,18 @@ describe('sheeting quote (spec invariants 10–11)', () => {
     await expect(svc.quote(input)).rejects.toMatchObject({ response: { details: { code: 'NO_WORKSHOP_RATE', workshop: 'Taller' } } });
   });
 
-  it('falls back from the size to the model-wide rate', async () => {
-    const svc = build([fresh], [{ ...queenRate, sizeLabel: null, rate: 12000 }]);
-    const q = await svc.quote(input);
-    expect(q.cost.labour).toBe(12000);
-    expect(q.labourRate.sizeLabel).toBeNull();
+  it('resolves the most specific rate: size + quality beats size, beats quality, beats the model-wide rate', async () => {
+    const model = { ...queenRate, sizeLabel: null, quality: null, rate: 10000 };
+    const byQuality = { ...queenRate, sizeLabel: null, quality: '500TC', rate: 11000 };
+    const bySize = { ...queenRate, quality: null, rate: 12000 };
+    const exact = { ...queenRate, quality: '500TC', rate: 14000 };
+    expect((await build([fresh], [model]).quote(input)).cost.labour).toBe(10000);
+    expect((await build([fresh], [model, byQuality]).quote(input)).cost.labour).toBe(11000);
+    expect((await build([fresh], [model, byQuality, bySize]).quote(input)).cost.labour).toBe(12000);
+    expect((await build([fresh], [model, byQuality, bySize, exact]).quote(input)).cost.labour).toBe(14000);
+    // The quality comes from the base fabric (500TC here), not from the request.
+    const q = await build([fresh], [{ ...exact, quality: '800TC', rate: 16000 }, model]).quote(input);
+    expect(q.cost.labour).toBe(10000);
   });
 
   it('11 · a cost older than the window is declared stale, with its date, never a silent zero', async () => {

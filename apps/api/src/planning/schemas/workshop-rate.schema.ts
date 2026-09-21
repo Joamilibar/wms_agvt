@@ -6,8 +6,8 @@ export type WorkshopRateDocument = WorkshopRate & Document;
 /**
  * The workshop's price list, versioned. Labour is a conversion cost: it is
  * quoted here and never enters the BOM, which is physical materials only.
- * Resolution: exact `sizeLabel` first, then the family fallback
- * (`sizeLabel: null`), then `NO_WORKSHOP_RATE` — never zero by default.
+ * Resolution: size + quality, then size, then quality, then the model-wide
+ * rate (both null), then `NO_WORKSHOP_RATE` — never zero by default.
  */
 @Schema({ timestamps: true, collection: 'workshop_rates' })
 export class WorkshopRate {
@@ -21,6 +21,10 @@ export class WorkshopRate {
   /** `Queen`, `King`… null = applies to the whole model. */
   @Prop({ type: String, default: null })
   sizeLabel!: string | null;
+
+  /** Fabric quality of the base fabric (`500TC`, `800TC`…); null = any. The sheet prices 800/1600TC higher. */
+  @Prop({ type: String, default: null })
+  quality!: string | null;
 
   /** CLP per finished unit. */
   @Prop({ required: true, min: 0 })
@@ -46,4 +50,4 @@ export class WorkshopRate {
 }
 
 export const WorkshopRateSchema = SchemaFactory.createForClass(WorkshopRate);
-WorkshopRateSchema.index({ workshop: 1, modelCode: 1, sizeLabel: 1, version: 1 }, { unique: true });
+WorkshopRateSchema.index({ workshop: 1, modelCode: 1, sizeLabel: 1, quality: 1, version: 1 }, { unique: true });

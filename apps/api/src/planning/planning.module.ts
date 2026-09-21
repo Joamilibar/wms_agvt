@@ -29,6 +29,7 @@ import { FabricSpec, FabricSpecSchema } from './schemas/fabric-spec.schema.js';
 import { SheetingModel, SheetingModelSchema } from './schemas/sheeting-model.schema.js';
 import { SheetingMastersService } from './sheeting/sheeting-masters.service.js';
 import { SheetingCalcService } from './sheeting/sheeting-calc.service.js';
+import { WorkshopRatesService } from './sheeting/workshop-rates.service.js';
 import { WorkshopRate, WorkshopRateSchema } from './schemas/workshop-rate.schema.js';
 import { SheetingController } from './sheeting/sheeting.controller.js';
 import { WarehousesService } from './masters/warehouses.service.js';
@@ -100,6 +101,7 @@ import { PlanningController } from './planning.controller.js';
     PlanningScheduler,
     SheetingMastersService,
     SheetingCalcService,
+    WorkshopRatesService,
   ],
   exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService, DemandEventsService, ForecastAccuracyService, ProjectsService, KpisService],
 })
