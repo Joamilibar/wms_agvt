@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useBsaleStatus, useSyncBsaleStock, useBsaleSyncJob } from '../hooks/useApi';
+import { useBsaleStatus, useSyncBsaleStock, useSyncBsaleCosts, useBsaleSyncJob, type BsaleCostSyncResult } from '../hooks/useApi';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Badge from '../components/ui/Badge';
 import { HiOutlineRefresh, HiOutlineCheckCircle, HiOutlineExclamationCircle } from 'react-icons/hi';
@@ -10,12 +10,17 @@ import { getErrorMessage } from '../lib/errors';
 export default function BSaleConfig() {
   const { data, isLoading } = useBsaleStatus();
   const syncMutation = useSyncBsaleStock();
+  const costsMutation = useSyncBsaleCosts();
   // M-07: the sync runs on a worker now; we hold the job id and poll it.
   const [jobId, setJobId] = useState<string | null>(null);
   const { data: job } = useBsaleSyncJob(jobId);
 
-  const running = syncMutation.isPending || (!!job && !['completed', 'failed'].includes(job.state));
-  const syncResult = job?.state === 'completed' ? job.result : null;
+  const running = syncMutation.isPending || costsMutation.isPending || (!!job && !['completed', 'failed'].includes(job.state));
+  // A stock job carries `skusChecked` and its cost pass under `costs`; a cost-only job is the cost result itself.
+  const syncResult = job?.state === 'completed' && job.result && 'skusChecked' in job.result ? job.result : null;
+  const costResult: BsaleCostSyncResult | null = job?.state === 'completed' && job.result
+    ? ('skusChecked' in job.result ? job.result.costs : job.result)
+    : null;
 
   const handleSync = async () => {
     const confirmed = await confirmDialog({
@@ -24,7 +29,8 @@ export default function BSaleConfig() {
         'BSale es la fuente de verdad de las cantidades: los saldos del WMS se ajustan ' +
         'a los suyos. Los lotes conservan su codigo y su fecha de entrada, asi que el ' +
         'aging report sigue siendo valido; solo el sobrante sin explicacion entra como ' +
-        'lote nuevo. No se tocan unidades reservadas por una orden en curso.',
+        'lote nuevo. No se tocan unidades reservadas por una orden en curso. Al terminar, ' +
+        'cada lote queda valorizado al costo promedio que BSale informa por SKU.',
       confirmLabel: 'Sincronizar',
     });
     if (!confirmed) return;
@@ -36,6 +42,16 @@ export default function BSaleConfig() {
       setJobId(id);
     } catch (e) {
       toast.error('No se pudo encolar la sincronizacion: ' + getErrorMessage(e));
+    }
+  };
+
+  const handleCosts = async () => {
+    setJobId(null);
+    try {
+      const { jobId: id } = await costsMutation.mutateAsync();
+      setJobId(id);
+    } catch (e) {
+      toast.error('No se pudo encolar la actualizacion de costos: ' + getErrorMessage(e));
     }
   };
 
@@ -95,6 +111,19 @@ export default function BSaleConfig() {
             {running ? 'Sincronizando en segundo plano...' : 'Iniciar Sincronización'}
           </button>
 
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleCosts}
+              disabled={running}
+              className="px-4 py-2 bg-bg-tertiary border border-border-primary rounded-lg text-xs text-text-secondary hover:text-text-primary disabled:opacity-50 transition-colors"
+            >
+              Solo actualizar costos
+            </button>
+            <span className="text-[11px] text-text-muted">
+              Valoriza cada lote al costo promedio de BSale por SKU (CLP). Corre solo al final de cada sincronización y el día 1 de cada mes.
+            </span>
+          </div>
+
           {/* Job in flight: the request returned immediately, the work did not. */}
           {jobId && running && (
             <div className="mt-5 p-4 rounded-lg border border-brand-blue/30 bg-brand-blue/5">
@@ -140,6 +169,7 @@ export default function BSaleConfig() {
                   </div>
                 ))}
               </div>
+              {syncResult.costs && <CostSummary costs={syncResult.costs} />}
               {syncResult.errors.length > 0 && (
                 <div className="mt-3">
                   <div className="flex items-center gap-1 mb-1">
@@ -155,8 +185,34 @@ export default function BSaleConfig() {
               )}
             </div>
           )}
+
+          {/* Cost-only job */}
+          {costResult && !syncResult && (
+            <div className="mt-5 p-4 rounded-lg border border-brand-green/30 bg-brand-green/5">
+              <div className="flex items-center gap-2 mb-1">
+                <HiOutlineCheckCircle className="w-5 h-5 text-brand-green" />
+                <span className="text-sm font-semibold text-brand-green">Costos actualizados</span>
+              </div>
+              <CostSummary costs={costResult} />
+            </div>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+function CostSummary({ costs }: { costs: BsaleCostSyncResult }) {
+  return (
+    <div className="mt-3">
+      <p className="text-xs text-text-secondary">
+        Costos: <span className="text-text-primary font-medium">{costs.valued}</span> de {costs.skus} SKU valorizados desde BSale · {costs.lotsUpdated} lotes actualizados
+        {costs.withoutCost.length > 0 && <span className="text-brand-orange"> · {costs.withoutCost.length} sin costo en BSale</span>}
+      </p>
+      {costs.withoutCost.length > 0 && (
+        <p className="text-[10px] text-text-muted font-mono mt-1 break-all">{costs.withoutCost.slice(0, 30).join(' · ')}{costs.withoutCost.length > 30 ? ' …' : ''}</p>
+      )}
+      {costs.errors.slice(0, 10).map((e, i) => <p key={i} className="text-[10px] text-brand-red font-mono">{e}</p>)}
     </div>
   );
 }

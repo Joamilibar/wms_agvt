@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { BsaleService } from './bsale.service.js';
 import { StockLot } from '../stock/schemas/stock-lot.schema.js';
+import { CacheService } from '../common/cache/cache.service.js';
 
 /**
  * BSale caps `limit` at 50 silently: the page holds 50 items whatever was
@@ -35,6 +36,7 @@ async function build(collections: Record<string, any[]>) {
       BsaleService,
       { provide: ConfigService, useValue: { get: (k: string) => (k === 'bsale.token' ? 'x' : 'http://bsale') } },
       { provide: getModelToken(StockLot.name), useValue: {} },
+      { provide: CacheService, useValue: { invalidate: async () => 0 } },
     ],
   }).compile();
   const service = moduleRef.get(BsaleService);

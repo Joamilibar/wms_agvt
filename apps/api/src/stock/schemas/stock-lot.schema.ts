@@ -57,6 +57,10 @@ export class StockLot {
   @Prop({ required: true, min: 0 })
   unitCost!: number;
 
+  /** Last time `unitCost` was taken from BSale's average cost (null = WMS-estimated). */
+  @Prop({ type: Date, default: null })
+  costSyncedAt!: Date | null;
+
   @Prop({ required: true, default: 'Central' })
   warehouse!: string;
 

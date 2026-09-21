@@ -31,6 +31,7 @@ import { PlanningItemsService } from './masters/planning-items.service.js';
 import { PlanningParamsService } from './masters/planning-params.service.js';
 import { SalesHistoryService } from './sales-history/sales-history.service.js';
 import { SalesHistoryProcessor, SALES_HISTORY_QUEUE } from './sales-history/sales-history.processor.js';
+import { BSALE_SYNC_QUEUE } from '../bsale/bsale-sync.processor.js';
 import { PurchaseOrdersService } from './purchase-orders/purchase-orders.service.js';
 import { PlanningRunsService } from './engine/planning-runs.service.js';
 import { StoreReplenishmentService } from './store/store-replenishment.service.js';
@@ -65,7 +66,7 @@ import { PlanningController } from './planning.controller.js';
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
-    BullModule.registerQueue({ name: SALES_HISTORY_QUEUE }),
+    BullModule.registerQueue({ name: SALES_HISTORY_QUEUE }, { name: BSALE_SYNC_QUEUE }),
     BsaleModule,
     CountersModule,
     OrdersModule,

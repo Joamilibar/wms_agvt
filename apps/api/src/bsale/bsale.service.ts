@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import axios, { AxiosInstance } from 'axios';
 import { StockLot, StockLotDocument } from '../stock/schemas/stock-lot.schema.js';
+import { CacheService } from '../common/cache/cache.service.js';
 
 /** A pack as BSale describes it, with component SKUs already resolved. */
 export interface BsalePack {
@@ -14,6 +15,21 @@ export interface BsalePack {
   components: { bsaleVariantId: string; sku: string; name: string; qtyPerPack: number }[];
 }
 
+export interface VariantCost {
+  /** Weighted average of what is on hand, CLP. */
+  averageCost: number;
+  totalCost: number;
+  layers: { cost: number; availableFifo: number; admissionDate: Date | null }[];
+}
+
+export interface CostSyncResult {
+  skus: number;
+  valued: number;
+  lotsUpdated: number;
+  withoutCost: string[];
+  errors: string[];
+}
+
 @Injectable()
 export class BsaleService {
   private readonly logger = new Logger(BsaleService.name);
@@ -22,6 +38,7 @@ export class BsaleService {
   constructor(
     private configService: ConfigService,
     @InjectModel(StockLot.name) private stockLotModel: Model<StockLotDocument>,
+    private cache: CacheService,
   ) {
     const token = this.configService.get<string>('bsale.token');
     const baseUrl = this.configService.get<string>('bsale.baseUrl');
@@ -452,6 +469,8 @@ export class BsaleService {
     decreased: number;
     skusChecked: number;
     errors: string[];
+    /** Cost pass run right after the quantities (null when the sync stopped early). */
+    costs: CostSyncResult | null;
   }> {
     if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
 
@@ -503,14 +522,14 @@ export class BsaleService {
         variantMap[varId] = {
           sku: v.code || v.barCode || varId,
           name: (pName && vDesc && pName !== vDesc) ? `${pName} - ${vDesc}` : pName || vDesc || `Variante ${varId}`,
-          cost: v.standardCost || 0,
+          cost: 0, // /variants.json carries no cost; resolved per SKU below only when a lot is created
         };
       }
     } catch (e: any) {
       // Without the catalog every SKU would fall back to its variant id, which
       // would then archive the real lots as "not reported". Stop here instead.
       errors.push(`Failed to fetch variants catalog: ${e.message}`);
-      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors };
+      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors, costs: null };
     }
     this.logger.log(`  ${Object.keys(variantMap).length} variants`);
 
@@ -533,7 +552,7 @@ export class BsaleService {
       // A partial read is worse than none: whatever was not read would be
       // archived below as absent from BSale.
       errors.push(`Failed to fetch stock levels: ${e.message}`);
-      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors };
+      return { consumed: 0, created, skipped, archived, unchanged, increased, decreased, skusChecked: 0, errors, costs: null };
     }
     this.logger.log(`  ${stockRows.length} stock rows`);
 
@@ -576,6 +595,15 @@ export class BsaleService {
     const now = new Date();
     const stamp = now.toISOString().slice(0, 10).replace(/-/g, '');
     const seen = new Set<string>();
+    // BSale's average cost, fetched once per variant and only for SKUs that get a new lot.
+    const costCache = new Map<string, number>();
+    const costFor = async (variantId: string) => {
+      if (!costCache.has(variantId)) {
+        try { costCache.set(variantId, Math.round((await this.getVariantCost(variantId))?.averageCost ?? 0)); }
+        catch { costCache.set(variantId, 0); }
+      }
+      return costCache.get(variantId) ?? 0;
+    };
 
     for (const [key, entry] of target) {
       seen.add(key);
@@ -590,6 +618,7 @@ export class BsaleService {
         targetQty: entry.qty,
         now,
         stamp,
+        costFor,
       });
 
       if (result.action === 'unchanged') unchanged++;
@@ -620,6 +649,16 @@ export class BsaleService {
       `omitidos: ${skipped}, avisos: ${errors.length}`,
     );
 
+    // 7. Quantities and costs move together: a reception registered in BSale
+    // changes both, and a lot valued at last month's average misstates the
+    // inventory the same way a wrong quantity would.
+    let costs: CostSyncResult | null = null;
+    try {
+      costs = await this.syncCostsFromBsale(requestedBy);
+    } catch (e: any) {
+      errors.push(`Costos no actualizados: ${e.message}`);
+    }
+
     return {
       consumed: stockRows.length,
       created,
@@ -630,6 +669,7 @@ export class BsaleService {
       decreased,
       skusChecked: target.size,
       errors,
+      costs,
     };
   }
 
@@ -657,6 +697,8 @@ export class BsaleService {
     targetQty: number;
     now: Date;
     stamp: string;
+    /** Cost for a lot created here; defaults to `cost`. */
+    costFor?: (variantId: string) => Promise<number>;
   }): Promise<{
     action: 'unchanged' | 'increased' | 'decreased';
     wmsQty: number;
@@ -691,6 +733,8 @@ export class BsaleService {
       }
 
       try {
+        const fromBsale = !!(input.costFor && input.variantId);
+        const unitCost = fromBsale ? await input.costFor!(input.variantId!) : input.cost;
         await this.stockLotModel.create({
           sku,
           name: input.name,
@@ -698,7 +742,8 @@ export class BsaleService {
           entryDate: now,
           qty: surplus,
           initialQty: surplus,
-          unitCost: input.cost,
+          unitCost,
+          costSyncedAt: fromBsale && unitCost > 0 ? now : null,
           warehouse,
           bsaleProductId: input.variantId,
           isActive: true,
@@ -747,5 +792,80 @@ export class BsaleService {
     return { action: 'decreased', wmsQty, created: 0, archived, shortfall: excess, warnings };
   }
 
-}
+  // ── costs ──────────────────────────────────────────────────────────────────
 
+  /**
+   * BSale's cost for one variant: the weighted average of what is on hand
+   * plus the FIFO reception layers behind it, in CLP. `/variants.json` does
+   * not carry a cost (the old `standardCost` read always produced 0), so
+   * this is the only place the number exists.
+   */
+  async getVariantCost(variantId: string): Promise<VariantCost | null> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+    try {
+      const { data } = await this.client.get(`/variants/${variantId}/costs.json`);
+      if (!data || typeof data.averageCost !== 'number') return null;
+      return {
+        averageCost: data.averageCost,
+        totalCost: data.totalCost ?? 0,
+        layers: (data.history ?? []).map((h: any) => ({
+          cost: Number(h.cost) || 0,
+          availableFifo: Number(h.availableFifo) || 0,
+          admissionDate: h.admissionDate ? new Date(h.admissionDate * 1000) : null,
+        })),
+      };
+    } catch (e: any) {
+      if (e.response?.status === 404) return null;
+      throw e;
+    }
+  }
+
+  /**
+   * Values every active lot at BSale's average cost for its SKU.
+   *
+   * BSale rules on cost the same way it rules on quantity: the cost it holds
+   * comes from the receptions the accountant registered, while the landed
+   * cost the WMS estimates when receiving a purchase order is a projection.
+   * That estimate stays only until the next cost sync. SKUs BSale does not
+   * cost (no receptions yet) keep whatever they have and are reported.
+   */
+  async syncCostsFromBsale(requestedBy?: string): Promise<CostSyncResult> {
+    if (!this.client) throw new ServiceUnavailableException('BSale no configurado');
+    this.logger.log(`BSale cost sync requested by user ${requestedBy ?? 'unknown'}`);
+
+    const groups = await this.stockLotModel.aggregate<{ _id: { sku: string; variantId: string | null }; lots: number }>([
+      { $match: { isActive: true } },
+      { $group: { _id: { sku: '$sku', variantId: '$bsaleProductId' }, lots: { $sum: 1 } } },
+    ]).exec();
+
+    const result: CostSyncResult = { skus: groups.length, valued: 0, lotsUpdated: 0, withoutCost: [], errors: [] };
+    const now = new Date();
+    const CONCURRENCY = 4;
+    for (let i = 0; i < groups.length; i += CONCURRENCY) {
+      await Promise.all(groups.slice(i, i + CONCURRENCY).map(async (g) => {
+        const { sku, variantId } = g._id;
+        if (!variantId) { result.withoutCost.push(sku); return; }
+        try {
+          const cost = await this.getVariantCost(variantId);
+          if (!cost || cost.averageCost <= 0) { result.withoutCost.push(sku); return; }
+          const unitCost = Math.round(cost.averageCost);
+          const res = await this.stockLotModel
+            .updateMany({ sku, isActive: true, unitCost: { $ne: unitCost } }, { $set: { unitCost, costSyncedAt: now } })
+            .exec();
+          result.valued++;
+          result.lotsUpdated += res.modifiedCount;
+        } catch (e: any) {
+          result.errors.push(`${sku}: ${e.message}`);
+        }
+      }));
+    }
+
+    // Every valued view (dashboard, aging, ABC by cost) was computed with the old costs.
+    await this.cache.invalidate('analytics:');
+    this.logger.log(
+      `Cost sync complete: ${result.valued}/${result.skus} SKUs valorizados, ${result.lotsUpdated} lotes actualizados, ` +
+      `${result.withoutCost.length} sin costo en BSale, ${result.errors.length} errores`,
+    );
+    return result;
+  }
+}

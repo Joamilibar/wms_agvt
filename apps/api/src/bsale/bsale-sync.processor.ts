@@ -10,6 +10,9 @@ export interface SyncStockJob {
   requestedBy: string;
 }
 
+/** Job name: value every active lot at BSale's average cost per SKU. */
+export const SYNC_COSTS_JOB = 'sync-costs';
+
 /**
  * Runs the BSale stock sync off the request thread.
  *
@@ -27,6 +30,7 @@ export class BsaleSyncProcessor extends WorkerHost {
   }
 
   async process(job: Job<SyncStockJob>) {
+    if (job.name === SYNC_COSTS_JOB) return this.bsaleService.syncCostsFromBsale(job.data.requestedBy);
     const { clearExisting, requestedBy } = job.data;
     this.logger.log(
       `Starting BSale stock sync (job ${job.id}, clearExisting=${clearExisting}, ` +

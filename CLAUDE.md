@@ -188,6 +188,12 @@ En consecuencia:
 - `clearExisting: true` sigue existiendo como salida de emergencia: archiva todo
   y reconstruye con fecha "día cero". Se lleva el aging por delante. No es el
   camino normal y el frontend ya no lo pide.
+- **El costo también es de BSale.** `/variants.json` no trae costo (el viejo
+  `standardCost` siempre daba 0); el número vive en `/variants/:id/costs.json`
+  (`averageCost` en CLP + capas FIFO). `syncCostsFromBsale` valoriza todos los
+  lotes activos al promedio por SKU y corre al final de cada sync de stock, con
+  `POST /bsale/sync-costs`, y el día 1 de cada mes. El costo desembarcado que
+  estima la recepción de una OC es provisional hasta ese momento.
 - **Trampa operativa:** un lote cargado a mano en el WMS que BSale no conozca
   será revertido por el próximo sync. `StockService.create` deja un `warn` con el
   usuario y el SKU. Si el WMS ve la recepción antes que BSale, hay que registrarla

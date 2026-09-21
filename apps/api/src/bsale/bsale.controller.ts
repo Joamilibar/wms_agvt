@@ -16,7 +16,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { BSALE_SYNC_QUEUE } from './bsale-sync.processor.js';
+import { BSALE_SYNC_QUEUE, SYNC_COSTS_JOB } from './bsale-sync.processor.js';
 
 @ApiTags('BSale')
 @ApiBearerAuth()
@@ -104,6 +104,21 @@ export class BsaleController {
       },
     );
 
+    return { jobId: job.id, status: 'queued' };
+  }
+
+  @Post('sync-costs')
+  @Roles('admin')
+  @ApiOperation({
+    summary: 'Queue a BSale cost sync',
+    description: 'Values every active lot at the average cost BSale reports per SKU (CLP). Poll GET /api/bsale/sync-jobs/:id.',
+  })
+  async syncCosts(@CurrentUser('userId') userId: string) {
+    const job = await this.syncQueue.add(
+      SYNC_COSTS_JOB,
+      { clearExisting: false, requestedBy: userId },
+      { attempts: 3, backoff: { type: 'exponential', delay: 10000 }, removeOnComplete: 50, removeOnFail: 100 },
+    );
     return { jobId: job.id, status: 'queued' };
   }
 

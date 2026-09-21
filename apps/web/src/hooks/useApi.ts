@@ -212,6 +212,12 @@ export const useSyncBsaleStock = () => useMutation({
       .then(r => r.data as { jobId: string; status: string }),
 });
 
+/** Result of a cost pass: every active lot valued at BSale's average cost (CLP). */
+export interface BsaleCostSyncResult { skus: number; valued: number; lotsUpdated: number; withoutCost: string[]; errors: string[] }
+export const useSyncBsaleCosts = () => useMutation({
+  mutationFn: () => api.post('/bsale/sync-costs').then(r => r.data as { jobId: string; status: string }),
+});
+
 export interface BsaleSyncJob {
   jobId: string;
   state: 'waiting' | 'active' | 'delayed' | 'completed' | 'failed' | 'unknown';
@@ -226,7 +232,8 @@ export interface BsaleSyncJob {
     decreased: number;
     skusChecked: number;
     errors: string[];
-  } | null;
+    costs: BsaleCostSyncResult | null;
+  } | BsaleCostSyncResult | null;
   failedReason: string | null;
   queuedAt: string | null;
   finishedAt: string | null;
@@ -246,6 +253,8 @@ export const useBsaleSyncJob = (jobId: string | null) => {
         // The worker rewrote the lots; drop the cached inventory views.
         qc.invalidateQueries({ queryKey: ['stock'] });
         qc.invalidateQueries({ queryKey: ['stockSummary'] });
+        qc.invalidateQueries({ queryKey: ['dashboard'] });
+        qc.invalidateQueries({ queryKey: ['planning', 'kpis'] });
         return false;
       }
       return 2000;
