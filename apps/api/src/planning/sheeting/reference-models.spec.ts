@@ -6,21 +6,33 @@ const cut = (model: typeof ENCIMERA_CRUCERO, measures: Record<string, number>) =
   evaluatePanels(model.panels, { ...model.vars, ...measures });
 
 describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas Tiendas)', () => {
-  it('encimera: one panel (A + 8) × (L + 19), every size of the sheet', () => {
-    const sheet: [string, number, number, number, number][] = [
-      ['Single', 190, 290, 198, 309],
-      ['Twin', 205, 290, 213, 309],
-      ['Full 135', 230, 290, 238, 309],
-      ['Queen', 255, 290, 263, 309],
-      ['King', 280, 290, 288, 309],
-      ['SuperKing', 300, 290, 308, 309],
+  it('encimera crucero: centre + three mitred double-layer frame strips, as the workshop makes it', () => {
+    // A × L finished includes the frame (F 15, top and sides). s = 2 per sewn edge, b = 2 bottom hem.
+    const sheet: [string, number, number, [number, number], [number, number], [number, number]][] = [
+      //  size        A    L    centro      lateral ×2   superior ×1
+      ['Single', 190, 290, [164, 279], [38, 320], [38, 220]],
+      ['Queen', 255, 290, [229, 279], [38, 320], [38, 285]],
+      ['King', 280, 290, [254, 279], [38, 320], [38, 310]],
+      ['SuperKing', 300, 290, [274, 279], [38, 320], [38, 330]],
     ];
-    for (const [, A, L, w, l] of sheet) {
-      const [p] = cut(ENCIMERA_CRUCERO, { A, L });
-      expect([p.widthCm, p.lengthCm]).toEqual([w, l]);
+    for (const [, A, L, centro, lateral, superior] of sheet) {
+      const [c, lat, sup] = cut(ENCIMERA_CRUCERO, { A, L });
+      expect([c.widthCm, c.lengthCm]).toEqual(centro);
+      expect([lat.widthCm, lat.lengthCm, lat.count, lat.mitred45, lat.fabricSlot]).toEqual([...lateral, 2, true, 'marco']);
+      expect([sup.widthCm, sup.lengthCm, sup.count, sup.mitred45, sup.fabricSlot]).toEqual([...superior, 1, true, 'marco']);
+      expect(c.fabricSlot).toBe('base');
     }
-    expect(ENCIMERA_CRUCERO.panels).toHaveLength(1);
-    expect(panelVars(ENCIMERA_CRUCERO.panels).sort()).toEqual(['A', 'L']);
+    expect(panelVars(ENCIMERA_CRUCERO.panels).sort()).toEqual(['A', 'F', 'L', 'b', 's']);
+  });
+
+  it('encimera: the costing sheet costs the same product as one 308×309 panel — kept as the comparison', () => {
+    // (A + 8) × (L + 15 + 4): the SuperKing costed that way does not fit the 305 roll; the real centre does.
+    const sheetPanel = nestPieces([{ role: 'hoja', count: 1, widthCm: 308, lengthCm: 309 }], 303, { rollWidthCm: 305 });
+    expect(sheetPanel).toMatchObject({ code: 'FABRIC_TOO_NARROW' });
+    const real = nestPieces(cut(ENCIMERA_CRUCERO, { A: 300, L: 290 }), 303, { rollWidthCm: 305, batchUnits: 20 });
+    if ('code' in real) throw new Error(real.code);
+    expect(real.pieces[0].nesting.orientation).toBe('contrahilo'); // 279 across, 2.74 m advance
+    expect(real.pieces[0].linearMetresPerUnit).toBeCloseTo(2.74, 4);
   });
 
   it('bajera: (A + 2(H+T) + sw) × (L + 2(H+T) + sl) reproduces the sheet with the "caída doblada" reading', () => {
@@ -49,16 +61,20 @@ describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas T
     expect(p.widthCm).toBeGreaterThan(widest);
   });
 
-  it('reference metres on the 305 roll: Queen encimera 3.09 al hilo · Queen/King/SuperKing bajera 2.61/2.86/3.06 contrahilo', () => {
+  it('reference metres on the 305 roll: Queen crucero 3.58 · Queen/King/SuperKing bajera 2.61/2.86/3.06 contrahilo', () => {
     const roll = REFERENCE_FABRICS.find((f) => f.sku === '63845371893523')!;
     const usable = roll.rollWidthCm - 2 * roll.selvageCm;
     const nest = (pieces: ReturnType<typeof cut>) => nestPieces(pieces, usable, { rollWidthCm: roll.rollWidthCm });
 
+    // Queen crucero: centre 229×279 contrahilo (2.29 m) + strips 38 wide, 7 across the 303 usable width.
     const enc = nest(cut(ENCIMERA_CRUCERO, { A: 255, L: 290 }));
     if ('code' in enc) throw new Error(enc.code);
-    expect(enc.linearMetresPerUnit).toBeCloseTo(3.09, 4);
-    expect(enc.pieces[0].nesting.orientation).toBe('al_hilo');
-    expect(enc.wastePct).toBeCloseTo(0.138, 3);
+    expect(enc.pieces[0].nesting.orientation).toBe('contrahilo');
+    expect(enc.pieces[0].linearMetresPerUnit).toBeCloseTo(2.29, 4);
+    expect(enc.pieces[1].nesting.piecesAcross).toBe(7); // laterals 320 long: al hilo, 7 across
+    expect(enc.pieces[2].nesting.orientation).toBe('contrahilo'); // the 285 top strip turns across the roll: 0.38 m
+    // 2.29 + 2 × 3.20/7 + 0.38 = 3.58 ml per unit, against the sheet's 3.09 for a single panel.
+    expect(enc.linearMetresPerUnit).toBeCloseTo(2.29 + 2 * 3.2 / 7 + 0.38, 3);
 
     for (const [A, ml] of [[155, 2.61], [180, 2.86], [200, 3.06]] as const) {
       const b = nest(cut(BAJERA_ELASTICADA, { A, L: 200, H: 35 }));
@@ -68,9 +84,6 @@ describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas T
       expect(b.wastePct).toBeCloseTo(0.049, 3);
     }
 
-    // SuperKing encimera does not fit the 305 roll and the sheet costs it as if it did.
-    const sk = nest(cut(ENCIMERA_CRUCERO, { A: 300, L: 290 }));
-    expect(sk).toMatchObject({ code: 'FABRIC_TOO_NARROW', requiredWidthCm: 308, availableWidthCm: 303 });
   });
 
   it('every preloaded model is well-formed on its sample measures', () => {

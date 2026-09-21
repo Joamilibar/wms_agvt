@@ -119,7 +119,9 @@ export interface NestingSummary {
 export function nestPieces(pieces: PieceToNest[], usableWidthCm: number, opts: NestingOptions = {}): NestingSummary | NestingFailure {
   const out: NestedPiece[] = [];
   for (const p of pieces) {
-    const nesting = nestPiece(p.widthCm, p.lengthCm, usableWidthCm, opts);
+    // A batch of N units lays N × count pieces of this role together.
+    const batch = opts.batchUnits ? opts.batchUnits * p.count : undefined;
+    const nesting = nestPiece(p.widthCm, p.lengthCm, usableWidthCm, { ...opts, batchUnits: batch });
     if (!nesting) return { code: 'FABRIC_TOO_NARROW', role: p.role, requiredWidthCm: requiredWidthCm(p.widthCm, p.lengthCm, opts.directional), availableWidthCm: usableWidthCm };
     out.push({ ...p, nesting, linearMetresPerUnit: round(nesting.linearMetresPerUnit * p.count, 4) });
   }

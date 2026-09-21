@@ -100,6 +100,9 @@ export class QuoteDto {
   @ApiProperty({ example: '63845371893523' })
   @IsString() @MinLength(1) fabricSku!: string;
 
+  @ApiPropertyOptional({ description: 'Tela del marco (slot "marco") si es de color; omitida = la misma del centro' })
+  @IsOptional() @IsString() frameFabricSku?: string;
+
   @ApiProperty({ example: { A: 255, L: 290 }, description: 'Medidas en cm: A ancho, L largo, H altura de colchón (bajera)' })
   @IsObject() measures!: Record<string, number>;
 

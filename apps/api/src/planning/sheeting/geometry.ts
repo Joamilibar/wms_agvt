@@ -32,6 +32,18 @@ export interface PanelSpec {
   length: Dimension;
   /** The mitre allowance is already inside `length`; this tells the workshop how to cut. */
   mitred45: boolean;
+  /** Which fabric of the quote the panel is cut from: `base` (default) or `marco`. */
+  fabricSlot?: string;
+}
+
+export const DEFAULT_FABRIC_SLOT = 'base';
+export const fabricSlotOf = (p: { fabricSlot?: string }): string => p.fabricSlot ?? DEFAULT_FABRIC_SLOT;
+
+/** Every fabric slot the panels use, `base` first. */
+export function fabricSlots(panels: { fabricSlot?: string }[]): string[] {
+  const set = new Set(panels.map(fabricSlotOf));
+  const others = [...set].filter((x) => x !== DEFAULT_FABRIC_SLOT).sort();
+  return set.has(DEFAULT_FABRIC_SLOT) ? [DEFAULT_FABRIC_SLOT, ...others] : others;
 }
 
 export type Vars = Record<string, number>;
@@ -86,7 +98,7 @@ export function normalizeDimension(d: Dimension): Dimension {
 }
 
 export function normalizePanel(p: PanelSpec): PanelSpec {
-  return { role: p.role, count: p.count, width: normalizeDimension(p.width), length: normalizeDimension(p.length), mitred45: p.mitred45 };
+  return { role: p.role, count: p.count, width: normalizeDimension(p.width), length: normalizeDimension(p.length), mitred45: p.mitred45, fabricSlot: fabricSlotOf(p) };
 }
 
 /** Human-readable `A − 2F1 + 8`, for error messages and the screen. */
@@ -149,11 +161,12 @@ export interface CutPiece {
   widthCm: number;
   lengthCm: number;
   mitred45: boolean;
+  fabricSlot: string;
 }
 
 /** Evaluates every panel of a model for concrete measures. */
 export function evaluatePanels(panels: PanelSpec[], vars: Vars): CutPiece[] {
-  return panels.map((p) => ({ role: p.role, count: p.count, widthCm: evalDimension(p.width, vars), lengthCm: evalDimension(p.length, vars), mitred45: p.mitred45 }));
+  return panels.map((p) => ({ role: p.role, count: p.count, widthCm: evalDimension(p.width, vars), lengthCm: evalDimension(p.length, vars), mitred45: p.mitred45, fabricSlot: fabricSlotOf(p) }));
 }
 
 export interface GeometryProblem {

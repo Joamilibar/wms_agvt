@@ -1,4 +1,4 @@
-import { dim, addConst, hemAllowances, Hems, PanelSpec } from './geometry.js';
+import { dim, Hems, PanelSpec } from './geometry.js';
 import type { SheetingFamily, MeasureRange } from '../schemas/sheeting-model.schema.js';
 
 /**
@@ -26,35 +26,43 @@ export interface ReferenceModel {
 
 const simple = (cm: number) => ({ cm, fold: 'simple' as const });
 
-// ── Encimera (top sheet) ─────────────────────────────────────────────────────
+// ── Encimera crucero (top sheet with a double-layer frame) ───────────────────
 //
-// The sheet costs the top sheet as ONE panel: (A + 8) × (L + 15 + 4). The 8 is
-// the two 4 cm side hems, the 15 is the top hem that makes the "crucero"
-// border, the 4 the bottom hem. No seams: a single panel has none.
-//   Queen 255×290 → 263×309 · King 280×290 → 288×309 · SuperKing 300×290 → 308×309
+// How the workshop actually makes it (confirmed 21-09-2026), not how the
+// costing sheet costs it:
+//   - The finished A × L INCLUDES the frame. The frame runs on the top edge
+//     and both sides (not the bottom), F = 15 cm wide.
+//   - Each frame edge is ONE strip of (s + F + s) × 2 = 38 cm, folded in
+//     two (front and back layers), mitred at 45° — so its length is the side
+//     plus F at each end. Every sewn edge takes s = 2 cm (two 1 cm folds).
+//   - The centre panel loses F on the three framed edges, takes s where it
+//     enters the frame, and a plain b = 2 cm hem at the bottom.
+//   - The frame is white or coloured: its fabric can differ from the
+//     centre's, with its own roll width and its own $/ml (`fabricSlot`).
+//   SuperKing 300×290 → centro 274×279 · laterales 2 × (38 × 320) · superior 38 × 330
 //
-// The coloured "crucero" application the sheet adds on top (`A × 14` above,
-// `L × 14` on each side, "Telas color") is NOT in this geometry: it does not
-// reduce the centre and the spec's reference metres (3.09 ml Queen) exclude
-// it. Pending decision — see the step-3 report.
-const ENCIMERA_HEMS: Hems = { left: simple(4), right: simple(4), top: simple(15), bottom: simple(4) };
-const encimeraHem = hemAllowances(ENCIMERA_HEMS);
+// The sheet (REV ADR) costs the same product as a single 308×309 panel plus
+// a colour application that does not reduce the centre; that geometry is
+// kept only as a documented comparison in the tests.
+const ENCIMERA_HEMS: Hems = { bottom: simple(2) };
 
 export const ENCIMERA_CRUCERO: ReferenceModel = {
   code: 'ENCIMERA_CRUCERO',
   name: 'Sábana encimera crucero',
   family: 'encimera',
-  vars: {},
+  vars: { F: 15, s: 2, b: 2 },
   hems: ENCIMERA_HEMS,
   panels: [
-    { role: 'centro', count: 1, width: addConst(dim({ A: 1 }), encimeraHem.widthCm), length: addConst(dim({ L: 1 }), encimeraHem.lengthCm), mitred45: false },
+    { role: 'centro', count: 1, width: dim({ A: 1, F: -2, s: 2 }), length: dim({ L: 1, F: -1, s: 1, b: 1 }), mitred45: false, fabricSlot: 'base' },
+    { role: 'marco_lateral', count: 2, width: dim({ F: 2, s: 4 }), length: dim({ L: 1, F: 2 }), mitred45: true, fabricSlot: 'marco' },
+    { role: 'marco_superior', count: 1, width: dim({ F: 2, s: 4 }), length: dim({ A: 1, F: 2 }), mitred45: true, fabricSlot: 'marco' },
   ],
   cutBatchUnits: 20,
   packagingClp: 2100, // sheet: 0.4668 × 4500 (Queen); varies ±40 by size
   freightClp: 727, // Costos fijos 2023 J19
   validRange: { A: { min: 90, max: 400 }, L: { min: 200, max: 320 } },
   sampleVars: { A: 255, L: 290 },
-  notes: 'Un panel: A + 8 (bastas laterales 4+4) × L + 19 (basta superior 15, inferior 4). Reproduce la hoja REV ADR. La aplicación de color del crucero (A×14 arriba, L×14 por lado) queda pendiente de decisión.',
+  notes: 'Marco F = 15 arriba y en los dos lados, tira única de 2(s+F+s) = 38 cm doblada en dos, inglete a 45° (tira = lado + 2F). Centro A − 2F + 2s × L − F + s + b; basta inferior b = 2. El marco puede ir en otra tela (slot "marco").',
 };
 
 // ── Bajera elasticada ────────────────────────────────────────────────────────
