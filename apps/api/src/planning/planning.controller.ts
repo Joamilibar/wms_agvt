@@ -23,6 +23,8 @@ import { UpdateWarehouseDto, UpdateParamsDto, ChannelOverrideDto, LoadHistoryDto
 import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto, UpdateDraftPurchaseOrderDto, CreateOrderFromRunDto } from './dto/purchase-order.dto.js';
 import { PlanningRunsService } from './engine/planning-runs.service.js';
 import { StoreReplenishmentService } from './store/store-replenishment.service.js';
+import { ProductionService } from './production/production.service.js';
+import { UpsertRecipeDto, ImportRecipesDto, ProductionPlanDto, CreateProductionOrderDto, CompleteProductionDto } from './dto/production.dto.js';
 import { BulkIdealsDto, CreateTransferDto, UpdateTransferDto } from './dto/store.dto.js';
 import type { PoStatus } from './schemas/purchase-order.schema.js';
 import type { Channel } from './schemas/sales-history.schema.js';
@@ -41,6 +43,7 @@ export class PlanningController {
     private purchaseOrders: PurchaseOrdersService,
     private runs: PlanningRunsService,
     private store: StoreReplenishmentService,
+    private production: ProductionService,
     @InjectQueue(SALES_HISTORY_QUEUE) private historyQueue: Queue<LoadHistoryJob>,
   ) {}
 
@@ -361,6 +364,76 @@ export class PlanningController {
   @Roles('admin', 'supervisor')
   cancelTransfer(@Param('id') id: string) {
     return this.store.cancel(id);
+  }
+
+  // ── production (phase 3) ───────────────────────────────────────────────────
+
+  @Get('production/recipes')
+  @ApiOperation({ summary: 'Recetas activas (o todas las versiones con all=true)' })
+  recipes(@Query('all') all?: string) {
+    return this.production.listRecipes(all !== 'true');
+  }
+
+  @Post('production/recipes')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Guarda una receta; si cambia, crea una versión nueva y desactiva la anterior' })
+  saveRecipe(@Body() dto: UpsertRecipeDto, @CurrentUser('email') email: string) {
+    return this.production.saveRecipe(dto, email ?? 'unknown');
+  }
+
+  @Post('production/recipes/import')
+  @Roles('admin')
+  importRecipes(@Body() dto: ImportRecipesDto, @CurrentUser('email') email: string) {
+    return this.production.importRecipes(dto.recipes, email ?? 'unknown');
+  }
+
+  @Post('production/recipes/:parentSku/deactivate')
+  @Roles('admin', 'supervisor')
+  async deactivateRecipe(@Param('parentSku') parentSku: string) {
+    await this.production.deactivateRecipe(parentSku);
+    return { ok: true };
+  }
+
+  @Post('production/plan')
+  @ApiOperation({ summary: 'Plan de producción: candidatos de la corrida (o cantidades dadas) y explosión de insumos neteada' })
+  productionPlan(@Body() dto: ProductionPlanDto) {
+    return this.production.plan(dto.requests);
+  }
+
+  @Get('production/orders')
+  productionOrders() {
+    return this.production.listOrders();
+  }
+
+  @Post('production/orders')
+  @Roles('admin', 'supervisor')
+  createProductionOrder(@Body() dto: CreateProductionOrderDto, @CurrentUser('userId') userId: string) {
+    return this.production.createOrder(dto, userId ?? null);
+  }
+
+  @Post('production/orders/:id/approve')
+  @Roles('admin', 'supervisor')
+  approveProductionOrder(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.production.approve(id, userId ?? null);
+  }
+
+  @Post('production/orders/:id/start')
+  @Roles('admin', 'supervisor')
+  startProductionOrder(@Param('id') id: string) {
+    return this.production.start(id);
+  }
+
+  @Post('production/orders/:id/complete')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Completa: consume insumos FIFO en el taller y crea el lote terminado en el destino' })
+  completeProductionOrder(@Param('id') id: string, @Body() dto: CompleteProductionDto, @CurrentUser('userId') userId: string) {
+    return this.production.complete(id, dto.produced, userId ?? null);
+  }
+
+  @Post('production/orders/:id/cancel')
+  @Roles('admin', 'supervisor')
+  cancelProductionOrder(@Param('id') id: string) {
+    return this.production.cancel(id);
   }
 
   // ── purchase orders ────────────────────────────────────────────────────────

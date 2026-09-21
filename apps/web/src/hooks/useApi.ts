@@ -550,3 +550,65 @@ export const useTransferAction = () => {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'transfers'] }); qc.invalidateQueries({ queryKey: ['planning', 'storePlan'] }); qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['stock'] }); },
   });
 };
+
+// Planning (Fase 3): recipes and production
+export type Uom = 'un' | 'kg' | 'm';
+export interface RecipeComponent { sku: string; name: string; qty: number; uom: Uom; scrapPct: number | null }
+export interface BomRecipe { _id: string; parentSku: string; name: string; version: number; isActive: boolean; components: RecipeComponent[]; notes: string; setBy: string; updatedAt: string }
+export interface MaterialRequirement {
+  sku: string; name: string; uom: Uom; required: number; level: number; from: { parentSku: string; qty: number }[];
+  available: number; onOrder: number; shortage: number;
+}
+export interface ProductionPlan {
+  runNumber: string | null; workshops: string[]; productionWarehouses: string[];
+  candidates: { sku: string; name: string; category: string; state: string; suggested: number; hasRecipe: boolean; recipeVersion: number | null }[];
+  requests: { sku: string; qty: number }[];
+  materials: MaterialRequirement[];
+  intermediates: Omit<MaterialRequirement, 'available' | 'onOrder' | 'shortage'>[];
+  missingRecipes: string[];
+  summary: { products: number; units: number; materials: number; shortages: number; kgDown: number; kgFeathers: number };
+}
+export interface ProductionOrder {
+  _id: string; number: string; workshop: string; destinationWarehouse: string;
+  status: 'draft' | 'approved' | 'in_progress' | 'completed' | 'cancelled';
+  lines: { sku: string; name: string; qty: number; qtyProduced: number; recipeVersion: number; reason: string }[];
+  materials: { sku: string; name: string; uom: Uom; required: number; available: number; consumed: number }[];
+  producedLots: string[]; notes: string; createdAt: string; completedAt: string | null;
+}
+export const useRecipes = () => useQuery({ queryKey: ['planning', 'recipes'], queryFn: () => api.get('/planning/production/recipes').then(r => r.data as BomRecipe[]) });
+export const useSaveRecipe = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { parentSku: string; name?: string; components: { sku: string; qty: number; uom: Uom; scrapPct?: number | null }[]; notes?: string }) =>
+      api.post('/planning/production/recipes', data).then(r => r.data as BomRecipe),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'recipes'] }); qc.invalidateQueries({ queryKey: ['planning', 'productionPlan'] }); },
+  });
+};
+export const useDeactivateRecipe = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (parentSku: string) => api.post(`/planning/production/recipes/${encodeURIComponent(parentSku)}/deactivate`).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'recipes'] }); qc.invalidateQueries({ queryKey: ['planning', 'productionPlan'] }); },
+  });
+};
+export const useProductionPlan = (requests: { sku: string; qty: number }[] | null) => useQuery({
+  queryKey: ['planning', 'productionPlan', requests],
+  queryFn: () => api.post('/planning/production/plan', requests ? { requests } : {}).then(r => r.data as ProductionPlan),
+});
+export const useProductionOrders = () => useQuery({ queryKey: ['planning', 'productionOrders'], queryFn: () => api.get('/planning/production/orders').then(r => r.data as ProductionOrder[]) });
+export const useCreateProductionOrder = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { workshop: string; destinationWarehouse?: string; lines: { sku: string; qty: number; reason?: string }[]; notes?: string }) =>
+      api.post('/planning/production/orders', data).then(r => r.data as ProductionOrder),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'productionOrders'] }); },
+  });
+};
+export const useProductionOrderAction = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action, body }: { id: string; action: 'approve' | 'start' | 'complete' | 'cancel'; body?: Record<string, unknown> }) =>
+      api.post(`/planning/production/orders/${id}/${action}`, body ?? {}).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'productionOrders'] }); qc.invalidateQueries({ queryKey: ['planning', 'productionPlan'] }); qc.invalidateQueries({ queryKey: ['stock'] }); },
+  });
+};

@@ -16,6 +16,9 @@ import { IdealStock, IdealStockSchema } from './schemas/ideal-stock.schema.js';
 import { TransferOrder, TransferOrderSchema } from './schemas/transfer-order.schema.js';
 import { Order, OrderSchema } from '../orders/schemas/order.schema.js';
 import { OrdersModule } from '../orders/orders.module.js';
+import { StockModule } from '../stock/stock.module.js';
+import { BomRecipe, BomRecipeSchema } from './schemas/bom-recipe.schema.js';
+import { ProductionOrder, ProductionOrderSchema } from './schemas/production-order.schema.js';
 import { WarehousesService } from './masters/warehouses.service.js';
 import { SuppliersService } from './masters/suppliers.service.js';
 import { PlanningItemsService } from './masters/planning-items.service.js';
@@ -25,13 +28,15 @@ import { SalesHistoryProcessor, SALES_HISTORY_QUEUE } from './sales-history/sale
 import { PurchaseOrdersService } from './purchase-orders/purchase-orders.service.js';
 import { PlanningRunsService } from './engine/planning-runs.service.js';
 import { StoreReplenishmentService } from './store/store-replenishment.service.js';
+import { ProductionService } from './production/production.service.js';
 import { PlanningController } from './planning.controller.js';
 
 /**
  * Purchasing, production and store replenishment share one demand engine.
  * Phase 0 holds the masters, the parameters and the sales history; phase 1
  * adds the engine (`engine/`), the saved runs and the purchase-order cycle;
- * phase 2 the store replenishment (`store/`) on top of the WMS picking.
+ * phase 2 the store replenishment (`store/`) on top of the WMS picking;
+ * phase 3 recipes, the material explosion and production orders (`production/`).
  */
 @Module({
   imports: [
@@ -46,6 +51,8 @@ import { PlanningController } from './planning.controller.js';
       { name: IdealStock.name, schema: IdealStockSchema },
       { name: TransferOrder.name, schema: TransferOrderSchema },
       { name: Order.name, schema: OrderSchema },
+      { name: BomRecipe.name, schema: BomRecipeSchema },
+      { name: ProductionOrder.name, schema: ProductionOrderSchema },
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
@@ -53,6 +60,7 @@ import { PlanningController } from './planning.controller.js';
     BsaleModule,
     CountersModule,
     OrdersModule,
+    StockModule,
   ],
   controllers: [PlanningController],
   providers: [
@@ -65,7 +73,8 @@ import { PlanningController } from './planning.controller.js';
     PurchaseOrdersService,
     PlanningRunsService,
     StoreReplenishmentService,
+    ProductionService,
   ],
-  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService],
+  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService],
 })
 export class PlanningModule {}

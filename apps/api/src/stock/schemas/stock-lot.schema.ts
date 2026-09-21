@@ -23,6 +23,10 @@ export class StockLot {
   @Prop({ required: true, min: 0 })
   qty!: number;
 
+  /** Unit of `qty`: pieces for product, kilos for down and feathers, metres for fabric. */
+  @Prop({ type: String, enum: ['un', 'kg', 'm'], default: 'un' })
+  uom!: 'un' | 'kg' | 'm';
+
   @Prop({ required: true, min: 0 })
   initialQty!: number;
 

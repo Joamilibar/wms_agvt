@@ -3,6 +3,8 @@ import { usePlanningAlerts } from '../hooks/useApi';
 import BoardTab from '../components/Planning/BoardTab';
 import ProposalTab from '../components/Planning/ProposalTab';
 import StoreTab from '../components/Planning/StoreTab';
+import ProductionTab from '../components/Planning/ProductionTab';
+import RecipesTab from '../components/Planning/RecipesTab';
 import HistoryTab from '../components/Planning/HistoryTab';
 import DocumentsTab from '../components/Planning/DocumentsTab';
 import ItemsTab from '../components/Planning/ItemsTab';
@@ -13,6 +15,8 @@ const TABS = [
   { key: 'board', label: 'Tablero' },
   { key: 'proposal', label: 'Pedido' },
   { key: 'store', label: 'Tienda' },
+  { key: 'production', label: 'Producción' },
+  { key: 'recipes', label: 'Recetas' },
   { key: 'history', label: 'Historial' },
   { key: 'documents', label: 'Documentos' },
   { key: 'items', label: 'Abastecimiento' },
@@ -34,7 +38,7 @@ export default function Planificacion() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Planificación</h1>
-        <p className="text-sm text-text-muted mt-1">Semáforo por SKU, pedido por proveedor, reposición a tienda, historial por canal y fichas de abastecimiento</p>
+        <p className="text-sm text-text-muted mt-1">Semáforo por SKU, pedido por proveedor, reposición a tienda, producción con recetas, historial por canal y fichas de abastecimiento</p>
       </div>
 
       <div className="flex flex-wrap gap-1 border-b border-border-primary">
@@ -55,6 +59,8 @@ export default function Planificacion() {
       {tab === 'board' && <BoardTab />}
       {tab === 'proposal' && <ProposalTab />}
       {tab === 'store' && <StoreTab />}
+      {tab === 'production' && <ProductionTab />}
+      {tab === 'recipes' && <RecipesTab />}
       {tab === 'history' && <HistoryTab />}
       {tab === 'documents' && <DocumentsTab />}
       {tab === 'items' && <ItemsTab />}

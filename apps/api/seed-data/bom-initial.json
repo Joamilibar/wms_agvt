@@ -1,0 +1,1189 @@
+{
+ "recipes": [
+  {
+   "parentSku": "62697037601495",
+   "name": "Almohada Pluss King (750)",
+   "components": [
+    {
+     "sku": "62697042662231",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.3936,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.6824,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 6: tubo 328 g + costado 210 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037672151",
+   "name": "Almohada Pluss King (850)",
+   "components": [
+    {
+     "sku": "62697042406103",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.3744,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.2496,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.4,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 6: tubo 312 g (mezcla 40 % D750) + costado 200 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037583831",
+   "name": "Almohada Classic King (750)",
+   "components": [
+    {
+     "sku": "62697042662231",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.372,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.608,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 7: tubo 310 g + costado 180 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037654487",
+   "name": "Almohada Classic King (850)",
+   "components": [
+    {
+     "sku": "62697042406103",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.3624,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.2416,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.344,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 7: tubo 302 g (mezcla 40 % D750) + costado 172 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037566167",
+   "name": "Almohada Soft King (750)",
+   "components": [
+    {
+     "sku": "62697042662231",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.312,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.528,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 8: tubo 260 g + costado 160 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037636823",
+   "name": "Almohada Soft King (850)",
+   "components": [
+    {
+     "sku": "62697042406103",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.3456,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.2304,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.306,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 8: tubo 288 g (mezcla 40 % D750) + costado 153 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037592663",
+   "name": "Almohada Pluss Americana (750)",
+   "components": [
+    {
+     "sku": "62697042653399",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.2328,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.4152,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 20: tubo 194 g + costado 130 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037663319",
+   "name": "Almohada Pluss Americana (850)",
+   "components": [
+    {
+     "sku": "62697042397271",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.2208,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.1472,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.248,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 20: tubo 184 g (mezcla 40 % D750) + costado 124 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037574999",
+   "name": "Almohada Classic Americana (750)",
+   "components": [
+    {
+     "sku": "62697042653399",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.216,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.384,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 21: tubo 180 g + costado 120 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037645655",
+   "name": "Almohada Classic Americana (850)",
+   "components": [
+    {
+     "sku": "62697042397271",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.2064,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.1376,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.228,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 21: tubo 172 g (mezcla 40 % D750) + costado 114 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037557335",
+   "name": "Almohada Soft Americana (750)",
+   "components": [
+    {
+     "sku": "62697042653399",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.2016,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.3544,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 22: tubo 168 g + costado 110 g, ×2 (celda H2), mezcla 40 % duvet en el tubo. Revisar el ×2."
+  },
+  {
+   "parentSku": "62697037627991",
+   "name": "Almohada Soft Americana (850)",
+   "components": [
+    {
+     "sku": "62697042397271",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 0.192,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.128,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.21,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 22: tubo 160 g (mezcla 40 % D750) + costado 105 g de D850, ×2 (celda H2). Revisar el ×2."
+  },
+  {
+   "parentSku": "62697039774167",
+   "name": "Plumón Std SK V",
+   "components": [
+    {
+     "sku": "62697042547415",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.616,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 5: 616 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039818327",
+   "name": "Plumón Std SK T/E",
+   "components": [
+    {
+     "sku": "62697042308951",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.109,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 6: 1109 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039862487",
+   "name": "Plumón Std SK Inv",
+   "components": [
+    {
+     "sku": "62697042308951",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.417,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 7: 1417 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039765335",
+   "name": "Plumón Std K V",
+   "components": [
+    {
+     "sku": "62697042538583",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.572,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 9: 572.0000000000001 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039809495",
+   "name": "Plumón Std K T/E",
+   "components": [
+    {
+     "sku": "62697042300119",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.03,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 10: 1030 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039853655",
+   "name": "Plumón Std K Inv",
+   "components": [
+    {
+     "sku": "62697042300119",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.316,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 11: 1316 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039756503",
+   "name": "Plumón Std Q V",
+   "components": [
+    {
+     "sku": "62697042529751",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.484,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 13: 484.00000000000006 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039800663",
+   "name": "Plumón Std Q T/E",
+   "components": [
+    {
+     "sku": "62697042291287",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.871,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 14: 871 g de 770 FP."
+  },
+  {
+   "parentSku": "62697039844823",
+   "name": "Plumón Std Q Inv",
+   "components": [
+    {
+     "sku": "62697042291287",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.113,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 15: 1113 g de 770 FP."
+  },
+  {
+   "parentSku": "72442525245511",
+   "name": "Plumón Std T V",
+   "components": [
+    {
+     "sku": "62697042520919",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.396,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 17: 396.00000000000006 g de 770 FP."
+  },
+  {
+   "parentSku": "72442489189675",
+   "name": "Plumón Std T T/E",
+   "components": [
+    {
+     "sku": "70749550072166",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.713,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 18: 713 g de 770 FP."
+  },
+  {
+   "parentSku": "72442450224800",
+   "name": "Plumón Std T Inv",
+   "components": [
+    {
+     "sku": "70749550072166",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.911,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 19: 911 g de 770 FP."
+  },
+  {
+   "parentSku": "72442242518064",
+   "name": "Plumón Std S V",
+   "components": [
+    {
+     "sku": "73254408399742",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.352,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 21: 352.00000000000006 g de 770 FP."
+  },
+  {
+   "parentSku": "72442209689596",
+   "name": "Plumón Std S T/E",
+   "components": [
+    {
+     "sku": "62697042282455",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.634,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 22: 634 g de 770 FP."
+  },
+  {
+   "parentSku": "72442169316566",
+   "name": "Plumón Std S Inv",
+   "components": [
+    {
+     "sku": "62697042282455",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.81,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 23: 810 g de 770 FP."
+  },
+  {
+   "parentSku": "72961551039820",
+   "name": "Plumón Premium SK V Cima  B",
+   "components": [
+    {
+     "sku": "72315575223601",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.585,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 5: 585 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039641687",
+   "name": "Plumón Premium SK V",
+   "components": [
+    {
+     "sku": "62697042388439",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.585,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 6: 585 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039685847",
+   "name": "Plumón Premium SK T/E",
+   "components": [
+    {
+     "sku": "62697042388439",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 1.0534,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 7: 1053.3600000000001 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039730007",
+   "name": "Plumón Premium SK Inv",
+   "components": [
+    {
+     "sku": "62697042388439",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 1.3059,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 8: 1305.92 g de 850 FP."
+  },
+  {
+   "parentSku": "72961588463989",
+   "name": "Plumón Premium K V Cima  B",
+   "components": [
+    {
+     "sku": "72315556966485",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.543,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 10: 543 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039632855",
+   "name": "Plumón Premium K V",
+   "components": [
+    {
+     "sku": "62697042379607",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.543,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 11: 543 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039677015",
+   "name": "Plumón Premium K T/E",
+   "components": [
+    {
+     "sku": "62697042379607",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.9781,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 12: 978.1200000000001 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039721175",
+   "name": "Plumón Premium K Inv",
+   "components": [
+    {
+     "sku": "62697042379607",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 1.2126,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 13: 1212.64 g de 850 FP."
+  },
+  {
+   "parentSku": "72961576361517",
+   "name": "Plumón Premium Q V Cima  B",
+   "components": [
+    {
+     "sku": "72315361282420",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.46,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 15: 460 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039624023",
+   "name": "Plumón Premium Q V",
+   "components": [
+    {
+     "sku": "62697042370775",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.46,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 16: 460 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039668183",
+   "name": "Plumón Premium Q T/E",
+   "components": [
+    {
+     "sku": "62697042370775",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.8276,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 17: 827.6400000000001 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039712343",
+   "name": "Plumón Premium Q Inv",
+   "components": [
+    {
+     "sku": "62697042370775",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 1.0261,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 18: 1026.0800000000002 g de 850 FP."
+  },
+  {
+   "parentSku": "72442537452398",
+   "name": "Plumón Premium T V",
+   "components": [
+    {
+     "sku": "76036490582482",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.376,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 20: 376 g de 850 FP."
+  },
+  {
+   "parentSku": "72442508598529",
+   "name": "Plumón Premium T T/E",
+   "components": [
+    {
+     "sku": "76036490582482",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.677,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 21: 677 g de 850 FP."
+  },
+  {
+   "parentSku": "72442462186830",
+   "name": "Plumón Premium T Inv",
+   "components": [
+    {
+     "sku": "76036490582482",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.84,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 22: 840 g de 850 FP."
+  },
+  {
+   "parentSku": "72442250951654",
+   "name": "Plumón Premium S V",
+   "components": [
+    {
+     "sku": "62697042361943",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.334,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 24: 334 g de 850 FP."
+  },
+  {
+   "parentSku": "72442219502179",
+   "name": "Plumón Premium S T/E",
+   "components": [
+    {
+     "sku": "62697042361943",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.602,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 25: 602 g de 850 FP."
+  },
+  {
+   "parentSku": "72442183265251",
+   "name": "Plumón Premium S Inv",
+   "components": [
+    {
+     "sku": "62697042361943",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042750551",
+     "qty": 0.746,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 26: 746 g de 850 FP."
+  },
+  {
+   "parentSku": "62697039438551",
+   "name": "Featherbed SK (15 % duvet)",
+   "components": [
+    {
+     "sku": "62697042635735",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 6.12,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.08,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 6: 7200 g, 15 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039491543",
+   "name": "Featherbed SK (25 % duvet)",
+   "components": [
+    {
+     "sku": "62697042635735",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 5.1,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.7,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 7: 6800 g, 25 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039544535",
+   "name": "Featherbed SK (50 % duvet)",
+   "components": [
+    {
+     "sku": "62697042635735",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 3.3,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 3.3,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 8: 6600 g, 50 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039429719",
+   "name": "Featherbed K (15 % duvet)",
+   "components": [
+    {
+     "sku": "62697042626903",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 5.508,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.972,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 10: 6480 g, 15 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039482711",
+   "name": "Featherbed K (25 % duvet)",
+   "components": [
+    {
+     "sku": "62697042626903",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 4.59,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.53,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 11: 6120 g, 25 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039535703",
+   "name": "Featherbed K (50 % duvet)",
+   "components": [
+    {
+     "sku": "62697042626903",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 2.97,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 2.97,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 12: 5940 g, 50 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039420887",
+   "name": "Featherbed Q (15 % duvet)",
+   "components": [
+    {
+     "sku": "62697042618071",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 4.743,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.837,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 14: 5580 g, 15 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039473879",
+   "name": "Featherbed Q (25 % duvet)",
+   "components": [
+    {
+     "sku": "62697042618071",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 3.9525,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.3175,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 15: 5270 g, 25 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039526871",
+   "name": "Featherbed Q (50 % duvet)",
+   "components": [
+    {
+     "sku": "62697042618071",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 2.5575,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 2.5575,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 16: 5115 g, 50 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039412055",
+   "name": "Featherbed T (15 % duvet)",
+   "components": [
+    {
+     "sku": "62697042609239",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 3.213,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.567,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 18: 3780 g, 15 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039465047",
+   "name": "Featherbed T (25 % duvet)",
+   "components": [
+    {
+     "sku": "62697042609239",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 2.6775,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.8925,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 19: 3570 g, 25 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039518039",
+   "name": "Featherbed T (50 % duvet)",
+   "components": [
+    {
+     "sku": "62697042609239",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 1.7325,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.7325,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 20: 3465 g, 50 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039403223",
+   "name": "Featherbed S (15 % duvet)",
+   "components": [
+    {
+     "sku": "62697042600407",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 2.754,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.486,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 22: 3240 g, 15 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039456215",
+   "name": "Featherbed S (25 % duvet)",
+   "components": [
+    {
+     "sku": "62697042600407",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 2.295,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 0.765,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 23: 3060 g, 25 % duvet 770 FP."
+  },
+  {
+   "parentSku": "62697039509207",
+   "name": "Featherbed S (50 % duvet)",
+   "components": [
+    {
+     "sku": "62697042600407",
+     "qty": 1,
+     "uom": "un"
+    },
+    {
+     "sku": "62697042759383",
+     "qty": 1.485,
+     "uom": "kg"
+    },
+    {
+     "sku": "62697042741719",
+     "qty": 1.485,
+     "uom": "kg"
+    }
+   ],
+   "notes": "Cálculo_Plumas fila 24: 2970 g, 50 % duvet 770 FP."
+  }
+ ]
+}
