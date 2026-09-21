@@ -21,3 +21,12 @@ export function getErrorMessage(error: unknown, fallback = 'Ocurrió un error in
 
   return fallback;
 }
+
+/** The structured `details` a 4xx may carry (see the API's AllExceptionsFilter), typed by the caller. */
+export function getErrorDetails<T>(error: unknown): T | null {
+  if (error instanceof AxiosError) {
+    const data = error.response?.data as { details?: T } | undefined;
+    return data?.details ?? null;
+  }
+  return null;
+}

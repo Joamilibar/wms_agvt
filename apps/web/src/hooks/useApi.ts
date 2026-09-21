@@ -717,3 +717,59 @@ export interface PlanningKpis {
 export interface PlanningAlert { type: string; severity: 'critical' | 'high' | 'medium' | 'low'; message: string; sku?: string; ref?: string }
 export const usePlanningKpis = () => useQuery({ queryKey: ['planning', 'kpis'], queryFn: () => api.get('/planning/kpis').then(r => r.data as PlanningKpis) });
 export const useOperationalAlerts = () => useQuery({ queryKey: ['planning', 'kpis', 'alerts'], queryFn: () => api.get('/planning/alerts').then(r => r.data as PlanningAlert[]) });
+
+// Planning · Sabanería (consumo de tela y cotizador)
+export interface FabricSpec { _id: string; sku: string; name: string; rollWidthCm: number; selvageCm: number; directional: boolean; quality: string; bsaleVariantId: string | null; isActive: boolean; notes: string }
+export interface SheetingTerm { var: string; coef: number }
+export interface SheetingDimension { terms: SheetingTerm[]; const: number }
+export interface SheetingPanel { role: string; count: number; width: SheetingDimension; length: SheetingDimension; mitred45: boolean; fabricSlot?: string }
+export interface SheetingModel {
+  _id: string; code: string; name: string; family: 'encimera' | 'bajera' | 'funda' | 'cubreplumon' | 'otro'; version: number; isActive: boolean;
+  vars: Record<string, number>; panels: SheetingPanel[]; hems: Record<string, { cm: number; fold: 'simple' | 'doble' }>; cutBatchUnits: number;
+  packagingClp: number; freightClp: number; validRange: Record<string, { min: number; max: number }>; sampleVars: Record<string, number>; notes: string;
+  panelsText: { role: string; count: number; width: string; length: string; mitred45: boolean }[];
+}
+export interface WorkshopRate { _id: string; workshop: string; modelCode: string; sizeLabel: string | null; quality: string | null; rate: number; validFrom: string; validTo: string | null; version: number; isActive: boolean; notes: string }
+export interface SheetingQuoteInput {
+  modelCode: string; modelVersion?: number; fabricSku: string; frameFabricSku?: string; measures: Record<string, number>; qty: number;
+  workshop: string; channel: string; sizeLabel?: string; cutBatchUnits?: number;
+}
+export interface SheetingFabricCost { sku: string; pricePerLinearMetre: number; costSource: 'bsale' | 'stale'; costSyncedAt: string | null; unit: 'ml' }
+export interface SheetingQuoteFabric {
+  slot: string; sku: string; name: string; rollWidthCm: number; usableWidthCm: number; directional: boolean;
+  consumption: { linearMetresPerUnit: number; linearMetresWithScrapPerUnit: number; netAreaM2PerUnit: number; rollAreaM2PerUnit: number; wastePct: number };
+  cost: SheetingFabricCost; fabricClp: number; theoreticalClp: number;
+}
+export interface SheetingQuote {
+  model: { code: string; version: number; name: string; family: string };
+  fabric: { sku: string; name: string; rollWidthCm: number; usableWidthCm: number; directional: boolean };
+  fabrics: SheetingQuoteFabric[];
+  measures: Record<string, number>; qty: number; workshop: string; channel: string; sizeLabel: string | null;
+  pieces: { role: string; count: number; widthCm: number; lengthCm: number; mitred45: boolean; fabricSlot: string; fabricSku: string; orientation: 'al_hilo' | 'contrahilo'; piecesAcross: number; linearMetresPerUnit: number }[];
+  consumption: { linearMetresPerUnit: number; linearMetresTotal: number; cuttingScrapPct: number; linearMetresWithScrapPerUnit: number; linearMetresWithScrapTotal: number; netAreaM2PerUnit: number; rollAreaM2PerUnit: number; wastePct: number; cutBatchUnits: number };
+  fabricCost: SheetingFabricCost;
+  cost: { fabric: number; labour: number; packaging: number; freight: number; supplies: number; total: number; totalQty: number };
+  theoretical: { netAreaM2: number; pricePerM2: number; fabric: number; deltaPct: number };
+  price: { marginFactor: number; netPvp: number; grossPvp: number; vatRate: number };
+  supplies: { sku: string; name: string; qty: number; uom: string; unitCost: number | null; cost: number }[];
+  labourRate: { rate: number; sizeLabel: string | null; quality: string | null; version: number };
+  paramsVersion: number; warnings: string[];
+}
+/** Structured error the quote returns in `details` (see AllExceptionsFilter). */
+export interface SheetingQuoteError {
+  code: 'FABRIC_TOO_NARROW' | 'NO_WORKSHOP_RATE' | 'NO_FABRIC_COST' | 'MISSING_MEASURES' | 'IMPOSSIBLE_GEOMETRY';
+  slot?: string; role?: string; requiredWidthCm?: number; availableWidthCm?: number;
+  alternatives?: { sku: string; name: string; rollWidthCm: number }[];
+  workshop?: string; modelCode?: string; sizeLabel?: string | null; quality?: string | null; sku?: string; missing?: string[];
+}
+export const useFabrics = () => useQuery({ queryKey: ['sheeting', 'fabrics'], queryFn: () => api.get('/planning/sheeting/fabrics').then(r => r.data as FabricSpec[]) });
+export const useSheetingModels = () => useQuery({ queryKey: ['sheeting', 'models'], queryFn: () => api.get('/planning/sheeting/models').then(r => r.data as SheetingModel[]) });
+export const useWorkshopRates = (workshop?: string) => useQuery({ queryKey: ['sheeting', 'rates', workshop], queryFn: () => api.get('/planning/sheeting/rates', { params: { workshop } }).then(r => r.data as WorkshopRate[]) });
+/** Idempotent and side-effect free: safe to call on every keystroke (debounced). A 400 carries `details` with the reason. */
+export const useSheetingQuote = (input: SheetingQuoteInput | null) => useQuery({
+  queryKey: ['sheeting', 'quote', input],
+  enabled: !!input,
+  retry: false,
+  placeholderData: (prev) => prev,
+  queryFn: () => api.post('/planning/sheeting/quote', input).then(r => r.data as SheetingQuote),
+});
