@@ -1,6 +1,7 @@
 import { evaluatePanels, findGeometryProblems, panelVars } from './geometry.js';
 import { nestPieces } from './nesting.js';
-import { ENCIMERA_CRUCERO, BAJERA_ELASTICADA, REFERENCE_FABRICS, REFERENCE_MODELS } from './reference-models.js';
+import { ENCIMERA_CRUCERO, BAJERA_ELASTICADA, FUNDA_ALMOHADA_LINO_MARCO, CUBREPLUMON, REFERENCE_FABRICS, REFERENCE_MODELS } from './reference-models.js';
+import { compileBlocks } from './blocks.js';
 
 const cut = (model: typeof ENCIMERA_CRUCERO, measures: Record<string, number>) =>
   evaluatePanels(model.panels, { ...model.vars, ...measures });
@@ -86,13 +87,36 @@ describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas T
 
   });
 
-  it('every preloaded model is well-formed on its sample measures', () => {
+  it('every preloaded model is well-formed on its sample measures (block models compiled first)', () => {
     for (const m of REFERENCE_MODELS) {
-      expect(findGeometryProblems(m.panels, { ...m.vars, ...m.sampleVars })).toEqual([]);
-      for (const v of panelVars(m.panels)) expect(v in m.vars || v in m.sampleVars).toBe(true);
+      const compiled = m.blocks.length ? compileBlocks(m.blocks) : { panels: m.panels, vars: {} };
+      const panels = m.panels.length ? m.panels : compiled.panels;
+      const vars = { ...m.vars, ...compiled.vars };
+      expect(panels.length).toBeGreaterThan(0);
+      expect(findGeometryProblems(panels, { ...vars, ...m.sampleVars })).toEqual([]);
+      for (const v of panelVars(panels)) expect(v in vars || v in m.sampleVars).toBe(true);
     }
+    expect(new Set(REFERENCE_MODELS.map((m) => m.code)).size).toBe(REFERENCE_MODELS.length);
     expect(new Set(REFERENCE_FABRICS.map((f) => f.sku)).size).toBe(REFERENCE_FABRICS.length);
     // Two linen widths coexist; the width is data, never a constant.
     expect(new Set(REFERENCE_FABRICS.map((f) => f.rollWidthCm)).size).toBeGreaterThan(2);
+  });
+
+  it('linen pillowcase with frame and the duvet cover compile to the expected panels', () => {
+    const funda = compileBlocks(FUNDA_ALMOHADA_LINO_MARCO.blocks);
+    const cut = evaluatePanels(funda.panels, { ...FUNDA_ALMOHADA_LINO_MARCO.vars, ...funda.vars, A: 50, L: 70 });
+    expect(cut.map((c) => [c.role, c.count, c.widthCm, c.lengthCm])).toEqual([
+      ['frente', 1, 46, 66], ['marco_lateral', 2, 8, 78], ['marco_horizontal', 2, 8, 58], ['reverso', 1, 46, 66], ['traslape', 1, 46, 34],
+    ]);
+    // Every piece of the linen case fits the 290 linen roll (288 usable), many across.
+    const nested = nestPieces(cut, 288, { rollWidthCm: 290, batchUnits: 20 });
+    if ('code' in nested) throw new Error(nested.code);
+    expect(nested.linearMetresPerUnit).toBeLessThan(1);
+
+    const duvet = compileBlocks(CUBREPLUMON.blocks);
+    const dcut = evaluatePanels(duvet.panels, { ...CUBREPLUMON.vars, ...duvet.vars, A: 225, L: 225 });
+    expect(dcut.map((c) => [c.role, c.count, c.widthCm, c.lengthCm])).toEqual([
+      ['frente', 1, 229, 229], ['reverso', 1, 229, 229], ['huincha_lateral', 2, 30, 225], ['huincha_horizontal', 2, 30, 225],
+    ]);
   });
 });

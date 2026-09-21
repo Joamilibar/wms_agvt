@@ -97,7 +97,61 @@ export const BAJERA_ELASTICADA: ReferenceModel = {
   notes: 'Medidas del colchón. Ancho A + 2(H+T) + sw, largo L + 2(H+T) + sl. sw = 16 y sl = 0 reproducen la hoja (Costura + Merma 8+8 solo al ancho); T = 10 agarre. Pendiente confirmar con el taller si la caída 80/90 de la hoja es total o por lado.',
 };
 
-export const REFERENCE_MODELS: ReferenceModel[] = [ENCIMERA_CRUCERO, BAJERA_ELASTICADA];
+// ── Fundas y cubreplumón (built from blocks; the sheet `Cubreplumones y Fundas Lino`) ──
+//
+// The linen sheet costs a pillowcase as front (53+8)×81 + back 65×75 + flap
+// 30×65 for the Americana and lists a 4 cm frame it does not add to the
+// area; the duvet cover as (A+8)×(L+8) + a 210-high back + a 26 cm tape.
+// Those figures do not map onto a construction the workshop confirmed, so
+// these models carry the block vocabulary with the sheet's parameters and
+// a note: they are meant to be duplicated and adjusted in the builder.
+const fromBlocks = (m: Omit<ReferenceModel, 'panels' | 'vars' | 'hems'> & { vars?: Record<string, number> }): ReferenceModel => ({ ...m, vars: m.vars ?? { s: 2 }, hems: {}, panels: [] });
+
+export const FUNDA_ALMOHADA: ReferenceModel = fromBlocks({
+  code: 'FUNDA_ALMOHADA',
+  name: 'Funda de almohada con traslape',
+  family: 'funda',
+  blocks: [{ block: 'panel_simple', params: { role: 'frente' } }, { block: 'reverso', params: {} }, { block: 'traslape', params: { O: 30 } }],
+  cutBatchUnits: 20,
+  packagingClp: 800,
+  freightClp: 260, // Costos fijos 2023 J20
+  validRange: { A: { min: 30, max: 80 }, L: { min: 40, max: 110 } },
+  sampleVars: { A: 50, L: 70 },
+  notes: 'Frente + reverso + traslape de 30 (hoja lino: traslape 30). Americana 50×70, King 50×90. Sin marco: la línea de algodón. Verificar traslape y bastas con el taller.',
+});
+
+export const FUNDA_ALMOHADA_LINO_MARCO: ReferenceModel = fromBlocks({
+  code: 'FUNDA_ALMOHADA_LINO_MARCO',
+  name: 'Funda de almohada lino con marco',
+  family: 'funda',
+  blocks: [
+    { block: 'panel_simple', params: { role: 'frente' } },
+    { block: 'marco', params: { F: 4, edges: 'top,bottom,left,right', layers: 1, mitred: true, fabricSlot: 'base' } },
+    { block: 'reverso', params: {} },
+    { block: 'traslape', params: { O: 30 } },
+  ],
+  cutBatchUnits: 20,
+  packagingClp: 800,
+  freightClp: 260,
+  validRange: { A: { min: 30, max: 80 }, L: { min: 40, max: 110 } },
+  sampleVars: { A: 50, L: 70 },
+  notes: 'Lino: marco de 4 cm (5 en Vira Vira) con inglete, tira simple en la misma tela. La hoja lista el marco pero no lo suma al área. Verificar con el taller si el reverso también lleva marco.',
+});
+
+export const CUBREPLUMON: ReferenceModel = fromBlocks({
+  code: 'CUBREPLUMON',
+  name: 'Cubreplumón con huincha',
+  family: 'cubreplumon',
+  blocks: [{ block: 'panel_simple', params: { role: 'frente' } }, { block: 'reverso', params: {} }, { block: 'huincha', params: { Hu: 26 } }],
+  cutBatchUnits: 10,
+  packagingClp: 4500,
+  freightClp: 1895, // Costos fijos 2023 F15 (por juego)
+  validRange: { A: { min: 140, max: 300 }, L: { min: 200, max: 260 } },
+  sampleVars: { A: 225, L: 225 },
+  notes: 'Frente + reverso + huincha de 26 (23 en piecera). La hoja de lino corta el reverso a 210 de alto, no al largo completo: confirmar con el taller (cierre por traslape interno o por huincha).',
+});
+
+export const REFERENCE_MODELS: ReferenceModel[] = [ENCIMERA_CRUCERO, BAJERA_ELASTICADA, FUNDA_ALMOHADA, FUNDA_ALMOHADA_LINO_MARCO, CUBREPLUMON];
 
 // ── Fabrics ──────────────────────────────────────────────────────────────────
 

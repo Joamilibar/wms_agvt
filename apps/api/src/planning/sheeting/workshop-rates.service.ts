@@ -19,7 +19,8 @@ export interface RateInput {
  * The costing sheet's labour column (REV ADR, 21-09-2026), loaded as-is for
  * every active workshop until the workshops hand in their own lists:
  * top sheet 500TC $12.000 / $14.000, 800TC and 1600TC $14.000 / $16.000
- * (small sizes / Queen and up); fitted sheet $6.000 / $7.000.
+ * (small sizes / Queen and up); fitted sheet $6.000 / $7.000; pillowcase
+ * $4.560 and duvet cover $10.560 from the linen sheet.
  */
 const SMALL = ['Single', 'Twin', 'Full'];
 const LARGE = ['Queen', 'King', 'SuperKing'];
@@ -32,6 +33,10 @@ export const SHEET_RATES: { modelCode: string; quality: string | null; sizes: st
   { modelCode: 'ENCIMERA_CRUCERO', quality: '1600TC', sizes: LARGE, rate: 16000 },
   { modelCode: 'BAJERA_ELASTICADA', quality: null, sizes: SMALL, rate: 6000 },
   { modelCode: 'BAJERA_ELASTICADA', quality: null, sizes: LARGE, rate: 7000 },
+  // Sheet `Cubreplumones y Fundas Lino`: pillowcase $4.560 (any size), duvet cover $10.560.
+  { modelCode: 'FUNDA_ALMOHADA', quality: null, sizes: [], rate: 4560 },
+  { modelCode: 'FUNDA_ALMOHADA_LINO_MARCO', quality: null, sizes: [], rate: 4560 },
+  { modelCode: 'CUBREPLUMON', quality: null, sizes: [], rate: 10560 },
 ];
 
 @Injectable()
@@ -94,7 +99,8 @@ export class WorkshopRatesService {
     let created = 0, skipped = 0;
     for (const workshop of workshops) {
       for (const r of SHEET_RATES) {
-        for (const sizeLabel of r.sizes) {
+        // An empty size list is one model-wide rate (sizeLabel null).
+        for (const sizeLabel of r.sizes.length ? r.sizes : [null]) {
           const key = { workshop, modelCode: r.modelCode, sizeLabel, quality: r.quality };
           if (await this.model.exists(key)) { skipped++; continue; }
           await this.model.create({ ...key, rate: r.rate, version: 1, isActive: true, setBy, validFrom: new Date('2026-01-01'), validTo: null, notes: 'Hoja REV ADR (columna Costo Taller), 21-09-2026' });
