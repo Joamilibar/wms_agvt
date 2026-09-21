@@ -501,3 +501,52 @@ export const useUpdateDraftOrder = () => {
   });
 };
 export const runExportUrl = (runId: string) => `${api.defaults.baseURL ?? ''}/planning/runs/${runId}/export`;
+
+// Planning (Fase 2): store replenishment
+export type StoreState = 'ENVIAR' | 'FALTANTE_SIN_RESPALDO' | 'RETIRO' | 'SOBRE_STOCK' | 'OK' | 'SIN_IDEAL';
+export interface StorePlanRow {
+  sku: string; name: string; category: string; abc: 'A' | 'B' | 'C'; dailyDemand: number; sigmaDaily: number;
+  ideal: number; idealSource: 'manual' | 'computed' | 'none'; displayMin: number; stockStore: number; inTransit: number; availableSource: number;
+  need: number; send: number; withdraw: number; coverageDays: number | null; state: StoreState; reasons: string[];
+}
+export interface StorePlan {
+  store: string; source: string; asOf: string;
+  params: { cycleDays: number; deliveryDays: number; demandWindowDays: number; splitDeliveryUnits: number; withdrawAfterMonths: number };
+  summary: Record<string, number> & { deliveries: number }; rows: StorePlanRow[];
+}
+export interface TransferLine { sku: string; name: string; qtySuggested: number; qtyApproved: number; qtyDelivered: number; reason: string; snapshot: { ideal: number; stockStore: number; inTransit: number; availableSource: number; idealSource: string } }
+export interface TransferOrder {
+  _id: string; number: string; direction: 'send' | 'withdraw'; fromWarehouse: string; toWarehouse: string;
+  status: 'draft' | 'approved' | 'picking' | 'delivered' | 'cancelled'; lines: TransferLine[]; pickingOrderNumber: string | null; notes: string; createdAt: string; deliveredAt: string | null;
+}
+export const useStores = () => useQuery({ queryKey: ['planning', 'stores'], queryFn: () => api.get('/planning/store/stores').then(r => r.data as { store: string; source: string }[]) });
+export const useStorePlan = (store: string | null) => useQuery({
+  queryKey: ['planning', 'storePlan', store], enabled: !!store,
+  queryFn: () => api.get('/planning/store/plan', { params: { store } }).then(r => r.data as StorePlan),
+});
+export const useUpsertIdeals = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ store, rows }: { store: string; rows: { sku: string; ideal: number | null; displayMin?: number; notes?: string }[] }) =>
+      api.post('/planning/store/ideals', { rows }, { params: { store } }).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'storePlan'] }); },
+  });
+};
+export const useTransfers = (store: string | null) => useQuery({
+  queryKey: ['planning', 'transfers', store], queryFn: () => api.get('/planning/store/transfers', { params: { store } }).then(r => r.data as TransferOrder[]),
+});
+export const useCreateTransfer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ store, direction, overrides }: { store: string; direction: 'send' | 'withdraw'; overrides: { sku: string; qty: number; reason?: string }[] }) =>
+      api.post('/planning/store/transfers', { direction, overrides }, { params: { store } }).then(r => r.data as TransferOrder),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'transfers'] }); },
+  });
+};
+export const useTransferAction = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action }: { id: string; action: 'approve' | 'deliver' | 'cancel' }) => api.post(`/planning/store/transfers/${id}/${action}`).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'transfers'] }); qc.invalidateQueries({ queryKey: ['planning', 'storePlan'] }); qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['stock'] }); },
+  });
+};

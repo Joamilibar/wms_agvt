@@ -22,6 +22,8 @@ import { BulkPlanningItemsDto, UpdatePlanningItemDto, QueryPlanningItemsDto } fr
 import { UpdateWarehouseDto, UpdateParamsDto, ChannelOverrideDto, LoadHistoryDto, SetEtaDto, RunDto } from './dto/misc.dto.js';
 import { CreatePurchaseOrderDto, ReceivePurchaseOrderDto, UpdateDraftPurchaseOrderDto, CreateOrderFromRunDto } from './dto/purchase-order.dto.js';
 import { PlanningRunsService } from './engine/planning-runs.service.js';
+import { StoreReplenishmentService } from './store/store-replenishment.service.js';
+import { BulkIdealsDto, CreateTransferDto, UpdateTransferDto } from './dto/store.dto.js';
 import type { PoStatus } from './schemas/purchase-order.schema.js';
 import type { Channel } from './schemas/sales-history.schema.js';
 
@@ -38,6 +40,7 @@ export class PlanningController {
     private history: SalesHistoryService,
     private purchaseOrders: PurchaseOrdersService,
     private runs: PlanningRunsService,
+    private store: StoreReplenishmentService,
     @InjectQueue(SALES_HISTORY_QUEUE) private historyQueue: Queue<LoadHistoryJob>,
   ) {}
 
@@ -290,6 +293,74 @@ export class PlanningController {
   @ApiOperation({ summary: 'Crea una OC en borrador con la propuesta de un proveedor; las cantidades cambiadas llevan motivo' })
   orderFromRun(@Param('id') id: string, @Body() dto: CreateOrderFromRunDto, @CurrentUser('userId') userId: string) {
     return this.runs.createPurchaseOrder(id, dto.supplierId ?? null, dto.overrides ?? [], userId ?? null);
+  }
+
+  // ── store replenishment (phase 2) ──────────────────────────────────────────
+
+  @Get('store/stores')
+  @ApiOperation({ summary: 'Tiendas activas y la bodega que las abastece' })
+  stores() {
+    return this.store.stores();
+  }
+
+  @Get('store/plan')
+  @ApiOperation({ summary: 'Plan de reposición de una tienda, calculado en vivo' })
+  storePlan(@Query('store') store: string) {
+    if (!store) throw new BadRequestException('store es obligatorio');
+    return this.store.plan(store);
+  }
+
+  @Get('store/ideals')
+  storeIdeals(@Query('store') store: string) {
+    if (!store) throw new BadRequestException('store es obligatorio');
+    return this.store.listIdeals(store);
+  }
+
+  @Post('store/ideals')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Crear, cambiar o borrar ideales manuales (ideal null = volver al calculado)' })
+  upsertIdeals(@Query('store') store: string, @Body() dto: BulkIdealsDto, @CurrentUser('email') email: string) {
+    if (!store) throw new BadRequestException('store es obligatorio');
+    return this.store.upsertIdeals(store, dto.rows, email ?? 'unknown');
+  }
+
+  @Get('store/transfers')
+  transfers(@Query('store') store?: string) {
+    return this.store.listTransfers(store || undefined);
+  }
+
+  @Post('store/transfers')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Congela el envío (o retiro) del plan en una transferencia en borrador' })
+  createTransfer(@Query('store') store: string, @Body() dto: CreateTransferDto, @CurrentUser('userId') userId: string) {
+    if (!store) throw new BadRequestException('store es obligatorio');
+    return this.store.createFromPlan(store, dto.direction, dto.overrides ?? [], userId ?? null);
+  }
+
+  @Patch('store/transfers/:id')
+  @Roles('admin', 'supervisor')
+  updateTransfer(@Param('id') id: string, @Body() dto: UpdateTransferDto) {
+    return this.store.updateDraft(id, dto.lines);
+  }
+
+  @Post('store/transfers/:id/approve')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Aprueba y crea la orden de picking en el origen (reserva FIFO)' })
+  approveTransfer(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.store.approve(id, userId);
+  }
+
+  @Post('store/transfers/:id/deliver')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Marca entregada: crea los lotes en el destino con lo que el picking tomó' })
+  deliverTransfer(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.store.deliver(id, userId ?? null);
+  }
+
+  @Post('store/transfers/:id/cancel')
+  @Roles('admin', 'supervisor')
+  cancelTransfer(@Param('id') id: string) {
+    return this.store.cancel(id);
   }
 
   // ── purchase orders ────────────────────────────────────────────────────────

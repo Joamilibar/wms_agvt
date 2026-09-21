@@ -258,7 +258,10 @@ export class OrdersService {
           // weighted one and the two must not be read as the same number.
           const hasSalePrice = (item.unitPrice ?? 0) > 0;
 
-          salesRows.push(...result.consumed.map(c => ({
+          // A store restock or an internal production move is not a sale: the
+          // units leave this warehouse but nothing was sold. Keeping them out
+          // of SalesRecord keeps ABC and coverage honest.
+          if (order.destinationType === 'client') salesRows.push(...result.consumed.map(c => ({
             timestamp: pickedAt,
             sku: item.sku,
             warehouse: tx.warehouse,
