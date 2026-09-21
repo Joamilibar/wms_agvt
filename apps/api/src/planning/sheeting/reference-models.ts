@@ -1,5 +1,5 @@
 import { dim, Hems, PanelSpec } from './geometry.js';
-import type { SheetingFamily, MeasureRange } from '../schemas/sheeting-model.schema.js';
+import type { SheetingFamily, MeasureRange, BlockRef } from '../schemas/sheeting-model.schema.js';
 
 /**
  * The models and fabrics that come preloaded, written by hand against
@@ -15,6 +15,7 @@ export interface ReferenceModel {
   family: SheetingFamily;
   vars: Record<string, number>;
   hems: Hems;
+  blocks: BlockRef[];
   panels: PanelSpec[];
   cutBatchUnits: number;
   packagingClp: number;
@@ -35,8 +36,8 @@ const simple = (cm: number) => ({ cm, fold: 'simple' as const });
 //   - Each frame edge is ONE strip of (s + F + s) × 2 = 38 cm, folded in
 //     two (front and back layers), mitred at 45° — so its length is the side
 //     plus F at each end. Every sewn edge takes s = 2 cm (two 1 cm folds).
-//   - The centre panel loses F on the three framed edges, takes s where it
-//     enters the frame, and a plain b = 2 cm hem at the bottom.
+//   - The centre panel loses F on the three framed edges and takes s on every
+//     edge: where it enters the frame and as the plain 2 cm hem at the bottom.
 //   - The frame is white or coloured: its fabric can differ from the
 //     centre's, with its own roll width and its own $/ml (`fabricSlot`).
 //   SuperKing 300×290 → centro 274×279 · laterales 2 × (38 × 320) · superior 38 × 330
@@ -50,10 +51,11 @@ export const ENCIMERA_CRUCERO: ReferenceModel = {
   code: 'ENCIMERA_CRUCERO',
   name: 'Sábana encimera crucero',
   family: 'encimera',
-  vars: { F: 15, s: 2, b: 2 },
+  vars: { F: 15, s: 2 },
   hems: ENCIMERA_HEMS,
+  blocks: [{ block: 'panel_simple', params: {} }, { block: 'marco', params: { F: 15, edges: 'top,left,right', layers: 2, mitred: true } }],
   panels: [
-    { role: 'centro', count: 1, width: dim({ A: 1, F: -2, s: 2 }), length: dim({ L: 1, F: -1, s: 1, b: 1 }), mitred45: false, fabricSlot: 'base' },
+    { role: 'centro', count: 1, width: dim({ A: 1, F: -2, s: 2 }), length: dim({ L: 1, F: -1, s: 2 }), mitred45: false, fabricSlot: 'base' },
     { role: 'marco_lateral', count: 2, width: dim({ F: 2, s: 4 }), length: dim({ L: 1, F: 2 }), mitred45: true, fabricSlot: 'marco' },
     { role: 'marco_superior', count: 1, width: dim({ F: 2, s: 4 }), length: dim({ A: 1, F: 2 }), mitred45: true, fabricSlot: 'marco' },
   ],
@@ -62,7 +64,7 @@ export const ENCIMERA_CRUCERO: ReferenceModel = {
   freightClp: 727, // Costos fijos 2023 J19
   validRange: { A: { min: 90, max: 400 }, L: { min: 200, max: 320 } },
   sampleVars: { A: 255, L: 290 },
-  notes: 'Marco F = 15 arriba y en los dos lados, tira única de 2(s+F+s) = 38 cm doblada en dos, inglete a 45° (tira = lado + 2F). Centro A − 2F + 2s × L − F + s + b; basta inferior b = 2. El marco puede ir en otra tela (slot "marco").',
+  notes: 'Marco F = 15 arriba y en los dos lados, tira única de 2(s+F+s) = 38 cm doblada en dos, inglete a 45° (tira = lado + 2F). Centro A − 2F + 2s × L − F + 2s (s = 2 en todo borde, también la basta inferior). El marco puede ir en otra tela (slot "marco").',
 };
 
 // ── Bajera elasticada ────────────────────────────────────────────────────────
@@ -83,6 +85,7 @@ export const BAJERA_ELASTICADA: ReferenceModel = {
   family: 'bajera',
   vars: { T: 10, sw: 16, sl: 0 },
   hems: {},
+  blocks: [{ block: 'panel_simple', params: { role: 'unico', seamPerEdge: 0 } }, { block: 'caida_elastica', params: { T: 10, extraWidth: 16, extraLength: 0 } }],
   panels: [
     { role: 'unico', count: 1, width: dim({ A: 1, H: 2, T: 2, sw: 1 }), length: dim({ L: 1, H: 2, T: 2, sl: 1 }), mitred45: false },
   ],

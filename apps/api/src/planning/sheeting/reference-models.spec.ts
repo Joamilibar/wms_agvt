@@ -7,7 +7,7 @@ const cut = (model: typeof ENCIMERA_CRUCERO, measures: Record<string, number>) =
 
 describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas Tiendas)', () => {
   it('encimera crucero: centre + three mitred double-layer frame strips, as the workshop makes it', () => {
-    // A × L finished includes the frame (F 15, top and sides). s = 2 per sewn edge, b = 2 bottom hem.
+    // A × L finished includes the frame (F 15, top and sides). s = 2 on every edge (seam or plain hem).
     const sheet: [string, number, number, [number, number], [number, number], [number, number]][] = [
       //  size        A    L    centro      lateral ×2   superior ×1
       ['Single', 190, 290, [164, 279], [38, 320], [38, 220]],
@@ -22,7 +22,7 @@ describe('reference models against the costing sheet (REV ADR  Sábanas y Fdas T
       expect([sup.widthCm, sup.lengthCm, sup.count, sup.mitred45, sup.fabricSlot]).toEqual([...superior, 1, true, 'marco']);
       expect(c.fabricSlot).toBe('base');
     }
-    expect(panelVars(ENCIMERA_CRUCERO.panels).sort()).toEqual(['A', 'F', 'L', 'b', 's']);
+    expect(panelVars(ENCIMERA_CRUCERO.panels).sort()).toEqual(['A', 'F', 'L', 's']);
   });
 
   it('encimera: the costing sheet costs the same product as one 308×309 panel — kept as the comparison', () => {

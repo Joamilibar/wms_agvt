@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  ArrayNotEmpty, IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
+  IsArray, IsBoolean, IsDateString, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min, MinLength, ValidateNested,
 } from 'class-validator';
 import { SHEETING_FAMILIES, type SheetingFamily } from '../schemas/sheeting-model.schema.js';
 
@@ -54,6 +54,11 @@ export class ModelSupplyDto {
   @IsIn(['un', 'kg', 'm']) uom!: 'un' | 'kg' | 'm';
 }
 
+export class BlockRefDto {
+  @IsString() @Matches(/^[a-z_]+$/) block!: string;
+  @IsObject() params!: Record<string, number | string | boolean>;
+}
+
 export class SaveModelDto {
   @ApiProperty({ example: 'ENCIMERA_CRUCERO' })
   @IsString() @Matches(/^[A-Z][A-Z0-9_]{2,39}$/, { message: 'code: mayúsculas, números y guión bajo' }) code!: string;
@@ -66,10 +71,11 @@ export class SaveModelDto {
   @ApiPropertyOptional({ description: 'Parámetros del modelo: F1, T, s…' })
   @IsOptional() @IsObject() vars?: Record<string, number>;
 
-  @ApiProperty({ type: [PanelSpecDto], description: 'Geometría compilada' })
-  @IsArray() @ArrayNotEmpty() @ValidateNested({ each: true }) @Type(() => PanelSpecDto) panels!: PanelSpecDto[];
+  @ApiPropertyOptional({ type: [PanelSpecDto], description: 'Geometría compilada; se ignora cuando vienen bloques' })
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => PanelSpecDto) panels?: PanelSpecDto[];
 
-  @ApiPropertyOptional() @IsOptional() @IsArray() blocks?: { block: string; params: Record<string, number | string | boolean> }[];
+  @ApiPropertyOptional({ type: [BlockRefDto], description: 'Lista ordenada de bloques; se compila al guardar' })
+  @IsOptional() @IsArray() @ValidateNested({ each: true }) @Type(() => BlockRefDto) blocks?: BlockRefDto[];
   @ApiPropertyOptional() @IsOptional() @IsObject() hems?: Record<string, { cm: number; fold: 'simple' | 'doble'; stitch?: 'simple' | 'doble' }>;
   @ApiPropertyOptional({ example: 20 }) @IsOptional() @IsInt() @Min(1) @Max(500) cutBatchUnits?: number;
 
@@ -86,6 +92,23 @@ export class SaveModelDto {
   @ApiPropertyOptional({ description: 'Traslado por unidad, CLP' }) @IsOptional() @IsNumber() @Min(0) freightClp?: number;
 
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) notes?: string;
+}
+
+export class PreviewModelDto extends SaveModelDto {
+  @ApiPropertyOptional({ description: 'Tela del centro para el encaje; omitida = la primera activa' })
+  @IsOptional() @IsString() fabricSku?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() frameFabricSku?: string;
+  @ApiPropertyOptional({ description: 'Medidas de prueba; omitidas = sampleVars del modelo' })
+  @IsOptional() @IsObject() measures?: Record<string, number>;
+  @ApiPropertyOptional() @IsOptional() @IsString() workshop?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() channel?: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() sizeLabel?: string;
+}
+
+export class DuplicateModelDto {
+  @ApiProperty({ example: 'ENCIMERA_CRUCERO_LINO' })
+  @IsString() @Matches(/^[A-Z][A-Z0-9_]{2,39}$/, { message: 'code: mayúsculas, números y guión bajo' }) code!: string;
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(120) name?: string;
 }
 
 // ── workshop rates ───────────────────────────────────────────────────────────

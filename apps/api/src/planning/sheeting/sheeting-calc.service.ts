@@ -11,6 +11,9 @@ import { SheetingMastersService } from './sheeting-masters.service.js';
 import { evaluatePanels, findGeometryProblems, panelVars, fabricSlots, CutPiece } from './geometry.js';
 import { nestPieces, requiredWidthCm, NestedPiece, NestingSummary } from './nesting.js';
 
+/** What the calculation needs from a model: a saved document or a draft from the builder. */
+export type ModelLike = Pick<SheetingModel, 'code' | 'version' | 'name' | 'family' | 'vars' | 'panels' | 'validRange' | 'cutBatchUnits' | 'supplies' | 'packagingClp' | 'freightClp'>;
+
 export interface QuoteInput {
   modelCode: string;
   modelVersion?: number;
@@ -107,7 +110,13 @@ export class SheetingCalcService {
   ) {}
 
   async quote(input: QuoteInput): Promise<QuoteResult> {
-    const [model, p] = await Promise.all([this.masters.model(input.modelCode, input.modelVersion), this.params.current()]);
+    const model = await this.masters.model(input.modelCode, input.modelVersion);
+    return this.quoteFor(model, input);
+  }
+
+  /** The same calculation for a model that is not (yet) saved — the builder's preview. */
+  async quoteFor(model: ModelLike, input: QuoteInput): Promise<QuoteResult> {
+    const p = await this.params.current();
     const warnings: string[] = [];
 
     // 1 · geometry
@@ -235,7 +244,7 @@ export class SheetingCalcService {
     return { sku: fabric.sku, pricePerLinearMetre: fabricPricePerLinearMetre(pick.unitCost, fabric), costSource: fresh ? 'bsale' : 'stale', costSyncedAt, unit: 'ml' };
   }
 
-  private async suppliesCost(model: SheetingModel) {
+  private async suppliesCost(model: ModelLike) {
     const out: QuoteResult['supplies'] = [];
     for (const s of model.supplies ?? []) {
       const lot = await this.stockModel.findOne({ sku: s.sku, isActive: true, unitCost: { $gt: 0 } }).sort({ costSyncedAt: -1, entryDate: -1 }).exec();

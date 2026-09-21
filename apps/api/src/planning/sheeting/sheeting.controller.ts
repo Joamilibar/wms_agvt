@@ -6,7 +6,10 @@ import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { SheetingMastersService } from './sheeting-masters.service.js';
 import type { SheetingModel } from '../schemas/sheeting-model.schema.js';
-import { UpsertFabricDto, SaveModelDto, QuoteDto, UpsertRateDto } from '../dto/sheeting.dto.js';
+import { UpsertFabricDto, SaveModelDto, QuoteDto, UpsertRateDto, PreviewModelDto, DuplicateModelDto } from '../dto/sheeting.dto.js';
+import { blockCatalogue } from './blocks.js';
+import { evaluatePanels } from './geometry.js';
+import { getErrorDetails } from './errors.js';
 import { WorkshopRatesService } from './workshop-rates.service.js';
 import { SheetingCalcService } from './sheeting-calc.service.js';
 
@@ -49,6 +52,43 @@ export class SheetingController {
   async model(@Param('code') code: string, @Query('version') version?: string) {
     const m = await this.masters.model(code, version ? Number(version) : undefined);
     return { ...m.toObject<SheetingModel>(), panelsText: this.masters.describePanels(m.panels) };
+  }
+
+  @Get('blocks')
+  @ApiOperation({ summary: 'Catálogo de bloques del constructor y sus parámetros' })
+  blocks() {
+    return blockCatalogue();
+  }
+
+  @Post('models/preview')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Compila los bloques y corre el encaje y el costo sobre medidas de muestra, sin persistir' })
+  async preview(@Body() dto: PreviewModelDto) {
+    const { panels, vars } = this.masters.resolveGeometry(dto);
+    const sample = { ...(dto.sampleVars ?? {}), ...(dto.measures ?? {}) };
+    const problems = this.masters.problemsOver(panels, vars, sample, dto.validRange ?? {});
+    const out: Record<string, unknown> = { panels, vars, panelsText: this.masters.describePanels(panels), problems, sample };
+    if (problems.length) return { ...out, cut: null, quote: null, quoteError: null };
+    out.cut = evaluatePanels(panels, { ...vars, ...sample });
+    const fabrics = await this.masters.fabrics();
+    const fabricSku = dto.fabricSku ?? fabrics[0]?.sku;
+    const workshops = (await this.rates.list()).map((r) => r.workshop);
+    const workshop = dto.workshop ?? workshops[0] ?? '';
+    if (!fabricSku || !workshop) return { ...out, quote: null, quoteError: { code: !fabricSku ? 'NO_FABRIC' : 'NO_WORKSHOP' } };
+    const draft = { code: dto.code, version: 0, name: dto.name, family: dto.family, vars, panels, validRange: dto.validRange ?? {}, cutBatchUnits: dto.cutBatchUnits ?? 20, supplies: (dto.supplies ?? []).map((s) => ({ ...s, name: s.name ?? '' })), packagingClp: dto.packagingClp ?? 0, freightClp: dto.freightClp ?? 0 };
+    try {
+      const quote = await this.calc.quoteFor(draft, { modelCode: dto.code, fabricSku, frameFabricSku: dto.frameFabricSku, measures: sample, qty: 1, workshop, channel: dto.channel ?? 'tienda', sizeLabel: dto.sizeLabel ?? null });
+      return { ...out, quote, quoteError: null };
+    } catch (e) {
+      return { ...out, quote: null, quoteError: getErrorDetails(e) };
+    }
+  }
+
+  @Post('models/:code/duplicate')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Copia la versión activa como versión 1 de un código nuevo' })
+  duplicate(@Param('code') code: string, @Body() dto: DuplicateModelDto, @CurrentUser('email') email: string) {
+    return this.masters.duplicateModel(code, dto.code, dto.name, email ?? 'unknown');
   }
 
   @Post('models')

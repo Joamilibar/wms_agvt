@@ -5,6 +5,7 @@ import { FabricSpec, FabricSpecDocument } from '../schemas/fabric-spec.schema.js
 import { SheetingModel, SheetingModelDocument } from '../schemas/sheeting-model.schema.js';
 import { StockLot, StockLotDocument } from '../../stock/schemas/stock-lot.schema.js';
 import { findGeometryProblems, formatDimension, panelVars, PanelSpec } from './geometry.js';
+import { compileBlocks, BlockRef } from './blocks.js';
 import { REFERENCE_FABRICS, REFERENCE_MODELS } from './reference-models.js';
 
 export interface FabricInput {
@@ -12,7 +13,9 @@ export interface FabricInput {
 }
 
 export interface ModelInput {
-  code: string; name: string; family: SheetingModel['family']; vars?: Record<string, number>; panels: PanelSpec[];
+  code: string; name: string; family: SheetingModel['family']; vars?: Record<string, number>;
+  /** Compiled geometry; when `blocks` are given they are compiled and take precedence. */
+  panels?: PanelSpec[];
   blocks?: SheetingModel['blocks']; hems?: SheetingModel['hems']; cutBatchUnits?: number; supplies?: { sku: string; name?: string; qty: number; uom: 'un' | 'kg' | 'm' }[];
   validRange?: SheetingModel['validRange']; sampleVars?: Record<string, number>; packagingClp?: number; freightClp?: number; notes?: string;
 }
@@ -79,13 +82,12 @@ export class SheetingMastersService {
    * range: a 30 cm frame on a 50 cm case is refused here, not in production.
    */
   async saveModel(input: ModelInput, setBy: string): Promise<SheetingModelDocument> {
-    if (!input.panels?.length) throw new BadRequestException('El modelo necesita al menos un panel');
-    const vars = input.vars ?? {};
+    const { panels, vars } = this.resolveGeometry(input);
     const sample = input.sampleVars ?? {};
-    const needed = panelVars(input.panels).filter((v) => !(v in vars) && !(v in sample));
+    const needed = panelVars(panels).filter((v) => !(v in vars) && !(v in sample));
     if (needed.length) throw new BadRequestException(`Variables sin valor de muestra ni de modelo: ${needed.join(', ')}`);
 
-    const problems = this.problemsOver(input.panels, vars, sample, input.validRange ?? {});
+    const problems = this.problemsOver(panels, vars, sample, input.validRange ?? {});
     if (problems.length) {
       throw new BadRequestException({ message: `Geometría imposible: ${problems.map((p) => `${p.role} ${p.axis === 'width' ? 'ancho' : 'largo'} = ${p.valueCm} cm (${p.expression})`).join('; ')}`, error: 'Bad Request', details: problems });
     }
@@ -94,9 +96,41 @@ export class SheetingMastersService {
     const version = (last?.version ?? 0) + 1;
     await this.modelModel.updateMany({ code: input.code, isActive: true }, { $set: { isActive: false } }).exec();
     const supplies = (input.supplies ?? []).map((x) => ({ ...x, name: x.name ?? '' }));
-    const doc = await this.modelModel.create({ ...input, supplies, vars, sampleVars: sample, version, isActive: true, setBy });
+    const doc = await this.modelModel.create({ ...input, panels, blocks: input.blocks ?? [], supplies, vars, sampleVars: sample, version, isActive: true, setBy });
     this.logger.log(`Modelo ${doc.code} v${doc.version} guardado por ${setBy} (${doc.panels.length} paneles)`);
     return doc;
+  }
+
+  /**
+   * The geometry a model input describes: its blocks compiled (the normal
+   * path from the screen) or its panels as given (hand-written references).
+   * Block variables (F, T, O…) are merged under the model's own `vars`; `s`
+   * defaults to the workshop's 2 cm per edge when the panels use it.
+   */
+  resolveGeometry(input: Pick<ModelInput, 'blocks' | 'panels' | 'vars'>): { panels: PanelSpec[]; vars: Record<string, number> } {
+    let panels = input.panels ?? [];
+    let vars: Record<string, number> = { ...(input.vars ?? {}) };
+    if (input.blocks?.length) {
+      try {
+        const compiled = compileBlocks(input.blocks as BlockRef[]);
+        panels = compiled.panels;
+        vars = { ...compiled.vars, ...vars };
+      } catch (e) {
+        throw new BadRequestException((e as Error).message);
+      }
+    }
+    if (panels.length === 0) throw new BadRequestException('El modelo necesita al menos un panel o un bloque');
+    if (panelVars(panels).includes('s') && vars.s === undefined) vars.s = 2;
+    return { panels, vars };
+  }
+
+  /** A copy of the active version of `code` as version 1 of `newCode`, ready to be edited. */
+  async duplicateModel(code: string, newCode: string, name: string | undefined, setBy: string): Promise<SheetingModelDocument> {
+    if (await this.modelModel.exists({ code: newCode })) throw new BadRequestException(`Ya existe un modelo ${newCode}`);
+    const src = await this.model(code);
+    const { code: _c, version: _v, isActive: _a, _id, createdAt, updatedAt, ...rest } = src.toObject<SheetingModel & { _id: unknown; createdAt?: Date; updatedAt?: Date }>();
+    void _c; void _v; void _a; void _id; void createdAt; void updatedAt;
+    return this.saveModel({ ...rest, code: newCode, name: name ?? `${src.name} (copia)`, notes: `Duplicado de ${code} v${src.version}. ${src.notes}`.trim() }, setBy);
   }
 
   /** Geometry problems on the sample and on every corner of the valid range. */
@@ -143,7 +177,7 @@ export class SheetingMastersService {
     const skipped: string[] = [];
     for (const m of REFERENCE_MODELS) {
       if (await this.modelModel.exists({ code: m.code })) { skipped.push(m.code); continue; }
-      await this.saveModel({ ...m, blocks: [], supplies: [] }, setBy);
+      await this.saveModel({ ...m, supplies: [] }, setBy);
       models++;
     }
     return { fabrics, models, skipped };

@@ -101,10 +101,19 @@ export function normalizePanel(p: PanelSpec): PanelSpec {
   return { role: p.role, count: p.count, width: normalizeDimension(p.width), length: normalizeDimension(p.length), mitred45: p.mitred45, fabricSlot: fabricSlotOf(p) };
 }
 
+/** The quote's measures read first in a printed expression: `A − 2F1 + 2s`, never `−2F1 + A + 2s`. */
+const MEASURES_FIRST = ['A', 'L', 'H'];
+const displayOrder = (a: Term, b: Term) => {
+  const ia = MEASURES_FIRST.indexOf(a.var);
+  const ib = MEASURES_FIRST.indexOf(b.var);
+  if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  return 0;
+};
+
 /** Human-readable `A − 2F1 + 8`, for error messages and the screen. */
 export function formatDimension(d: Dimension): string {
   const parts: string[] = [];
-  for (const t of addDimensions(d, { terms: [], const: 0 }).terms) {
+  for (const t of [...addDimensions(d, { terms: [], const: 0 }).terms].sort(displayOrder)) {
     const abs = Math.abs(t.coef);
     const body = `${abs === 1 ? '' : trimNumber(abs)}${t.var}`;
     parts.push(parts.length === 0 ? (t.coef < 0 ? `−${body}` : body) : `${t.coef < 0 ? '−' : '+'} ${body}`);
