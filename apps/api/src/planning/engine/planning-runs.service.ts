@@ -12,6 +12,8 @@ import { WarehousesService } from '../masters/warehouses.service.js';
 import { PurchaseOrdersService } from '../purchase-orders/purchase-orders.service.js';
 import { historyWindow } from '../history-window.js';
 import { evaluateSku, classifyAbc, EngineParams, MonthPoint, SkuInput, SkuResult } from './demand-engine.js';
+import { DemandEventsService } from '../phase4/events.service.js';
+import { ForecastAccuracyService } from '../phase4/accuracy.service.js';
 
 /** Origins the purchasing engine evaluates. Packs are exploded; services never planned. */
 const PLANNED_ORIGINS = ['imported', 'national', 'raw_material', 'supply', 'unknown'] as const;
@@ -32,6 +34,8 @@ export class PlanningRunsService {
     private params: PlanningParamsService,
     private warehouses: WarehousesService,
     private purchaseOrders: PurchaseOrdersService,
+    private events: DemandEventsService,
+    private accuracy: ForecastAccuracyService,
   ) {}
 
   // ── run ────────────────────────────────────────────────────────────────────
@@ -62,6 +66,7 @@ export class PlanningRunsService {
       ]).exec(),
     ]);
     const transit = await this.purchaseOrders.inTransit();
+    const eventFactors = await this.events.factorsFor(items.map((i) => ({ sku: i.sku, category: i.category })), asOf);
 
     const supplierById = new Map(suppliers.map((s) => [String(s._id), s]));
     const historyBySku = new Map<string, MonthPoint[]>();
@@ -98,6 +103,7 @@ export class PlanningRunsService {
         available: availableBySku.get(it.sku) ?? 0,
         inTransit: (transit.get(it.sku) ?? []).map((t) => ({ qty: t.qty, eta: t.eta })),
         asOf,
+        eventFactors: eventFactors.get(it.sku),
       };
       const r = evaluateSku(input, engineParams);
       results.push({
@@ -113,6 +119,7 @@ export class PlanningRunsService {
     summary.moqFlags = results.filter((r) => r.moqExceedsHorizon).length;
     summary.yoyAlerts = results.filter((r) => r.yoy.alert).length;
     summary.missingLeadTime = results.filter((r) => r.reasons.some((x) => x.startsWith('Sin lead time'))).length;
+    summary.withEvents = results.filter((r) => r.reasons.some((x) => x.startsWith('Eventos aplicados'))).length;
 
     const year = asOf.getFullYear();
     const seq = await this.counters.next(`PL-${year}`);
@@ -121,7 +128,7 @@ export class PlanningRunsService {
       status: 'draft', asOf, fromMonth: window.fromMonth, toMonth: window.toMonth, paramsVersion: p.version,
       purchaseWarehouses, summary, results, createdBy: userId ? new Types.ObjectId(userId) : null, notes,
     });
-    this.logger.log(`Planning run ${run.number}: ${results.length} SKUs, ${summary.QUIEBRE ?? 0} quiebre, ${summary.REPONER ?? 0} reponer, ${summary.suggestedUnits} u. sugeridas`);
+    this.logger.log(`Planning run ${run.number}: ${results.length} SKUs, ${summary.QUIEBRE ?? 0} quiebre, ${summary.REPONER ?? 0} reponer, ${summary.suggestedUnits} u. sugeridas; ${await this.accuracy.recordRun(run)} pronosticos registrados`);
     return run;
   }
 

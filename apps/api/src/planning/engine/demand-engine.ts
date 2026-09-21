@@ -54,6 +54,8 @@ export interface SkuInput {
   inTransit: { qty: number; eta: Date | null }[];
   /** Date of the run; "next month" and horizons are counted from here. */
   asOf: Date;
+  /** Extra factor per concrete month ('YYYY-MM') from demand events matching this SKU; missing = 1. */
+  eventFactors?: Record<string, number>;
 }
 
 export interface SkuResult {
@@ -168,8 +170,13 @@ export function baseForecast(series: MonthPoint[], params: Pick<EngineParams, 'b
   return params.baseWeight12m * last12 + (1 - params.baseWeight12m) * last6;
 }
 
+/**
+ * Factor of a concrete month: the calendar seasonality ('12' → 2.4) times
+ * any event that covers that month ('2026-11' → 1.5 for a Cyber). Keys of
+ * two characters are calendar months, of seven are concrete months.
+ */
 export function seasonalFor(monthKey: string, factors: Record<string, number>): number {
-  return factors[monthKey.slice(5, 7)] ?? 1;
+  return (factors[monthKey.slice(5, 7)] ?? 1) * (factors[monthKey] ?? 1);
 }
 
 export function growthFor(category: string, params: Pick<EngineParams, 'growthDefault' | 'growthByCategory'>): number {
@@ -232,7 +239,9 @@ export function evaluateSku(input: SkuInput, params: EngineParams): SkuResult {
   const pattern = classifyPattern(series);
   const growth = growthFor(input.category, params);
   const nextMonth = addMonths(params.monthKeys[params.monthKeys.length - 1], 1);
-  const seasonalNext = seasonalFor(nextMonth, params.seasonalFactors);
+  const factors = { ...params.seasonalFactors, ...(input.eventFactors ?? {}) };
+  const seasonalNext = seasonalFor(nextMonth, factors);
+  if (input.eventFactors && Object.keys(input.eventFactors).length) reasons.push(`Eventos aplicados: ${Object.entries(input.eventFactors).map(([m, f]) => `${m} ×${f}`).join(', ')}`);
 
   const leadTimeDays =
     input.origin === 'imported'
@@ -244,7 +253,7 @@ export function evaluateSku(input: SkuInput, params: EngineParams): SkuResult {
   const base = baseForecast(series, params);
   const demandNext = base === null ? 0 : base * seasonalNext * (1 + growth);
   const horizonDays = leadTimeDays + params.reviewDays;
-  const demandMonthly = base === null ? 0 : demandOverDays(base, growth, input.asOf, Math.max(horizonDays, 30), params.seasonalFactors) / (Math.max(horizonDays, 30) / 30);
+  const demandMonthly = base === null ? 0 : demandOverDays(base, growth, input.asOf, Math.max(horizonDays, 30), factors) / (Math.max(horizonDays, 30) / 30);
 
   // Deviation on the series without outlier documents: a single 104-unit boleta is not variability.
   const sigma = stdev(series.map((p) => p.qtyNoOutlier));
@@ -266,12 +275,12 @@ export function evaluateSku(input: SkuInput, params: EngineParams): SkuResult {
     const min = Math.ceil(mean(nonZero));
     ss = min;
     rop = min;
-    target = min + demandOverDays(base, growth, input.asOf, horizonDays, params.seasonalFactors);
+    target = min + demandOverDays(base, growth, input.asOf, horizonDays, factors);
     reasons.push('Demanda intermitente: mín/máx en unidades en vez de fórmula');
   } else {
-    rop = ss + demandOverDays(base, growth, input.asOf, leadTimeDays, params.seasonalFactors);
+    rop = ss + demandOverDays(base, growth, input.asOf, leadTimeDays, factors);
     const cycleDays = input.cadenceDays ?? params.reviewDays;
-    target = ss + demandOverDays(base, growth, input.asOf, leadTimeDays + cycleDays, params.seasonalFactors);
+    target = ss + demandOverDays(base, growth, input.asOf, leadTimeDays + cycleDays, factors);
   }
 
   const horizonEnd = new Date(input.asOf.getTime() + horizonDays * 86400000);
@@ -288,7 +297,7 @@ export function evaluateSku(input: SkuInput, params: EngineParams): SkuResult {
     reasons.push(`El MOQ cubre ${Math.round(rounded / demandMonthly)} meses de demanda`);
   }
 
-  const cov = base === null ? null : coverageDays(input.available, input.inTransit, ss, base, growth, input.asOf, params.seasonalFactors);
+  const cov = base === null ? null : coverageDays(input.available, input.inTransit, ss, base, growth, input.asOf, factors);
   const coverageMonths = cov === null ? null : Math.round((cov / 30) * 10) / 10;
 
   // Year-over-year for the coming month: shown, alerted, never multiplied (D2).

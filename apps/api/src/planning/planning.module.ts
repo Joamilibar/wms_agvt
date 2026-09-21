@@ -19,6 +19,12 @@ import { OrdersModule } from '../orders/orders.module.js';
 import { StockModule } from '../stock/stock.module.js';
 import { BomRecipe, BomRecipeSchema } from './schemas/bom-recipe.schema.js';
 import { ProductionOrder, ProductionOrderSchema } from './schemas/production-order.schema.js';
+import { DemandEvent, DemandEventSchema, ProjectDemand, ProjectDemandSchema, ForecastAccuracy, ForecastAccuracySchema } from './schemas/phase4.schemas.js';
+import { DemandEventsService } from './phase4/events.service.js';
+import { ForecastAccuracyService } from './phase4/accuracy.service.js';
+import { ProjectsService } from './phase4/projects.service.js';
+import { KpisService } from './phase4/kpis.service.js';
+import { PlanningScheduler } from './phase4/scheduler.service.js';
 import { WarehousesService } from './masters/warehouses.service.js';
 import { SuppliersService } from './masters/suppliers.service.js';
 import { PlanningItemsService } from './masters/planning-items.service.js';
@@ -53,6 +59,9 @@ import { PlanningController } from './planning.controller.js';
       { name: Order.name, schema: OrderSchema },
       { name: BomRecipe.name, schema: BomRecipeSchema },
       { name: ProductionOrder.name, schema: ProductionOrderSchema },
+      { name: DemandEvent.name, schema: DemandEventSchema },
+      { name: ProjectDemand.name, schema: ProjectDemandSchema },
+      { name: ForecastAccuracy.name, schema: ForecastAccuracySchema },
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
@@ -74,7 +83,12 @@ import { PlanningController } from './planning.controller.js';
     PlanningRunsService,
     StoreReplenishmentService,
     ProductionService,
+    DemandEventsService,
+    ForecastAccuracyService,
+    ProjectsService,
+    KpisService,
+    PlanningScheduler,
   ],
-  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService],
+  exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService, DemandEventsService, ForecastAccuracyService, ProjectsService, KpisService],
 })
 export class PlanningModule {}

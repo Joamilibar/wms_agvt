@@ -612,3 +612,99 @@ export const useProductionOrderAction = () => {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'productionOrders'] }); qc.invalidateQueries({ queryKey: ['planning', 'productionPlan'] }); qc.invalidateQueries({ queryKey: ['stock'] }); },
   });
 };
+
+// Planning (Fase 4): parameters, demand events, projects, accuracy, KPIs and alerts
+export interface PlanningParams {
+  version: number; projectMinUnits: number; projectOffices: string[]; companyRutMin: number; companyRutMax: number; outlierPercentile: number;
+  baseWeight12m: number; growthDefault: number; growthByCategory: Record<string, number>; seasonalFactors: Record<string, number>;
+  yoyAlertPct: number; yoyMultiplierEnabled: boolean; ssMonthsImported: number; ssMonthsNational: number; zByClass: Record<string, number>;
+  reviewDays: number; nationalLeadTimeDays: number; moqMaxCoverageMonths: number; overstockExtraMonths: number; phaseOutMonths: number; newSkuMonths: number;
+  storeCycleDays: number; storeDeliveryDays: number; storeDisplayMin: Record<string, number>; storeDemandWindowDays: number; storeSplitDeliveryUnits: number;
+  scrapPct: number; changedBy: string; changeNote: string; createdAt: string;
+}
+export type PlanningParamsPatch = Partial<Omit<PlanningParams, 'version' | 'changedBy' | 'createdAt'>>;
+export const usePlanningParams = () => useQuery({ queryKey: ['planning', 'params'], queryFn: () => api.get('/planning/params').then(r => r.data as PlanningParams) });
+export const usePlanningParamsHistory = () => useQuery({ queryKey: ['planning', 'params', 'history'], queryFn: () => api.get('/planning/params/history').then(r => r.data as PlanningParams[]) });
+export const useUpdatePlanningParams = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (patch: PlanningParamsPatch) => api.patch('/planning/params', patch).then(r => r.data as PlanningParams),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'params'] }); },
+  });
+};
+
+export interface DemandEvent {
+  _id: string; name: string; from: string; to: string; categories: string[]; skus: string[]; uplift: number;
+  source: 'history' | 'manual'; isActive: boolean; notes: string;
+}
+export type DemandEventInput = Omit<DemandEvent, '_id' | 'source'>;
+export const useDemandEvents = () => useQuery({ queryKey: ['planning', 'events'], queryFn: () => api.get('/planning/events').then(r => r.data as DemandEvent[]) });
+export const useSaveDemandEvent = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: Partial<DemandEventInput> }) =>
+      (id ? api.patch(`/planning/events/${id}`, data) : api.post('/planning/events', data)).then(r => r.data as DemandEvent),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'events'] }); },
+  });
+};
+export const useDeleteDemandEvent = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/planning/events/${id}`).then(r => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'events'] }); },
+  });
+};
+
+export type ProjectStatus = 'quote' | 'confirmed' | 'delivered' | 'cancelled';
+export interface ProjectLine { sku: string; name: string; qty: number }
+export interface ProjectDemand {
+  _id: string; number: string; customer: string; rut: string | null; status: ProjectStatus; requiredDate: string | null; warehouse: string;
+  lines: ProjectLine[]; orderId: string | null; orderNumber: string | null; notes: string; createdAt: string;
+}
+export interface ProjectCoverageLine { sku: string; qty: number; available: number; inTransit: number; covered: boolean }
+export interface ProjectsResponse { items: ProjectDemand[]; coverage: Record<string, ProjectCoverageLine[]> }
+export interface ProjectInput { customer: string; rut?: string; requiredDate?: string; warehouse?: string; lines: { sku: string; qty: number }[]; notes?: string }
+export const useProjects = () => useQuery({ queryKey: ['planning', 'projects'], queryFn: () => api.get('/planning/projects').then(r => r.data as ProjectsResponse) });
+export const useSaveProject = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id?: string; data: Partial<ProjectInput> }) =>
+      (id ? api.patch(`/planning/projects/${id}`, data) : api.post('/planning/projects', data)).then(r => r.data as ProjectDemand),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'projects'] }); },
+  });
+};
+export const useProjectAction = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, action }: { id: string; action: 'confirm' | 'deliver' | 'cancel' }) => api.post(`/planning/projects/${id}/${action}`).then(r => r.data as ProjectDemand),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'projects'] }); qc.invalidateQueries({ queryKey: ['orders'] }); qc.invalidateQueries({ queryKey: ['stock'] }); qc.invalidateQueries({ queryKey: ['planning', 'kpis'] }); },
+  });
+};
+
+export interface AccuracyMetric { month: string; runNumber: string; group: string; skus: number; forecast: number; actual: number; wape: number | null; bias: number | null }
+export const useForecastAccuracy = (groupBy: 'abc' | 'origin' | 'category') => useQuery({
+  queryKey: ['planning', 'accuracy', groupBy],
+  queryFn: () => api.get('/planning/accuracy', { params: { groupBy } }).then(r => r.data as AccuracyMetric[]),
+});
+export const useCloseMonths = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post('/planning/accuracy/close').then(r => r.data as { months: string[]; rows: number }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['planning', 'accuracy'] }); qc.invalidateQueries({ queryKey: ['planning', 'kpis'] }); },
+  });
+};
+
+export interface PlanningKpis {
+  run: { number: string; asOf: string; status: string } | null;
+  forecast: { month: string; wape: number | null; bias: number | null; skus: number } | null;
+  breaches: { ab: number; all: number; abSkus: { sku: string; name: string; abc: string }[] };
+  overstock: { skus: number; units: number; value: number | null };
+  deadStock: { skus: number; units: number; value: number | null };
+  fillRate: { orders: number; requested: number; picked: number; pct: number | null };
+  supplier: { linesWithEta: number; onTimePct: number | null };
+  production: { orders: number; kgPlanned: number; kgConsumed: number };
+  adoption: { orders: number; lines: number; changed: number; acceptedPct: number | null };
+}
+export interface PlanningAlert { type: string; severity: 'critical' | 'high' | 'medium' | 'low'; message: string; sku?: string; ref?: string }
+export const usePlanningKpis = () => useQuery({ queryKey: ['planning', 'kpis'], queryFn: () => api.get('/planning/kpis').then(r => r.data as PlanningKpis) });
+export const useOperationalAlerts = () => useQuery({ queryKey: ['planning', 'kpis', 'alerts'], queryFn: () => api.get('/planning/alerts').then(r => r.data as PlanningAlert[]) });

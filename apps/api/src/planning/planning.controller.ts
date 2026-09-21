@@ -1,5 +1,5 @@
 import {
-  Controller, Get, Post, Patch, Body, Param, Query, UseGuards, NotFoundException, BadRequestException, Res, Header,
+  Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, NotFoundException, BadRequestException, Res, Header,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -26,6 +26,11 @@ import { StoreReplenishmentService } from './store/store-replenishment.service.j
 import { ProductionService } from './production/production.service.js';
 import { UpsertRecipeDto, ImportRecipesDto, ProductionPlanDto, CreateProductionOrderDto, CompleteProductionDto } from './dto/production.dto.js';
 import { BulkIdealsDto, CreateTransferDto, UpdateTransferDto } from './dto/store.dto.js';
+import { CreateEventDto, UpdateEventDto, CreateProjectDto, UpdateProjectDto } from './dto/phase4.dto.js';
+import { DemandEventsService } from './phase4/events.service.js';
+import { ForecastAccuracyService } from './phase4/accuracy.service.js';
+import { ProjectsService } from './phase4/projects.service.js';
+import { KpisService } from './phase4/kpis.service.js';
 import type { PoStatus } from './schemas/purchase-order.schema.js';
 import type { Channel } from './schemas/sales-history.schema.js';
 
@@ -44,6 +49,10 @@ export class PlanningController {
     private runs: PlanningRunsService,
     private store: StoreReplenishmentService,
     private production: ProductionService,
+    private events: DemandEventsService,
+    private accuracy: ForecastAccuracyService,
+    private projects: ProjectsService,
+    private kpis: KpisService,
     @InjectQueue(SALES_HISTORY_QUEUE) private historyQueue: Queue<LoadHistoryJob>,
   ) {}
 
@@ -492,5 +501,96 @@ export class PlanningController {
   @Roles('admin')
   cancelPurchaseOrder(@Param('id') id: string) {
     return this.purchaseOrders.cancel(id);
+  }
+  // ── phase 4: events ────────────────────────────────────────────────────────
+
+  @Get('events')
+  @ApiOperation({ summary: 'Eventos de demanda: períodos con multiplicador sobre el pronóstico' })
+  listEvents() {
+    return this.events.list();
+  }
+
+  @Post('events')
+  @Roles('admin', 'supervisor')
+  createEvent(@Body() dto: CreateEventDto) {
+    return this.events.create(dto);
+  }
+
+  @Patch('events/:id')
+  @Roles('admin', 'supervisor')
+  updateEvent(@Param('id') id: string, @Body() dto: UpdateEventDto) {
+    return this.events.update(id, dto);
+  }
+
+  @Delete('events/:id')
+  @Roles('admin')
+  async removeEvent(@Param('id') id: string) {
+    await this.events.remove(id);
+    return { ok: true };
+  }
+
+  // ── phase 4: projects ──────────────────────────────────────────────────────
+
+  @Get('projects')
+  @ApiOperation({ summary: 'Pipeline de proyectos B2B con cobertura por línea' })
+  async listProjects() {
+    const [items, coverage] = await Promise.all([this.projects.list(), this.projects.coverage()]);
+    return { items, coverage };
+  }
+
+  @Post('projects')
+  @Roles('admin', 'supervisor')
+  createProject(@Body() dto: CreateProjectDto, @CurrentUser('userId') userId: string) {
+    return this.projects.create(dto, userId);
+  }
+
+  @Patch('projects/:id')
+  @Roles('admin', 'supervisor')
+  updateProject(@Param('id') id: string, @Body() dto: UpdateProjectDto) {
+    return this.projects.update(id, dto);
+  }
+
+  @Post('projects/:id/confirm')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Confirma: crea un picking que reserva las unidades del proyecto' })
+  confirmProject(@Param('id') id: string, @CurrentUser('userId') userId: string) {
+    return this.projects.confirm(id, userId);
+  }
+
+  @Post('projects/:id/deliver')
+  @Roles('admin', 'supervisor')
+  deliverProject(@Param('id') id: string) {
+    return this.projects.deliver(id);
+  }
+
+  @Post('projects/:id/cancel')
+  @Roles('admin', 'supervisor')
+  cancelProject(@Param('id') id: string) {
+    return this.projects.cancel(id);
+  }
+
+  // ── phase 4: accuracy, KPIs, alerts ────────────────────────────────────────
+
+  @Get('accuracy')
+  @ApiOperation({ summary: 'WAPE y sesgo por mes y grupo (abc | origin | category)' })
+  accuracyMetrics(@Query('groupBy') groupBy?: string) {
+    return this.accuracy.metrics(groupBy === 'origin' || groupBy === 'category' ? groupBy : 'abc');
+  }
+
+  @Post('accuracy/close')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Cierra a mano los meses vencidos (el job mensual lo hace el día 1)' })
+  closeMonths() {
+    return this.accuracy.closeMonths();
+  }
+
+  @Get('kpis')
+  kpisSummary() {
+    return this.kpis.kpis();
+  }
+
+  @Get('alerts')
+  alerts() {
+    return this.kpis.alerts();
   }
 }

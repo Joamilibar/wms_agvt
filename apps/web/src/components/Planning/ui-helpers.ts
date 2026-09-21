@@ -14,3 +14,8 @@ export const monthLabel = (m: string) => {
   const [y, mm] = m.split('-');
   return `${['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][Number(mm) - 1]} ${y.slice(2)}`;
 };
+/** Day of an ISO date stored at UTC midnight, without the timezone shifting it a day back. */
+export const fmtIsoDay = (iso: string) => {
+  const [y, m, d] = iso.slice(0, 10).split('-');
+  return `${d}-${m}-${y}`;
+};
