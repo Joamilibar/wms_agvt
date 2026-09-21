@@ -261,7 +261,8 @@ export class OrdersService {
           // A store restock or an internal production move is not a sale: the
           // units leave this warehouse but nothing was sold. Keeping them out
           // of SalesRecord keeps ABC and coverage honest.
-          if (order.destinationType === 'client') salesRows.push(...result.consumed.map(c => ({
+          // Orders from before the field existed have no destinationType: they were sales.
+          if ((order.destinationType ?? 'client') === 'client') salesRows.push(...result.consumed.map(c => ({
             timestamp: pickedAt,
             sku: item.sku,
             warehouse: tx.warehouse,

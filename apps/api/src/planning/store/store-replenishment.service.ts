@@ -239,7 +239,7 @@ export class StoreReplenishmentService {
     });
     await this.orders.startOrder(String(order._id), userId);
     t.status = 'approved';
-    t.pickingOrderId = order._id as Types.ObjectId;
+    t.pickingOrderId = order._id;
     t.pickingOrderNumber = order.orderId;
     t.approvedBy = new Types.ObjectId(userId);
     t.approvedAt = new Date();
