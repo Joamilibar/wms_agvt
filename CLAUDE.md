@@ -199,6 +199,29 @@ En consecuencia:
   usuario y el SKU. Si el WMS ve la recepción antes que BSale, hay que registrarla
   también allá.
 
+## Sabanería (consumo de tela y cotizador)
+
+`apps/api/src/planning/sheeting/`, controller propio `/api/planning/sheeting`,
+spec en `docs/sabaneria-consumo-spec.md`. La tela se compra por metro lineal de
+un rollo de ancho fijo, no por área: `nesting.ts` (puro) evalúa al hilo y
+contrahilo y falla con `FABRIC_TOO_NARROW` si no cabe; nunca redondea ni empalma.
+
+- La geometría es **datos**: cada panel es `Σ coef·var + const` (`geometry.ts`),
+  sin `eval`. Un modelo es una lista de bloques (`blocks.ts`) que se **compila al
+  guardar** y se persiste como `panels`; el cálculo nunca ejecuta bloques, así
+  que arreglar un bloque no cambia modelos ya congelados. Sin ramas por familia.
+- Crucero, como lo hace el taller: A×L incluye el marco (F 15 arriba y lados);
+  cada borde es UNA tira de 2(s+F+s) = 38 cm doblada en dos, con inglete
+  (lado + 2F); `s` = 2 cm en todo borde cosido y en la basta simple. Centro
+  `A − 2F + 2s × L − F + 2s`. El marco puede ir en otra tela (`fabricSlot`).
+- El ancho de rollo vive en `fabric_specs`, nunca en código. El $/ml sale del
+  lote que BSale valorizó (`costSyncedAt`); viejo = `stale`, sin costo = error.
+- Sin tarifa de taller (`workshop_rates`, por talla y calidad de tela) no hay
+  cotización: `NO_WORKSHOP_RATE`, nunca cero. La mano de obra no entra en la BOM.
+- `cuttingScrapPct` (merma de corte) es distinto de `scrapPct` (proceso).
+- `POST /quotes/:id/freeze` congela una cotización guardada como la siguiente
+  versión de `BomRecipe`; es idempotente (`bomRecipeId`).
+
 ## graphify
 
 This project has a graphify knowledge graph at graphify-out/.
