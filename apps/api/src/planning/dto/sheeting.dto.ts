@@ -166,3 +166,12 @@ export class QuoteDto {
 
   @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) @Max(500) cutBatchUnits?: number;
 }
+
+// ── saved quotes ─────────────────────────────────────────────────────────────
+
+export class SaveQuoteDto extends QuoteDto {
+  @ApiPropertyOptional({ description: 'SKU del producto terminado; necesario para congelar como receta' })
+  @IsOptional() @IsString() productSku?: string;
+
+  @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) notes?: string;
+}

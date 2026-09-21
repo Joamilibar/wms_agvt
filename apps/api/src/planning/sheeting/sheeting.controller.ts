@@ -6,7 +6,8 @@ import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { SheetingMastersService } from './sheeting-masters.service.js';
 import type { SheetingModel } from '../schemas/sheeting-model.schema.js';
-import { UpsertFabricDto, SaveModelDto, QuoteDto, UpsertRateDto, PreviewModelDto, DuplicateModelDto } from '../dto/sheeting.dto.js';
+import { UpsertFabricDto, SaveModelDto, QuoteDto, UpsertRateDto, PreviewModelDto, DuplicateModelDto, SaveQuoteDto } from '../dto/sheeting.dto.js';
+import { SheetingRecipesService } from './sheeting-recipes.service.js';
 import { blockCatalogue } from './blocks.js';
 import { evaluatePanels } from './geometry.js';
 import { getErrorDetails } from './errors.js';
@@ -22,7 +23,7 @@ import { SheetingCalcService } from './sheeting-calc.service.js';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('planning/sheeting')
 export class SheetingController {
-  constructor(private masters: SheetingMastersService, private calc: SheetingCalcService, private rates: WorkshopRatesService) {}
+  constructor(private masters: SheetingMastersService, private calc: SheetingCalcService, private rates: WorkshopRatesService, private recipes: SheetingRecipesService) {}
 
   // ── fabrics ────────────────────────────────────────────────────────────────
 
@@ -43,8 +44,8 @@ export class SheetingController {
   @Get('models')
   @ApiOperation({ summary: 'Modelos activos con su geometría compilada' })
   async models(@Query('all') all?: string) {
-    const items = await this.masters.models(all === 'true');
-    return items.map((m) => ({ ...m.toObject<SheetingModel>(), panelsText: this.masters.describePanels(m.panels) }));
+    const [items, usage] = await Promise.all([this.masters.models(all === 'true'), this.recipes.usage()]);
+    return items.map((m) => ({ ...m.toObject<SheetingModel>(), panelsText: this.masters.describePanels(m.panels), quotes: usage[m.code] ?? 0 }));
   }
 
   @Get('models/:code')
@@ -129,5 +130,30 @@ export class SheetingController {
   @ApiOperation({ summary: 'Calcula consumo y costo sin persistir. Idempotente; es lo que usa la pantalla mientras se tipea' })
   quote(@Body() dto: QuoteDto) {
     return this.calc.quote(dto);
+  }
+
+  @Post('quotes')
+  @Roles('admin', 'supervisor')
+  @ApiOperation({ summary: 'Guarda una cotización (se recalcula al guardar) con las versiones que usó' })
+  saveQuote(@Body() dto: SaveQuoteDto, @CurrentUser('userId') userId: string, @CurrentUser('email') email: string) {
+    return this.recipes.save(dto, userId ?? null, email ?? 'unknown');
+  }
+
+  @Get('quotes')
+  @ApiOperation({ summary: 'Historial de cotizaciones, filtrable' })
+  quotes(@Query('modelCode') modelCode?: string, @Query('productSku') productSku?: string, @Query('fabricSku') fabricSku?: string, @Query('frozen') frozen?: string, @Query('limit') limit?: string) {
+    return this.recipes.list({ modelCode, productSku, fabricSku, frozen: frozen === undefined ? undefined : frozen === 'true', limit: limit ? Number(limit) : undefined });
+  }
+
+  @Get('quotes/:id')
+  quoteById(@Param('id') id: string) {
+    return this.recipes.findById(id);
+  }
+
+  @Post('quotes/:id/freeze')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Congela la cotización como la siguiente versión de BomRecipe del producto (idempotente)' })
+  freeze(@Param('id') id: string, @CurrentUser('email') email: string) {
+    return this.recipes.freeze(id, email ?? 'unknown');
   }
 }

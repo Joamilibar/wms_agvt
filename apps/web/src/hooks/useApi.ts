@@ -811,3 +811,27 @@ export const useDuplicateSheetingModel = () => {
   });
 };
 export const useSheetingModelsAll = () => useQuery({ queryKey: ['sheeting', 'models', 'all'], queryFn: () => api.get('/planning/sheeting/models', { params: { all: 'true' } }).then(r => r.data as SheetingModel[]) });
+
+export interface SavedSheetingQuote {
+  _id: string; number: string; productSku: string | null; productName: string; modelCode: string; modelVersion: number; fabricSku: string; frameFabricSku: string | null;
+  input: SheetingQuoteInput; result: SheetingQuote; paramsVersion: number; costSource: 'bsale' | 'stale'; costSyncedAt: string | null;
+  bomRecipeId: string | null; bomRecipeVersion: number | null; setBy: string; notes: string; createdAt: string;
+}
+export const useSheetingQuotes = (params?: { modelCode?: string; productSku?: string; frozen?: boolean; limit?: number }) => useQuery({
+  queryKey: ['sheeting', 'quotes', params],
+  queryFn: () => api.get('/planning/sheeting/quotes', { params }).then(r => r.data as SavedSheetingQuote[]),
+});
+export const useSaveSheetingQuote = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SheetingQuoteInput & { productSku?: string; notes?: string }) => api.post('/planning/sheeting/quotes', data).then(r => r.data as SavedSheetingQuote),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sheeting', 'quotes'] }); qc.invalidateQueries({ queryKey: ['sheeting', 'models'] }); },
+  });
+};
+export const useFreezeSheetingQuote = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/planning/sheeting/quotes/${id}/freeze`).then(r => r.data as { recipeId: string; recipeVersion: number; created: boolean }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sheeting', 'quotes'] }); qc.invalidateQueries({ queryKey: ['planning', 'recipes'] }); },
+  });
+};

@@ -1,18 +1,21 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import { Link } from 'react-router';
 import { useAuthStore } from '../stores/auth.store';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  useFabrics, useSheetingModels, useSheetingQuote, usePlanningWarehouses,
-  type SheetingModel, type SheetingQuote, type SheetingQuoteError, type SheetingQuoteInput,
+  useFabrics, useSheetingModels, useSheetingQuote, usePlanningWarehouses, usePlanningItems, useSheetingQuotes, useSaveSheetingQuote, useFreezeSheetingQuote,
+  type SheetingModel, type SheetingQuote, type SheetingQuoteError, type SheetingQuoteInput, type SavedSheetingQuote,
 } from '../hooks/useApi';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { getErrorDetails, getErrorMessage } from '../lib/errors';
+import { confirmDialog } from '../lib/confirm';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Badge from '../components/ui/Badge';
-import { inputCls, selectCls, fmtClp } from '../components/Planning/ui-helpers';
+import { inputCls, selectCls, btnGhost, btnPrimary, fmtClp } from '../components/Planning/ui-helpers';
+import { TableShell, Empty } from '../components/Planning/ui';
 import { RollLayout } from '../components/Sheeting/RollLayout';
 
 const SIZES = ['Single', 'Twin', 'Full', 'Queen', 'King', 'SuperKing'] as const;
@@ -90,6 +93,30 @@ export default function Cotizador() {
   const debounced = useDebouncedValue(input, 350);
   const quote = useSheetingQuote(debounced);
   const details = quote.error ? getErrorDetails<SheetingQuoteError>(quote.error) : null;
+
+  // Saving recomputes server-side and keeps the versions used; freezing turns a saved quote into the product's BomRecipe.
+  const [productSku, setProductSku] = useState('');
+  const [saveNotes, setSaveNotes] = useState('');
+  const { data: catalog } = usePlanningItems({});
+  const saveQuote = useSaveSheetingQuote();
+  const freeze = useFreezeSheetingQuote();
+  const { data: saved } = useSheetingQuotes({ limit: 30 });
+  const productName = catalog?.find((i) => i.sku === productSku.trim())?.name;
+  const onSave = async () => {
+    if (!input) return;
+    try {
+      const q = await saveQuote.mutateAsync({ ...input, productSku: productSku.trim() || undefined, notes: saveNotes });
+      toast.success(`${q.number} guardada`);
+      setSaveNotes('');
+    } catch (e) { toast.error(getErrorMessage(e)); }
+  };
+  const onFreeze = async (q: SavedSheetingQuote) => {
+    if (!(await confirmDialog({ title: `Congelar ${q.number} como receta`, detail: `Se crea la siguiente versión de la receta de ${q.productName || q.productSku}: la tela en metros por unidad con la merma de corte, más los insumos. La mano de obra no entra en la BOM.`, confirmLabel: 'Congelar' }))) return;
+    try {
+      const r = await freeze.mutateAsync(q._id);
+      toast.success(r.created ? `Receta v${r.recipeVersion} creada` : `Ya estaba congelada como receta v${r.recipeVersion}`);
+    } catch (e) { toast.error(getErrorMessage(e)); }
+  };
 
   if (lm || lf) return <LoadingSpinner />;
 
@@ -172,8 +199,45 @@ export default function Cotizador() {
           {quote.error && <QuoteError message={getErrorMessage(quote.error)} details={details} fabrics={fabrics ?? []} />}
           {quote.data && !quote.error && <QuoteResult q={quote.data} stale={quote.isFetching} />}
           {!input && <p className="text-sm text-text-muted">Completa modelo, tela, medidas y taller para cotizar.</p>}
+
+          {quote.data && !quote.error && can('admin', 'supervisor') && (
+            <div className="bg-bg-secondary border border-border-primary rounded-xl p-4 space-y-2">
+              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Guardar cotización</h3>
+              <div className="flex flex-wrap items-center gap-2">
+                <input value={productSku} onChange={(e) => setProductSku(e.target.value)} list="sheeting-product-skus" className={`${inputCls} w-48 font-mono`} placeholder="SKU del producto" />
+                <datalist id="sheeting-product-skus">{(catalog ?? []).filter((i) => i.origin === 'national').slice(0, 800).map((i) => <option key={i.sku} value={i.sku}>{i.name}</option>)}</datalist>
+                <span className="text-xs text-text-secondary flex-1 min-w-[160px] truncate">{productName ?? (productSku ? <span className="text-brand-amber">SKU fuera de abastecimiento</span> : 'Necesario para congelar como receta')}</span>
+                <input value={saveNotes} onChange={(e) => setSaveNotes(e.target.value)} className={`${inputCls} w-64`} placeholder="Notas" />
+                <button onClick={onSave} disabled={saveQuote.isPending} className={btnPrimary}>Guardar</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {saved && saved.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-text-primary">Cotizaciones guardadas</h3>
+          <TableShell headers={['N°', 'Producto', 'Modelo', 'Tela', 'Medidas', 'ml/u', 'Costo/u', 'PVP neto', 'Costo tela', 'Receta', '']}>
+            {saved.length === 0 && <Empty colSpan={11} text="Sin cotizaciones guardadas" />}
+            {saved.map((q) => (
+              <tr key={q._id} className="border-b border-border-secondary">
+                <td className="px-3 py-2 font-mono text-xs text-brand-blue">{q.number}</td>
+                <td className="px-3 py-2 text-xs text-text-primary max-w-[220px] truncate" title={q.productName}>{q.productName || <span className="text-text-muted font-mono">{q.productSku ?? '—'}</span>}</td>
+                <td className="px-3 py-2 text-xs text-text-secondary">{q.modelCode} v{q.modelVersion}</td>
+                <td className="px-3 py-2 text-xs text-text-secondary max-w-[200px] truncate">{q.result.fabrics.map((f) => f.name).join(' + ')}</td>
+                <td className="px-3 py-2 text-xs text-text-secondary font-mono">{Object.entries(q.input.measures).map(([k, v]) => `${k}${v}`).join(' ')}</td>
+                <td className="px-3 py-2 text-xs text-text-secondary">{q.result.consumption.linearMetresPerUnit.toLocaleString('es-CL', { maximumFractionDigits: 2 })}</td>
+                <td className="px-3 py-2 text-xs text-text-primary">{fmtClp(q.result.cost.total)}</td>
+                <td className="px-3 py-2 text-xs text-text-secondary">{fmtClp(q.result.price.netPvp)}</td>
+                <td className="px-3 py-2"><Badge label={q.costSource === 'bsale' ? 'BSale' : 'Desactualizado'} variant={q.costSource === 'bsale' ? 'green' : 'amber'} /></td>
+                <td className="px-3 py-2 text-xs">{q.bomRecipeId ? <Badge label={`v${q.bomRecipeVersion}`} variant="blue" /> : <span className="text-text-muted">—</span>}</td>
+                <td className="px-3 py-2 text-right">{can('admin') && !q.bomRecipeId && q.productSku && <button onClick={() => onFreeze(q)} className={btnGhost} disabled={freeze.isPending}>Congelar como receta</button>}</td>
+              </tr>
+            ))}
+          </TableShell>
+        </div>
+      )}
     </div>
   );
 }
