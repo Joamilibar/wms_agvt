@@ -28,6 +28,8 @@ import { PlanningScheduler } from './phase4/scheduler.service.js';
 import { FabricSpec, FabricSpecSchema } from './schemas/fabric-spec.schema.js';
 import { SheetingModel, SheetingModelSchema } from './schemas/sheeting-model.schema.js';
 import { SheetingMastersService } from './sheeting/sheeting-masters.service.js';
+import { SheetingCalcService } from './sheeting/sheeting-calc.service.js';
+import { WorkshopRate, WorkshopRateSchema } from './schemas/workshop-rate.schema.js';
 import { SheetingController } from './sheeting/sheeting.controller.js';
 import { WarehousesService } from './masters/warehouses.service.js';
 import { SuppliersService } from './masters/suppliers.service.js';
@@ -69,6 +71,7 @@ import { PlanningController } from './planning.controller.js';
       { name: ForecastAccuracy.name, schema: ForecastAccuracySchema },
       { name: FabricSpec.name, schema: FabricSpecSchema },
       { name: SheetingModel.name, schema: SheetingModelSchema },
+      { name: WorkshopRate.name, schema: WorkshopRateSchema },
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
@@ -96,6 +99,7 @@ import { PlanningController } from './planning.controller.js';
     KpisService,
     PlanningScheduler,
     SheetingMastersService,
+    SheetingCalcService,
   ],
   exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService, DemandEventsService, ForecastAccuracyService, ProjectsService, KpisService],
 })

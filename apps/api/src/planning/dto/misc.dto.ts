@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, Min, IsIn, IsBoolean, IsArray, IsDateString, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsNumber, Min, Max, IsIn, IsBoolean, IsArray, IsDateString, IsObject } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { WAREHOUSE_ROLES, PLANNING_USES } from '../schemas/warehouse.schema.js';
 import type { WarehouseRole, PlanningUse } from '../schemas/warehouse.schema.js';
@@ -90,6 +90,13 @@ export class UpdateParamsDto {
   @IsOptional() @IsNumber() @Min(7) storeDemandWindowDays?: number;
   @IsOptional() @IsNumber() @Min(1) storeSplitDeliveryUnits?: number;
   @IsOptional() @IsNumber() @Min(0) scrapPct?: number;
+  @IsOptional() @IsNumber() @Min(0) @Max(1) cuttingScrapPct?: number;
+  @IsOptional() @IsNumber() @Min(0) defaultTuckCm?: number;
+  @IsOptional() @IsNumber() @Min(0) defaultSelvageCm?: number;
+  @IsOptional() @IsNumber() @Min(1) defaultCutBatchUnits?: number;
+  @IsOptional() @IsObject() marginByChannel?: Record<string, number>;
+  @IsOptional() @IsNumber() @Min(0) @Max(1) vatRate?: number;
+  @IsOptional() @IsNumber() @Min(1) fabricCostStaleDays?: number;
   @IsOptional() @IsString() changeNote?: string;
 }
 

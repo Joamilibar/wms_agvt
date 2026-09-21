@@ -14,7 +14,7 @@ export interface FabricInput {
 export interface ModelInput {
   code: string; name: string; family: SheetingModel['family']; vars?: Record<string, number>; panels: PanelSpec[];
   blocks?: SheetingModel['blocks']; hems?: SheetingModel['hems']; cutBatchUnits?: number; supplies?: { sku: string; name?: string; qty: number; uom: 'un' | 'kg' | 'm' }[];
-  validRange?: SheetingModel['validRange']; sampleVars?: Record<string, number>; notes?: string;
+  validRange?: SheetingModel['validRange']; sampleVars?: Record<string, number>; packagingClp?: number; freightClp?: number; notes?: string;
 }
 
 /**

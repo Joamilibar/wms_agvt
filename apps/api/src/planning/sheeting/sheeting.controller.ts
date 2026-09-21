@@ -6,7 +6,8 @@ import { Roles } from '../../common/decorators/roles.decorator.js';
 import { CurrentUser } from '../../common/decorators/current-user.decorator.js';
 import { SheetingMastersService } from './sheeting-masters.service.js';
 import type { SheetingModel } from '../schemas/sheeting-model.schema.js';
-import { UpsertFabricDto, SaveModelDto } from '../dto/sheeting.dto.js';
+import { UpsertFabricDto, SaveModelDto, QuoteDto } from '../dto/sheeting.dto.js';
+import { SheetingCalcService } from './sheeting-calc.service.js';
 
 /**
  * Sheeting consumption and quoting. Its own controller on purpose:
@@ -17,7 +18,7 @@ import { UpsertFabricDto, SaveModelDto } from '../dto/sheeting.dto.js';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('planning/sheeting')
 export class SheetingController {
-  constructor(private masters: SheetingMastersService) {}
+  constructor(private masters: SheetingMastersService, private calc: SheetingCalcService) {}
 
   // ── fabrics ────────────────────────────────────────────────────────────────
 
@@ -61,5 +62,13 @@ export class SheetingController {
   @ApiOperation({ summary: 'Carga las telas y los modelos de referencia (idempotente)' })
   seed(@CurrentUser('email') email: string) {
     return this.masters.seed(email ?? 'seed');
+  }
+
+  // ── quote ──────────────────────────────────────────────────────────────────
+
+  @Post('quote')
+  @ApiOperation({ summary: 'Calcula consumo y costo sin persistir. Idempotente; es lo que usa la pantalla mientras se tipea' })
+  quote(@Body() dto: QuoteDto) {
+    return this.calc.quote(dto);
   }
 }

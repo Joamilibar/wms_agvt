@@ -17,6 +17,8 @@ export interface ReferenceModel {
   hems: Hems;
   panels: PanelSpec[];
   cutBatchUnits: number;
+  packagingClp: number;
+  freightClp: number;
   validRange: Record<string, MeasureRange>;
   sampleVars: Record<string, number>;
   notes: string;
@@ -48,6 +50,8 @@ export const ENCIMERA_CRUCERO: ReferenceModel = {
     { role: 'centro', count: 1, width: addConst(dim({ A: 1 }), encimeraHem.widthCm), length: addConst(dim({ L: 1 }), encimeraHem.lengthCm), mitred45: false },
   ],
   cutBatchUnits: 20,
+  packagingClp: 2100, // sheet: 0.4668 × 4500 (Queen); varies ±40 by size
+  freightClp: 727, // Costos fijos 2023 J19
   validRange: { A: { min: 90, max: 400 }, L: { min: 200, max: 320 } },
   sampleVars: { A: 255, L: 290 },
   notes: 'Un panel: A + 8 (bastas laterales 4+4) × L + 19 (basta superior 15, inferior 4). Reproduce la hoja REV ADR. La aplicación de color del crucero (A×14 arriba, L×14 por lado) queda pendiente de decisión.',
@@ -75,6 +79,8 @@ export const BAJERA_ELASTICADA: ReferenceModel = {
     { role: 'unico', count: 1, width: dim({ A: 1, H: 2, T: 2, sw: 1 }), length: dim({ L: 1, H: 2, T: 2, sl: 1 }), mitred45: false },
   ],
   cutBatchUnits: 20,
+  packagingClp: 1710, // sheet: 0.38 × 4500 (Queen)
+  freightClp: 649, // Costos fijos 2023 J18
   validRange: { A: { min: 80, max: 220 }, L: { min: 180, max: 220 }, H: { min: 15, max: 50 } },
   sampleVars: { A: 155, L: 200, H: 35 },
   notes: 'Medidas del colchón. Ancho A + 2(H+T) + sw, largo L + 2(H+T) + sl. sw = 16 y sl = 0 reproducen la hoja (Costura + Merma 8+8 solo al ancho); T = 10 agarre. Pendiente confirmar con el taller si la caída 80/90 de la hoja es total o por lado.',

@@ -85,6 +85,13 @@ export class SheetingModel {
   @Prop({ type: [SchemaFactory.createForClass(ModelSupply)], default: [] })
   supplies!: ModelSupply[];
 
+  /** Packaging and freight per finished unit, CLP (from the costing sheet's per-family figures). */
+  @Prop({ default: 0, min: 0 })
+  packagingClp!: number;
+
+  @Prop({ default: 0, min: 0 })
+  freightClp!: number;
+
   /** Measures the model makes sense for, per input variable. */
   @Prop({ type: Object, default: {} })
   validRange!: Record<string, MeasureRange>;

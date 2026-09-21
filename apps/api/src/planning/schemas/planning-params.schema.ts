@@ -114,6 +114,33 @@ export class PlanningParams {
   @Prop({ default: 0.03 })
   scrapPct!: number;
 
+  // ── sheeting (sabanería) ───────────────────────────────────────────────────
+  /** Cutting waste on the metres bought. NOT `scrapPct` (process loss): mixing them counts twice. PENDING: measured value from the workshop. */
+  @Prop({ default: 0.03 })
+  cuttingScrapPct!: number;
+
+  /** Tuck under the mattress for fitted sheets. */
+  @Prop({ default: 10 })
+  defaultTuckCm!: number;
+
+  @Prop({ default: 1 })
+  defaultSelvageCm!: number;
+
+  /** Units laid together in one cut. PENDING: real batch per family (blocker 4). */
+  @Prop({ default: 20 })
+  defaultCutBatchUnits!: number;
+
+  /** Sale price = cost × factor, per channel. */
+  @Prop({ type: Object, default: { tienda: 3.0, hoteleria: 2.5 } })
+  marginByChannel!: Record<string, number>;
+
+  @Prop({ default: 0.19 })
+  vatRate!: number;
+
+  /** A fabric cost older than this is reported as `stale` on the quote. */
+  @Prop({ default: 45 })
+  fabricCostStaleDays!: number;
+
   @Prop({ default: '' })
   changedBy!: string;
 

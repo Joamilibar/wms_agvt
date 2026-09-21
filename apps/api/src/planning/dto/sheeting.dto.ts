@@ -82,5 +82,38 @@ export class SaveModelDto {
   @ApiPropertyOptional({ description: 'Medidas de muestra para validar y previsualizar' })
   @IsOptional() @IsObject() sampleVars?: Record<string, number>;
 
+  @ApiPropertyOptional({ description: 'Empaque por unidad, CLP' }) @IsOptional() @IsNumber() @Min(0) packagingClp?: number;
+  @ApiPropertyOptional({ description: 'Traslado por unidad, CLP' }) @IsOptional() @IsNumber() @Min(0) freightClp?: number;
+
   @ApiPropertyOptional() @IsOptional() @IsString() @MaxLength(1000) notes?: string;
+}
+
+// ── quote ────────────────────────────────────────────────────────────────────
+
+export class QuoteDto {
+  @ApiProperty({ example: 'ENCIMERA_CRUCERO' })
+  @IsString() @MinLength(1) modelCode!: string;
+
+  @ApiPropertyOptional({ description: 'Versión concreta; omitido = la activa' })
+  @IsOptional() @IsInt() @Min(1) modelVersion?: number;
+
+  @ApiProperty({ example: '63845371893523' })
+  @IsString() @MinLength(1) fabricSku!: string;
+
+  @ApiProperty({ example: { A: 255, L: 290 }, description: 'Medidas en cm: A ancho, L largo, H altura de colchón (bajera)' })
+  @IsObject() measures!: Record<string, number>;
+
+  @ApiProperty({ example: 20 })
+  @IsInt() @Min(1) @Max(100000) qty!: number;
+
+  @ApiProperty({ example: 'Taller Santa Cruz Los Lirios' })
+  @IsString() @MinLength(1) workshop!: string;
+
+  @ApiProperty({ example: 'tienda' })
+  @IsString() @MinLength(1) @MaxLength(40) channel!: string;
+
+  @ApiPropertyOptional({ example: 'Queen', description: 'Talla de la lista de precios del taller' })
+  @IsOptional() @IsString() @MaxLength(40) sizeLabel?: string;
+
+  @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) @Max(500) cutBatchUnits?: number;
 }
