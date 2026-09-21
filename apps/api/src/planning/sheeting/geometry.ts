@@ -92,7 +92,7 @@ export function normalizePanel(p: PanelSpec): PanelSpec {
 /** Human-readable `A − 2F1 + 8`, for error messages and the screen. */
 export function formatDimension(d: Dimension): string {
   const parts: string[] = [];
-  for (const t of normalizeDimension(d).terms) {
+  for (const t of addDimensions(d, { terms: [], const: 0 }).terms) {
     const abs = Math.abs(t.coef);
     const body = `${abs === 1 ? '' : trimNumber(abs)}${t.var}`;
     parts.push(parts.length === 0 ? (t.coef < 0 ? `−${body}` : body) : `${t.coef < 0 ? '−' : '+'} ${body}`);

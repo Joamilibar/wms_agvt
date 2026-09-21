@@ -25,6 +25,10 @@ import { ForecastAccuracyService } from './phase4/accuracy.service.js';
 import { ProjectsService } from './phase4/projects.service.js';
 import { KpisService } from './phase4/kpis.service.js';
 import { PlanningScheduler } from './phase4/scheduler.service.js';
+import { FabricSpec, FabricSpecSchema } from './schemas/fabric-spec.schema.js';
+import { SheetingModel, SheetingModelSchema } from './schemas/sheeting-model.schema.js';
+import { SheetingMastersService } from './sheeting/sheeting-masters.service.js';
+import { SheetingController } from './sheeting/sheeting.controller.js';
 import { WarehousesService } from './masters/warehouses.service.js';
 import { SuppliersService } from './masters/suppliers.service.js';
 import { PlanningItemsService } from './masters/planning-items.service.js';
@@ -63,6 +67,8 @@ import { PlanningController } from './planning.controller.js';
       { name: DemandEvent.name, schema: DemandEventSchema },
       { name: ProjectDemand.name, schema: ProjectDemandSchema },
       { name: ForecastAccuracy.name, schema: ForecastAccuracySchema },
+      { name: FabricSpec.name, schema: FabricSpecSchema },
+      { name: SheetingModel.name, schema: SheetingModelSchema },
       { name: StockLot.name, schema: StockLotSchema },
       { name: PackRecipe.name, schema: PackRecipeSchema },
     ]),
@@ -72,7 +78,7 @@ import { PlanningController } from './planning.controller.js';
     OrdersModule,
     StockModule,
   ],
-  controllers: [PlanningController],
+  controllers: [PlanningController, SheetingController],
   providers: [
     WarehousesService,
     SuppliersService,
@@ -89,6 +95,7 @@ import { PlanningController } from './planning.controller.js';
     ProjectsService,
     KpisService,
     PlanningScheduler,
+    SheetingMastersService,
   ],
   exports: [WarehousesService, SuppliersService, PlanningItemsService, PlanningParamsService, SalesHistoryService, PurchaseOrdersService, PlanningRunsService, StoreReplenishmentService, ProductionService, DemandEventsService, ForecastAccuracyService, ProjectsService, KpisService],
 })
