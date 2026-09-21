@@ -18,6 +18,7 @@ import Usuarios from './pages/Usuarios';
 import Packs from './pages/Packs';
 import Planificacion from './pages/Planificacion';
 import Cotizador from './pages/Cotizador';
+import ModelosSabaneria from './pages/ModelosSabaneria';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,14 @@ export default function App() {
               }
             />
             <Route path="/cotizador" element={<Cotizador />} />
+            <Route
+              path="/cotizador/modelos"
+              element={
+                <RoleRoute roles={['admin', 'supervisor']}>
+                  <ModelosSabaneria />
+                </RoleRoute>
+              }
+            />
             <Route path="/abc" element={<ABCAnalysis />} />
             <Route path="/cobertura" element={<Coverage />} />
             <Route path="/aging" element={<Aging />} />

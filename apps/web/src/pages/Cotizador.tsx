@@ -1,4 +1,6 @@
 import { useEffect, useMemo } from 'react';
+import { Link } from 'react-router';
+import { useAuthStore } from '../stores/auth.store';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -45,6 +47,7 @@ export default function Cotizador() {
   const { data: models, isLoading: lm } = useSheetingModels();
   const { data: fabrics, isLoading: lf } = useFabrics();
   const { data: warehouses } = usePlanningWarehouses();
+  const can = useAuthStore((s) => s.can);
   const workshops = useMemo(() => (warehouses ?? []).filter((w) => w.role === 'workshop' && w.isActive), [warehouses]);
 
   const { register, control, setValue, formState: { errors } } = useForm<Form>({
@@ -92,9 +95,13 @@ export default function Cotizador() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">Cotizador de sabanería</h1>
-        <p className="text-sm text-text-muted mt-1">Metros lineales, orientación del corte, merma y costo desglosado. La tela se cotiza como se compra: por metro de rollo, no por área.</p>
+      <div className="flex flex-wrap items-end gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Cotizador de sabanería</h1>
+          <p className="text-sm text-text-muted mt-1">Metros lineales, orientación del corte, merma y costo desglosado. La tela se cotiza como se compra: por metro de rollo, no por área.</p>
+        </div>
+        <span className="flex-1" />
+        {can('admin', 'supervisor') && <Link to="/cotizador/modelos" className="px-3 py-1.5 bg-bg-secondary border border-border-primary rounded-lg text-xs text-text-secondary hover:bg-bg-tertiary">Modelos y constructor</Link>}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">

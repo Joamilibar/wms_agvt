@@ -725,7 +725,7 @@ export interface SheetingDimension { terms: SheetingTerm[]; const: number }
 export interface SheetingPanel { role: string; count: number; width: SheetingDimension; length: SheetingDimension; mitred45: boolean; fabricSlot?: string }
 export interface SheetingModel {
   _id: string; code: string; name: string; family: 'encimera' | 'bajera' | 'funda' | 'cubreplumon' | 'otro'; version: number; isActive: boolean;
-  vars: Record<string, number>; panels: SheetingPanel[]; hems: Record<string, { cm: number; fold: 'simple' | 'doble' }>; cutBatchUnits: number;
+  vars: Record<string, number>; panels: SheetingPanel[]; blocks: BlockRef[]; setBy: string; updatedAt: string; hems: Record<string, { cm: number; fold: 'simple' | 'doble' }>; cutBatchUnits: number;
   packagingClp: number; freightClp: number; validRange: Record<string, { min: number; max: number }>; sampleVars: Record<string, number>; notes: string;
   panelsText: { role: string; count: number; width: string; length: string; mitred45: boolean }[];
 }
@@ -773,3 +773,41 @@ export const useSheetingQuote = (input: SheetingQuoteInput | null) => useQuery({
   placeholderData: (prev) => prev,
   queryFn: () => api.post('/planning/sheeting/quote', input).then(r => r.data as SheetingQuote),
 });
+export interface BlockParamSpec { name: string; type: 'number' | 'string' | 'boolean'; label: string; default?: number | string | boolean; unit?: string; hint?: string }
+export interface BlockDef { name: string; label: string; description: string; params: BlockParamSpec[] }
+export interface BlockRef { block: string; params: Record<string, number | string | boolean> }
+export interface SheetingModelInput {
+  code: string; name: string; family: SheetingModel['family']; blocks: BlockRef[]; vars?: Record<string, number>; hems?: SheetingModel['hems'];
+  cutBatchUnits?: number; supplies?: { sku: string; name?: string; qty: number; uom: 'un' | 'kg' | 'm' }[]; validRange?: SheetingModel['validRange'];
+  sampleVars?: Record<string, number>; packagingClp?: number; freightClp?: number; notes?: string;
+}
+export interface SheetingPreviewInput extends SheetingModelInput { fabricSku?: string; frameFabricSku?: string; measures?: Record<string, number>; workshop?: string; channel?: string; sizeLabel?: string }
+export interface GeometryProblem { role: string; axis: 'width' | 'length'; valueCm: number; expression: string; at?: Record<string, number> }
+export interface SheetingPreview {
+  panels: SheetingPanel[]; vars: Record<string, number>; panelsText: SheetingModel['panelsText']; problems: GeometryProblem[]; sample: Record<string, number>;
+  cut: { role: string; count: number; widthCm: number; lengthCm: number; mitred45: boolean; fabricSlot: string }[] | null;
+  quote: SheetingQuote | null; quoteError: (SheetingQuoteError & { message?: string }) | null;
+}
+export const useBlockCatalogue = () => useQuery({ queryKey: ['sheeting', 'blocks'], queryFn: () => api.get('/planning/sheeting/blocks').then(r => r.data as BlockDef[]) });
+export const useSheetingModelPreview = (input: SheetingPreviewInput | null) => useQuery({
+  queryKey: ['sheeting', 'preview', input],
+  enabled: !!input && input.blocks.length > 0,
+  retry: false,
+  placeholderData: (prev) => prev,
+  queryFn: () => api.post('/planning/sheeting/models/preview', input).then(r => r.data as SheetingPreview),
+});
+export const useSaveSheetingModel = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: SheetingModelInput) => api.post('/planning/sheeting/models', data).then(r => r.data as SheetingModel),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sheeting', 'models'] }); },
+  });
+};
+export const useDuplicateSheetingModel = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ code, newCode, name }: { code: string; newCode: string; name?: string }) => api.post(`/planning/sheeting/models/${encodeURIComponent(code)}/duplicate`, { code: newCode, name }).then(r => r.data as SheetingModel),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sheeting', 'models'] }); },
+  });
+};
+export const useSheetingModelsAll = () => useQuery({ queryKey: ['sheeting', 'models', 'all'], queryFn: () => api.get('/planning/sheeting/models', { params: { all: 'true' } }).then(r => r.data as SheetingModel[]) });

@@ -104,8 +104,9 @@ export class SheetingMastersService {
   /**
    * The geometry a model input describes: its blocks compiled (the normal
    * path from the screen) or its panels as given (hand-written references).
-   * Block variables (F, T, O…) are merged under the model's own `vars`; `s`
-   * defaults to the workshop's 2 cm per edge when the panels use it.
+   * Block variables (F, T, O…) win over the model's own `vars`, which only
+   * add what the blocks do not set; `s` defaults to the workshop's 2 cm per
+   * edge when the panels use it.
    */
   resolveGeometry(input: Pick<ModelInput, 'blocks' | 'panels' | 'vars'>): { panels: PanelSpec[]; vars: Record<string, number> } {
     let panels = input.panels ?? [];
@@ -114,7 +115,8 @@ export class SheetingMastersService {
       try {
         const compiled = compileBlocks(input.blocks as BlockRef[]);
         panels = compiled.panels;
-        vars = { ...compiled.vars, ...vars };
+        // The blocks own the variables they set (F, T, O…); the model's vars only add what they do not (s).
+        vars = { ...vars, ...compiled.vars };
       } catch (e) {
         throw new BadRequestException((e as Error).message);
       }
