@@ -222,6 +222,21 @@ contrahilo y falla con `FABRIC_TOO_NARROW` si no cabe; nunca redondea ni empalma
 - `POST /quotes/:id/freeze` congela una cotización guardada como la siguiente
   versión de `BomRecipe`; es idempotente (`bomRecipeId`).
 
+## En curso: producción por talleres
+
+Sin empezar. El contexto y las decisiones ya tomadas están en
+`docs/produccion-por-talleres-handoff.md` — leerlo antes de tocar el módulo.
+
+Lo esencial: el requisito no es un taller por producto sino una **ruta con
+etapas** (las almohadas duvet se llenan en SAPRU y se cierran en Los Lirios), y
+se acordó **una OP por etapa con traspaso real** del semiterminado. Queda
+bloqueado esperando el archivo de talleres por producto del usuario.
+
+Dos cosas que el handoff documenta y conviene no redescubrir: hoy no hay
+**ninguna receta activa**, así que la pestaña no puede emitir una sola OP; y el
+paso 6 del sync archiva todo lote que BSale no reporte, que es lo que le pasaría
+a un semiterminado sin SKU propio en BSale.
+
 ## graphify
 
 This project has a graphify knowledge graph at graphify-out/.
