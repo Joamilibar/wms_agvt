@@ -1,6 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+export const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const TOKEN_KEY = 'wms_token';
 export const REFRESH_KEY = 'wms_refresh';

@@ -6,9 +6,10 @@ import { HiOutlineRefresh, HiOutlineCheckCircle, HiOutlineExclamationCircle } fr
 import toast from 'react-hot-toast';
 import { confirmDialog } from '../lib/confirm';
 import { getErrorMessage } from '../lib/errors';
+import { API_URL } from '../lib/api';
 
 export default function BSaleConfig() {
-  const { data, isLoading } = useBsaleStatus();
+  const { data, isLoading, isError, error, refetch } = useBsaleStatus();
   const syncMutation = useSyncBsaleStock();
   const costsMutation = useSyncBsaleCosts();
   // M-07: the sync runs on a worker now; we hold the job id and poll it.
@@ -70,26 +71,50 @@ export default function BSaleConfig() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">Estado</span>
-            <Badge label={data?.configured ? 'Configurado' : 'No Configurado'} variant={data?.configured ? 'green' : 'amber'} />
+            <Badge
+              label={isError ? 'Sin conexión' : data?.configured ? 'Configurado' : 'No Configurado'}
+              variant={isError ? 'red' : data?.configured ? 'green' : 'amber'}
+            />
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">URL Base</span>
-            <span className="text-sm font-mono text-text-muted">{data?.baseUrl}</span>
+            <span className="text-sm font-mono text-text-muted">{data?.baseUrl ?? '—'}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">Última Sincronización</span>
-            <span className="text-sm text-text-muted">{data?.lastSync || 'Nunca'}</span>
+            <span className="text-sm text-text-muted">{isError ? '—' : data?.lastSync || 'Nunca'}</span>
           </div>
         </div>
 
-        {!data?.configured && (
+        {/* A failed request used to fall through to "Token no configurado": `data`
+            comes back undefined, so `!data?.configured` reads as "the API says
+            there is no token" when the API in fact never answered. A stack that
+            is simply not up then reads as a .env problem, and the .env is the
+            first place someone looks. The two states are now told apart, and
+            only the second one blames the token. */}
+        {isError ? (
+          <div className="mt-6 p-4 bg-brand-red/10 border border-brand-red/30 rounded-lg">
+            <p className="text-sm text-brand-red font-medium">No se pudo contactar la API</p>
+            <p className="text-xs text-text-muted mt-1">
+              El estado de la integración es desconocido: esto no dice nada sobre el token.
+              Verifique que la API esté corriendo en <code className="text-brand-blue">{API_URL}</code>.
+            </p>
+            <p className="text-xs text-text-muted mt-2 font-mono">{getErrorMessage(error)}</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-3 text-xs text-brand-blue hover:underline"
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : !data?.configured ? (
           <div className="mt-6 p-4 bg-brand-amber/10 border border-brand-amber/30 rounded-lg">
             <p className="text-sm text-brand-amber font-medium">Token no configurado</p>
             <p className="text-xs text-text-muted mt-1">
               Configure la variable de entorno <code className="text-brand-blue">BSALE_TOKEN</code> para habilitar la integración.
             </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Sync stock section */}

@@ -157,9 +157,14 @@ export const useAgingSummary = (warehouse?: string) => useQuery({
 });
 
 // BSale
+/** What `GET /bsale/status` answers. `configured` says the API holds a token — nothing about reachability. */
+export interface BsaleStatus { configured: boolean; baseUrl: string; lastSync: string | null }
 export const useBsaleStatus = () => useQuery({
   queryKey: ['bsale-status'],
-  queryFn: () => api.get('/bsale/status').then(r => r.data),
+  queryFn: () => api.get('/bsale/status').then(r => r.data as BsaleStatus),
+  // A failed call must stay distinguishable from `configured: false`; keeping
+  // the last good answer around would blur exactly that.
+  retry: 1,
 });
 
 export const useBsaleDocuments = (params?: { limit?: number; officeid?: string; number?: string }) => useQuery({
